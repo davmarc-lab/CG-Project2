@@ -20,7 +20,7 @@ object = ./Entity/Object.cpp
 objecth = ./Entity/Object.hpp
 enth = ./Entity/Entity.hpp
 icomh = ./Component/IComponent.hpp
-compth = ./Component/Transform.cpp
+compth = ./Component/Transform.hpp
 shader = ./Shader/Shader.cpp
 shaderh = ./Shader/Shader.hpp
 libh = Lib.hpp
@@ -39,17 +39,14 @@ opengl.o: main.cpp ${imageh} ${libh}
 	gcc -c ${FLAGS} main.cpp -o opengl.o
 ###---END---###
 
-main.exe: main.o window.o object.o transf.o glad.o
-	g++ ${FLAGS} -o main.exe main.o window.o object.o transf.o glad.o ${LIBS}
+main.exe: main.o window.o object.o glad.o
+	g++ ${FLAGS} -o main.exe main.o window.o object.o glad.o ${LIBS}
 
-main.o: main.cpp ${gladh} ${libh} ${enth}
+main.o: main.cpp ${gladh} ${libh} ${enth} ${compth} ${icomh}
 	gcc -c ${FLAGS} main.cpp -o main.o
 
 window.o: ${win} ${winh} ${libh} ${gladh}
 	gcc -c ${FLAGS} ${win} -o window.o
-
-transf.o: ${compth} ${icomh}
-	gcc -c ${FLAGS} ${compth} -o transf.o
 
 object.o: ${object} ${objecth} ${libh} ${enth}
 	gcc -c ${FLAGS} ${object} -o object.o

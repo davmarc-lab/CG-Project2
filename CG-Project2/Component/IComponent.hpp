@@ -1,6 +1,7 @@
 #pragma once
 
+#include <typeinfo>
 class IComponent {
     public:
-        virtual void update() = 0;
+        const char* getComponentClass() { return typeid(this).name(); }
 };

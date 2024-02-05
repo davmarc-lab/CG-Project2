@@ -1,11 +1,10 @@
+#include "Component/IComponent.hpp"
 #include "Entity/Entity.hpp"
 #include "Entity/Object.hpp"
 #include "Lib.hpp"
 #include "Window/Window.hpp"
 
-#include <cassert>
 #include <iostream>
-#include <typeinfo>
 
 #define PI 3.14159265358979323846
 #define GAME_NAME "Welcome 3D"
