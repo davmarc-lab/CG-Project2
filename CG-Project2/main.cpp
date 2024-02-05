@@ -3,7 +3,9 @@
 #include "Lib.hpp"
 #include "Window/Window.hpp"
 
+#include <cassert>
 #include <iostream>
+#include <typeinfo>
 
 #define PI 3.14159265358979323846
 #define GAME_NAME "Welcome 3D"
@@ -11,40 +13,43 @@
 const int WIDTH = 1812, HEIGHT = 1017;
 
 int main() {
-  Window window = Window(GAME_NAME, WIDTH, HEIGHT);
+    Window window = Window(GAME_NAME, WIDTH, HEIGHT);
 
-  Entity cube = Entity();
+    /* Window second = Window(GAME_NAME, WIDTH, HEIGHT); */
+    /* const std::type_info& gg = typeid(Window); */
+    /* cout << gg.name() << ", " << typeid(window).name() << endl; */
 
-  Object *obj = new Object(vec3(0), vec3(1), vec3(0));
+    Entity cube = Entity();
 
-  cout << obj->getId() << endl;
+    Object *obj = new Object(vec3(0), vec3(1), vec3(0));
 
-  // time variables */
-  float deltaTime = 0.0f;
-  float lastFrame = 0.0f;
+    cout << obj->getId() << endl;
 
-  // Start of window loop
-  while (!glfwWindowShouldClose(window.getWindow()))
-  {
-      // manage frames time
-      float currentFrame = glfwGetTime();
-      deltaTime = currentFrame - lastFrame;
-      lastFrame = currentFrame;
+    // time variables 
+    float deltaTime = 0.0f;
+    float lastFrame = 0.0f;
 
-      // input
-      window.processCloseInput();
+    // Start of window loop
+    while (!glfwWindowShouldClose(window.getWindow())) {
+        // manage frames time
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
-      // update game state
+        // input
+        window.processCloseInput();
 
-      // render
-      glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // update game state
 
-      // swap buffers and poll IO events
-      glfwSwapBuffers(window.getWindow());
-      glfwPollEvents();
-  }
+        // render
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  window.terminateWindow();
-  return 0;
+        // swap buffers and poll IO events
+        glfwSwapBuffers(window.getWindow());
+        glfwPollEvents();
+    }
+
+    window.terminateWindow();
+    return 0;
 }

@@ -5,7 +5,6 @@
 #include "Object.hpp"
 #include "../Buffers/VAO.hpp"
 #include "../Buffers/VBO.hpp"
-#include "../Component/TransformComponent.hpp"
 
 #include <unordered_map>
 
@@ -35,7 +34,7 @@ class Entity
         vector<Object> entities;
 
         // Components
-        unordered_map<unsigned int, TransformComponent> transformComponent;
+        /* unordered_map<unsigned int, TransformComponent> transformComponent; */
 
     public:
         ~Entity() {}
