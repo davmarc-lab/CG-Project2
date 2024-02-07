@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string.h>
 #include "../Lib.hpp"
 
 class Window

@@ -1,32 +1,48 @@
-#include "Component/IComponent.hpp"
-#include "Entity/Entity.hpp"
-#include "Entity/Object.hpp"
 #include "Lib.hpp"
 #include "Window/Window.hpp"
+#include "Game/Game.hpp"
 
-#include <iostream>
+#include "Entity/Entity.hpp"
+#include "Component/Transform.hpp"
+#include "System/TransformSystem.hpp"
 
-#define PI 3.14159265358979323846
 #define GAME_NAME "Welcome 3D"
 
 const int WIDTH = 1812, HEIGHT = 1017;
 
+Window window = Window(GAME_NAME, WIDTH, HEIGHT);
+Game game = Game(WIDTH, HEIGHT);
+
+// time variables 
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+/*
+ *  Callback function for keyboard user input
+ *  @param key keyboard key pressed
+ *  @param scancode scancode of the key
+ *  @param action GLFW action for keys
+ *  @param mods tells which special key where pressed
+ */
+void keyboard_input_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    game.processInput(key, action, deltaTime);
+}
+
 int main() {
-    Window window = Window(GAME_NAME, WIDTH, HEIGHT);
 
-    /* Window second = Window(GAME_NAME, WIDTH, HEIGHT); */
-    /* const std::type_info& gg = typeid(Window); */
-    /* cout << gg.name() << ", " << typeid(window).name() << endl; */
+    /* Entity ent; */
+    /* Transform comp(vec3(25, 500, 1000), vec3(1), vec3(90, -90, 0)); */
 
-    Entity cube = Entity();
+    /* ent.addComponent<Transform>(comp); */
+    /* TransformSystem system = TransformSystem(); */
+    /* system.addEntity(&ent); */
+    /* system.update(); */
 
-    Object *obj = new Object(vec3(0), vec3(1), vec3(0));
+    /* ent.getComponent<Transform>()->setPosition(vec3(0, 0, 0)); */
+    /* system.update(); */
 
-    cout << obj->getId() << endl;
-
-    // time variables 
-    float deltaTime = 0.0f;
-    float lastFrame = 0.0f;
+    // initialize game entities
+    game.init();
 
     // Start of window loop
     while (!glfwWindowShouldClose(window.getWindow())) {
@@ -39,6 +55,7 @@ int main() {
         window.processCloseInput();
 
         // update game state
+        glfwSetKeyCallback(window.getWindow(), keyboard_input_callback);
 
         // render
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
