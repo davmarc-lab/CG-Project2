@@ -19,6 +19,7 @@ float lastFrame = 0.0f;
 
 /*
  *  Callback function for keyboard user input
+ *
  *  @param key keyboard key pressed
  *  @param scancode scancode of the key
  *  @param action GLFW action for keys
@@ -40,32 +41,32 @@ int main() {
 
     /* ent.getComponent<Transform>()->setPosition(vec3(0, 0, 0)); */
     /* system.update(); */
-
+    
     // initialize game entities
     game.init();
 
-    // Start of window loop
-    while (!glfwWindowShouldClose(window.getWindow())) {
-        // manage frames time
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+    /* // Start of window loop */
+    /* while (!glfwWindowShouldClose(window.getWindow())) { */
+    /*     // manage frames time */
+    /*     float currentFrame = glfwGetTime(); */
+    /*     deltaTime = currentFrame - lastFrame; */
+    /*     lastFrame = currentFrame; */
 
-        // input
-        window.processCloseInput();
+    /*     // input */
+    /*     window.processCloseInput(); */
 
-        // update game state
-        glfwSetKeyCallback(window.getWindow(), keyboard_input_callback);
+    /*     // update game state */
+    /*     glfwSetKeyCallback(window.getWindow(), keyboard_input_callback); */
 
-        // render
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    /*     // render */
+    /*     glClearColor(0.4f, 0.4f, 0.4f, 1.0f); */
+    /*     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
 
-        // swap buffers and poll IO events
-        glfwSwapBuffers(window.getWindow());
-        glfwPollEvents();
-    }
+    /*     // swap buffers and poll IO events */
+    /*     glfwSwapBuffers(window.getWindow()); */
+    /*     glfwPollEvents(); */
+    /* } */
 
-    window.terminateWindow();
+    /* window.terminateWindow(); */
     return 0;
 }

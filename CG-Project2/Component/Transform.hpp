@@ -75,8 +75,6 @@ class Transform : public IComponent {
 
             this->model = this->model * translate * scale * rotation;
 
-            cout << to_string(this->info.position) << endl;
-
             // implementig rotation using quaternions
         }
 

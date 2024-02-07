@@ -22,11 +22,13 @@ class Game {
     public:
         Game() {}
 
-        Game(const int width, const int height);
+        Game(const int width, const int height) : resolution(ivec2(width, height)) {}
 
         void init();
 
         void processInput(int key, int mode, float dt);
+
+        void update(float dt);
 
         ~Game() = default;
 };

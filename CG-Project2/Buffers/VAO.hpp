@@ -2,8 +2,7 @@
 
 #include "../Lib.hpp"
 
-class VAO
-{
+class VAO {
     private:
         GLuint id;
 
@@ -12,16 +11,12 @@ class VAO
         ~VAO() {}
 
         /* Empty constructor. */
-        VAO()
-        {
-            glGenVertexArrays(1, &this->id);
-        }
+        VAO() { glGenVertexArrays(1, &this->id); }
 
         /*
          * This method bind the buffer and retrives its id.
          */
-        GLuint bind() 
-        { 
+        GLuint bind() {
             glBindVertexArray(this->id);
             return this->id;
         }

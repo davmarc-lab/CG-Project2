@@ -2,38 +2,36 @@
 
 #include "../Lib.hpp"
 
-class VBO
-{
+class VBO {
     private:
         GLuint id;
+        GLenum bufferType;
+        GLenum bufferUsage;
 
     public:
-        ~VBO()
-        {
-            this->destrory();
-        }
-
-        VBO(const void* data, const unsigned int size)
-        {
-            this->bind();
-            glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-        }
+        ~VBO() { this->destrory(); }
 
         VBO() {}
 
-        GLuint bind()
-        {
-            glBindBuffer(GL_ARRAY_BUFFER, this->id);
+        VBO(GLenum bufferType, GLenum bufferUsage) : bufferType(bufferType), bufferUsage(bufferUsage) {
+            glGenBuffers(1, &this->id);
+        }
 
+        GLuint bind() {
+            glBindBuffer(this->bufferType, this->id);
             return this->id;
         }
 
-        void unbind() { glBindBuffer(GL_ARRAY_BUFFER, 0); }
+        void unbind() { glBindBuffer(this->bufferType, 0); }
 
-        void bindAttribPosition(const GLuint pos, const int start, const int end, const int stride, const void* offset)
-        {
+        void bindAttribPosition(const int pos, const int start, const int end, const int stride, const void *offset) {
             glVertexAttribPointer(start, end, GL_FLOAT, GL_FALSE, stride, offset);
             glEnableVertexAttribArray(pos);
+        }
+
+        void bufferData(unsigned int size, void *data) {
+            this->bind();
+            glBufferData(this->bufferType, size, data, this->bufferUsage);
         }
 
         void destrory() { glDeleteBuffers(1, &this->id); }

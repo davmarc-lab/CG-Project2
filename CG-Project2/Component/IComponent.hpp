@@ -1,6 +1,7 @@
 #pragma once
 
 #include <typeinfo>
+
 class IComponent {
     public:
         virtual ~IComponent() = default;
