@@ -84,5 +84,7 @@ class Transform : public IComponent {
 
         const vec3 getScale() { return this->info.scale; }
 
+        mat4 getModelMatrix() { return this->model; }
+
         /* const vec3 getRotation() { return this->info.rotation; } */
 };

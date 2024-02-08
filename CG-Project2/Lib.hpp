@@ -1,6 +1,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "include/glad/glad.h"
-#include <GLFW/glfw3.h>
+#include "include/GLFW/glfw3.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/matrix_transform.hpp>

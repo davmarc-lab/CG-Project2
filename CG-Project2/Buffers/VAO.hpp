@@ -26,6 +26,8 @@ class VAO {
          */
         void unbind() { glBindVertexArray(0); }
 
+        GLuint getId() { return this->id; }
+
         /*
          * This method destrory the current buffer.
          */

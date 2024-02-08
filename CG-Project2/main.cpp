@@ -45,28 +45,30 @@ int main() {
     // initialize game entities
     game.init();
 
-    /* // Start of window loop */
-    /* while (!glfwWindowShouldClose(window.getWindow())) { */
-    /*     // manage frames time */
-    /*     float currentFrame = glfwGetTime(); */
-    /*     deltaTime = currentFrame - lastFrame; */
-    /*     lastFrame = currentFrame; */
 
-    /*     // input */
-    /*     window.processCloseInput(); */
+    // Start of window loop
+    while (!glfwWindowShouldClose(window.getWindow())) {
+        // manage frames time
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
-    /*     // update game state */
-    /*     glfwSetKeyCallback(window.getWindow(), keyboard_input_callback); */
+        // input
+        window.processCloseInput();
+        glfwSetKeyCallback(window.getWindow(), keyboard_input_callback);
 
-    /*     // render */
-    /*     glClearColor(0.4f, 0.4f, 0.4f, 1.0f); */
-    /*     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
+        // update game state
+        game.update(deltaTime);
 
-    /*     // swap buffers and poll IO events */
-    /*     glfwSwapBuffers(window.getWindow()); */
-    /*     glfwPollEvents(); */
-    /* } */
+        // render
+        glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    /* window.terminateWindow(); */
+        // swap buffers and poll IO events
+        glfwSwapBuffers(window.getWindow());
+        glfwPollEvents();
+    }
+
+    window.terminateWindow();
     return 0;
 }

@@ -9,8 +9,8 @@
 
 class World {
     private:
-        VAO vao;
         unsigned int currentId = 0;
+        VAO vao;
         std::unordered_map<unsigned int, Entity> entities;
 
     public:
@@ -26,7 +26,11 @@ class World {
             this->currentId++;
         }
 
+        GLuint getId() { return this->vao.getId(); }
+
         std::unordered_map<unsigned int, Entity> getEntities() { return this->entities; }
+
+        Entity getEntityById(const unsigned int id) { return this->entities.find(id)->second; }
 
         ~World() = default;
 };
