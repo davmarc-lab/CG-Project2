@@ -3,8 +3,8 @@
 #include "../Lib.hpp"
 
 #include "../Color/Color.hpp"
-#include "../Text/Text.hpp"
 #include "../Shader/Shader.hpp"
+#include "../Text/Text.hpp"
 
 struct Buffers {
     GLuint vao;
@@ -30,12 +30,13 @@ struct Colors {
 };
 
 struct Render {
-    Shader shader = Shader("./resources/shaders/menuVertexShader.glsl", "./resources/shaders/menuFragmentShader.glsl");
+    Shader shader = Shader("./resources/shaders/menuVertexShader.glsl",
+                           "./resources/shaders/menuFragmentShader.glsl");
     mat4 projection = mat4(1.0f);
 };
 
 struct Addon {
-    vector<Text*> labels;
+    vector<Text *> labels;
 };
 
 class Component {
@@ -52,14 +53,14 @@ public:
         this->render.shader.setMat4("projection", textProjection);
     }
 
-    Component(vector<vec3> vertex, vector<vec4> colors) 
-        : coords( { vertex, colors } ) {
+    Component(vector<vec3> vertex, vector<vec4> colors)
+    : coords({vertex, colors}) {
         this->render.shader.use();
         this->render.shader.setMat4("projection", textProjection);
     }
 
-    Component(vector<vec3> vertex, vector<vec4> colors, vec3 pos, vec3 scale) 
-        : coords( { vertex, colors } ), model( { pos, scale } ) {
+    Component(vector<vec3> vertex, vector<vec4> colors, vec3 pos, vec3 scale)
+    : coords({vertex, colors}), model({pos, scale}) {
         this->render.shader.use();
         this->render.shader.setMat4("projection", textProjection);
     }
@@ -78,8 +79,7 @@ public:
 
     inline mat4 getModelMatrix() {
         const mat4 base = mat4(1.0f);
-        this->model.model = base *
-            translate(base, this->model.position) *
+        this->model.model = base * translate(base, this->model.position) *
             scale(base, this->model.scale);
         return this->model.model;
     }
@@ -107,16 +107,24 @@ public:
     }
 
     /*
+    * This method takes all labels of a Component and re-center them.
+    */
+    inline void refreshLabelCenter() {
+        for (const auto elem : this->addons.labels) {
+            auto center = this->getPosition();
+            vec3 textSize = vec3(elem->getTotalWidth(), elem->getTotalHeight(), 0);
+
+            elem->setPosition(abs(center - vec3(textSize.x / 2, textSize.y / 2, 0)));
+        }
+    }
+
+    /*
      * This method add a Text to a Component in the center.
      * You can modify the position of the Text after adding.
-    */
-    inline void addLabel(Text* text) {
-        auto center = this->getPosition();
-        vec3 textSize = vec3(text->getTotalWidth(), text->getTotalHeight(), 0);
-
-        text->setPosition(abs(center - vec3(textSize.x / 2, textSize.y / 2, 0)));
-
+     */
+    inline void addLabel(Text *text) {
         this->addons.labels.push_back(text);
+        this->refreshLabelCenter();
     }
 
     virtual void createVertexArray() = 0;

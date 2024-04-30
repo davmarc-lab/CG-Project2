@@ -339,7 +339,7 @@ obj/Debug/main.o: main.cpp /usr/include/stdc-predef.h Color/Color.hpp \
  /usr/include/c++/13.2.1/bits/stl_vector.h \
  /usr/include/c++/13.2.1/bits/stl_bvector.h \
  /usr/include/c++/13.2.1/bits/vector.tcc Menu/Menu.hpp Menu/Component.hpp \
- Menu/../Text/Text.hpp Menu/../Text/../Shader/Shader.hpp \
+ Menu/../Shader/Shader.hpp Menu/../Text/Text.hpp \
  /usr/include/c++/13.2.1/map /usr/include/c++/13.2.1/bits/stl_tree.h \
  /usr/include/c++/13.2.1/ext/aligned_buffer.h \
  /usr/include/c++/13.2.1/bits/node_handle.h \
@@ -357,7 +357,7 @@ obj/Debug/main.o: main.cpp /usr/include/stdc-predef.h Color/Color.hpp \
  /usr/include/freetype/ftimage.h /usr/include/freetype/fterrors.h \
  /usr/include/freetype/ftmoderr.h /usr/include/freetype/fterrdef.h \
  Menu/StartMenu.hpp Menu/ButtonComponent.hpp Menu/OptionPane.hpp \
- Game/Game.hpp Game/../Window/Window.hpp Menu/RectComponent.hpp
+ Game/Game.hpp Game/../Window/Window.hpp
 /usr/include/stdc-predef.h:
 Color/Color.hpp:
 Color/../Lib.hpp:
@@ -795,8 +795,8 @@ Color/../include/glad/../KHR/khrplatform.h:
 /usr/include/c++/13.2.1/bits/vector.tcc:
 Menu/Menu.hpp:
 Menu/Component.hpp:
+Menu/../Shader/Shader.hpp:
 Menu/../Text/Text.hpp:
-Menu/../Text/../Shader/Shader.hpp:
 /usr/include/c++/13.2.1/map:
 /usr/include/c++/13.2.1/bits/stl_tree.h:
 /usr/include/c++/13.2.1/ext/aligned_buffer.h:
@@ -826,4 +826,3 @@ Menu/ButtonComponent.hpp:
 Menu/OptionPane.hpp:
 Game/Game.hpp:
 Game/../Window/Window.hpp:
-Menu/RectComponent.hpp:

@@ -26,7 +26,7 @@ public:
     OptionPane() {
         this->backButton->setScale(vec3(50, 30, 0));
         this->backButton->createVertexArray();
-        this->switchLight->setScale(vec3(100, 20, 0));
+        this->switchLight->setScale(vec3(150, 20, 0));
         this->switchLight->createVertexArray();
 
         this->buttons.push_back(this->backButton);
@@ -46,6 +46,7 @@ public:
             return true;
         } else if (this->switchLight->isMouseColliding(pos)) {
             this->switchModel();
+            this->switchLight->refreshLabelCenter();
         }
         return false;
     }

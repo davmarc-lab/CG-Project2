@@ -4,9 +4,6 @@
 #include "Menu/StartMenu.hpp"
 #include "Game/Game.hpp"
 #include "Menu/ButtonComponent.hpp"
-#include "Menu/Component.hpp"
-#include "Menu/RectComponent.hpp"
-#include "Text/Text.hpp"
 #include "Window/Window.hpp"
 
 #define GAME_NAME "3D Project"
