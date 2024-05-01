@@ -9,6 +9,7 @@
 #include "../Shape/Cube.hpp"
 #include "../Scene/Scene.hpp"
 #include "../Chunk/Chunk.hpp"
+#include "../Shape/Model.hpp"
 
 Game::Game(unsigned int width, unsigned int height)
 {
@@ -24,7 +25,8 @@ mat4 projection;
 Scene scene;
 Camera camera = Camera();
 Cubemap* skybox = new Cubemap();
-Shader cubeShader, skyboxShader;
+Model* bag;
+Shader cubeShader, modelShader, skyboxShader;
 
 struct Mouse
 {
@@ -59,9 +61,15 @@ void Game::init(Window* window)
     projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
     scene = Scene(projection);
 
+    camera.moveCamera(vec3(0, 0, 2));
+
     cubeShader = Shader("./resources/shaders/vertexShader.glsl", "./resources/shaders/fragmentShader.glsl");
     cubeShader.use();
     cubeShader.setMat4("projection", projection);
+
+    modelShader = Shader("./resources/shaders/modelVertexShader.glsl", "./resources/shaders/modelFragmentShader.glsl");
+    modelShader.use();
+    modelShader.setMat4("projection", projection);
 
     skyboxShader = Shader("./resources/shaders/vertexShaderSkybox.glsl", "./resources/shaders/fragmentShaderSkybox.glsl");
     skyboxShader.use();
@@ -70,7 +78,7 @@ void Game::init(Window* window)
 
     skybox->createVertexArray();
 
-    camera.moveCamera(vec3(0, 0, 2));
+    bag = new Model("./resources/models/backpack/backpack.obj", Flip::VERTICALLY);
 
     // sets the mouse callback function
     glfwSetInputMode(window->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -122,6 +130,14 @@ void Game::update(float deltaTime)
 {
     cubeShader.use();
     cubeShader.setMat4("view", camera.getViewMatrix());
+
+    modelShader.use();
+    modelShader.setMat4("view", camera.getViewMatrix());
+    auto model = mat4(1.f);
+    model = translate(model, vec3(2, 2, 2));
+    model = scale(model, vec3(0.2));
+    modelShader.setMat4("model", model);
+
     // sending variables to skybox shader
     skyboxShader.use();
     skyboxShader.setMat4("view", mat4(mat3(camera.getViewMatrix())));
@@ -138,6 +154,10 @@ void Game::render()
     Chunk chunk = Chunk(0);
     chunk.generateChunk();
     chunk.drawChunk(cubeShader);
+
+    modelShader.use();
+    bag->draw(modelShader);
+
 }
 
 void Game::clear()
