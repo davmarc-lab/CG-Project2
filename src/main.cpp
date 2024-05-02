@@ -1,9 +1,9 @@
 ﻿#include "Color/Color.hpp"
+#include "Game/Game.hpp"
 #include "Lib.hpp"
+#include "Menu/ButtonComponent.hpp"
 #include "Menu/Menu.hpp"
 #include "Menu/StartMenu.hpp"
-#include "Game/Game.hpp"
-#include "Menu/ButtonComponent.hpp"
 #include "Window/Window.hpp"
 #include <GLFW/glfw3.h>
 
@@ -11,10 +11,11 @@
 
 int main() {
     Window window = Window(GAME_NAME, WIDTH, HEIGHT);
-    Menu* menu = new StartMenu(window.getWindow());
+    Menu *menu = new StartMenu(window.getWindow());
     // Initialize all game object and window
 
-    ButtonComponent* c = new ButtonComponent(vec3(310, 310, 0), color::WHITE, "Options", 40, color::BLUE);
+    ButtonComponent *c = new ButtonComponent(vec3(310, 310, 0), color::WHITE,
+                                             "Options", 40, color::BLUE);
     c->setPosition(vec3(310, 310, 0));
     c->setScale(vec3(100, 30, 0));
     c->createVertexArray();
@@ -23,9 +24,9 @@ int main() {
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
-    while(!glfwWindowShouldClose(window.getWindow())
-        && !(menu->getState() == MenuState::PLAY 
-        || menu->getState() == MenuState::EXIT)) {
+    while (!glfwWindowShouldClose(window.getWindow()) &&
+           !(menu->getState() == MenuState::PLAY ||
+             menu->getState() == MenuState::EXIT)) {
 
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -62,9 +63,13 @@ int main() {
 
     // Let's play
 
-
     // enable depth test for 3D
     window.enableGL(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+    glStencilOp(GL_ZERO, GL_KEEP, GL_REPLACE);
     // Start of game loop
 
     Game game = Game(WIDTH, HEIGHT);
@@ -75,6 +80,9 @@ int main() {
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+
+        glClearColor(1.f, 1.f, 1.f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         // input
         window.processCloseInput();
@@ -89,8 +97,6 @@ int main() {
         y = HEIGHT - y; */
 
         // render
-        glClearColor(0.f, 0.f, 0.f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         game.render();
 
         // swap buffers and poll IO events

@@ -103,6 +103,7 @@ void Cube::draw(Shader shader)
 
     glBindVertexArray(this->vao);
     glDrawArrays(GL_TRIANGLES, 0, this->vertex.size());
+    glBindVertexArray(0);
 }
 
 void Cube::clearShape()

@@ -19,9 +19,9 @@ Game::Game(unsigned int width, unsigned int height) {
 Scene scene;
 Camera camera = Camera();
 Cubemap *skybox = new Cubemap();
-Cube *cube;
+Cube *cube, *tmp;
 Model *bag;
-Shader cubeShader, modelShader, skyboxShader;
+Shader cubeShader, modelShader, skyboxShader, outlineShader;
 Crosshair *c;
 
 struct Mouse {
@@ -59,7 +59,19 @@ void Game::init(Window *window) {
     cubeShader.use();
     cubeShader.setMat4("projection", projection);
 
+    Texture texture =
+        Texture("resources/textures/web-dirt.png", Cube().getTextureCoords());
+    texture.createTexture();
+
     cube = new Cube(color::RED);
+    cube->createVertexArray();
+    cube->attachTexture(texture);
+    cube->transformMesh(vec3(0), vec3(0.3), vec3(0), 0);
+
+    tmp = new Cube(color::RED);
+    tmp->createVertexArray();
+    tmp->attachTexture(texture);
+    tmp->transformMesh(vec3(0), vec3(0.31), vec3(0), 0);
 
     modelShader = Shader("./resources/shaders/modelVertexShader.glsl",
                          "./resources/shaders/modelFragmentShader.glsl");
@@ -71,6 +83,11 @@ void Game::init(Window *window) {
     skyboxShader.use();
     skyboxShader.setMat4("projection", projection);
     skyboxShader.setInt("skybox", 0);
+
+    outlineShader = Shader("./resources/shaders/vertexShader.glsl",
+                           "./resources/shaders/outlineShader.glsl");
+    outlineShader.use();
+    outlineShader.setMat4("projection", projection);
 
     skybox->createVertexArray();
 
@@ -132,6 +149,9 @@ void Game::update(float deltaTime) {
     cubeShader.use();
     cubeShader.setMat4("view", camera.getViewMatrix());
 
+    outlineShader.use();
+    outlineShader.setMat4("view", camera.getViewMatrix());
+
     /* modelShader.use();
     modelShader.setMat4("view", camera.getViewMatrix());
     auto model = mat4(1.f);
@@ -148,17 +168,27 @@ void Game::render() {
     // draw the game scene
 
     // draw the skybox
+    glStencilMask(0x00);
     skyboxShader.use();
     skybox->draw(skyboxShader);
+
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilMask(0xFF);
     cubeShader.use();
-    Chunk chunk = Chunk(0);
-    chunk.generateChunk();
-    chunk.drawChunk(cubeShader);
+    cube->draw(cubeShader);
+
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilMask(0x00);
+    outlineShader.use();
+    tmp->draw(outlineShader);
+    glStencilMask(0xFF);
+    glStencilFunc(GL_ALWAYS, 0, 0xFF);
+    glEnable(GL_DEPTH_TEST);
 
     /*   modelShader.use();
         bag->draw(modelShader); */
-
     c->drawCrosshair(camera.getViewMatrix());
+    // use border shader and draw again
 }
 
 void Game::clear() { scene.clear(); }

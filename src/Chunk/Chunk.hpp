@@ -3,7 +3,7 @@
 #include "../Shape/Shape3D.hpp"
 #include "../Shape/Cube.hpp"
 
-#define NUM_BLOCKS 1
+#define NUM_BLOCKS 5
 
 class Chunk {
 private:
