@@ -20,7 +20,7 @@ Scene scene;
 Camera camera = Camera();
 Cubemap *skybox = new Cubemap();
 Cube *cube, *tmp;
-Model *bag;
+Model *bean;
 Shader cubeShader, modelShader, skyboxShader, outlineShader;
 Crosshair *c;
 
@@ -66,12 +66,16 @@ void Game::init(Window *window) {
     cube = new Cube(color::RED);
     cube->createVertexArray();
     cube->attachTexture(texture);
-    cube->transformMesh(vec3(0), vec3(0.3), vec3(0), 0);
+    cube->transformMesh(vec3(0), vec3(BLOCK_DIM), vec3(0), 0);
+
+    printVec3(camera.getCameraPosition() * vec3(1));
+
+    cube->isColliding(camera.getCameraPosition() * vec3(-1), camera.getCameraPosition() * vec3(1));
 
     tmp = new Cube(color::RED);
     tmp->createVertexArray();
     tmp->attachTexture(texture);
-    tmp->transformMesh(vec3(0), vec3(0.31), vec3(0), 0);
+    tmp->transformMesh(vec3(0), vec3(BLOCK_DIM + OUTLINE_DIM), vec3(0), 0);
 
     modelShader = Shader("./resources/shaders/modelVertexShader.glsl",
                          "./resources/shaders/modelFragmentShader.glsl");
@@ -90,6 +94,9 @@ void Game::init(Window *window) {
     outlineShader.setMat4("projection", projection);
 
     skybox->createVertexArray();
+
+    // Troll
+    // bean = new Model("./resources/models/bean/bean.obj");
 
     // bag = new Model("./resources/models/backpack/backpack.obj",
     // Flip::VERTICALLY);
@@ -145,6 +152,11 @@ void Game::processInput(float deltaTime, Window window) {
     }
 }
 
+void checkCameraCollision() {
+    for (const auto elem: scene.getSceneElements()) {
+    }
+}
+
 void Game::update(float deltaTime) {
     cubeShader.use();
     cubeShader.setMat4("view", camera.getViewMatrix());
@@ -152,23 +164,26 @@ void Game::update(float deltaTime) {
     outlineShader.use();
     outlineShader.setMat4("view", camera.getViewMatrix());
 
-    /* modelShader.use();
+/*     modelShader.use();
     modelShader.setMat4("view", camera.getViewMatrix());
     auto model = mat4(1.f);
-    model = translate(model, vec3(2, 2, 2));
-    model = scale(model, vec3(0.2));
+    model = translate(model, vec3(0, 0, 2));
+    model = scale(model, vec3(0.1));
     modelShader.setMat4("model", model); */
 
     // sending variables to skybox shader
     skyboxShader.use();
     skyboxShader.setMat4("view", mat4(mat3(camera.getViewMatrix())));
+
+    checkCameraCollision();
+    printVec3(camera.getCameraPosition());
+    cout << cube->isColliding(vec3(-BLOCK_DIM) * camera.getCameraPosition(), vec3(BLOCK_DIM) * camera.getCameraPosition()) << endl;
 }
 
 void Game::render() {
     // draw the game scene
 
     // draw the skybox
-    glStencilMask(0x00);
     skyboxShader.use();
     skybox->draw(skyboxShader);
 
@@ -183,7 +198,9 @@ void Game::render() {
     tmp->draw(outlineShader);
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 0, 0xFF);
-    glEnable(GL_DEPTH_TEST);
+
+    /* modelShader.use();
+    bean->draw(modelShader); */
 
     /*   modelShader.use();
         bag->draw(modelShader); */
