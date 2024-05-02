@@ -29,3 +29,5 @@ inline void printMat4(mat4 mat) {
 const float WIDTH = 1600.f, HEIGHT = 900.f;
 
 const mat4 textProjection = ortho(0.f, WIDTH, 0.f, HEIGHT);
+
+const mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);

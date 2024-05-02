@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Lib.hpp"
 #include "../include/texture/stb_image.hpp"
 #include "Mesh.hpp"
 

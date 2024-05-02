@@ -18,7 +18,6 @@ public:
     Cube() {
         buildCube();
         this->setVertexNum(this->vertex.size());
-
     }
 
     Cube(Color color);
@@ -28,4 +27,6 @@ public:
     virtual void draw(Shader shader) override;
 
     virtual void clearShape() override;
+
+    ~Cube() = default;
 };

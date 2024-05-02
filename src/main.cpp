@@ -5,6 +5,7 @@
 #include "Game/Game.hpp"
 #include "Menu/ButtonComponent.hpp"
 #include "Window/Window.hpp"
+#include <GLFW/glfw3.h>
 
 #define GAME_NAME "3D Project"
 
@@ -88,7 +89,7 @@ int main() {
         y = HEIGHT - y; */
 
         // render
-        glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+        glClearColor(0.f, 0.f, 0.f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         game.render();
 
