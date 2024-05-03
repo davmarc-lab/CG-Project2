@@ -52,7 +52,7 @@ void mouseMovementCallback(GLFWwindow *window, double xposIn, double yposIn) {
 void Game::init(Window *window) {
     scene = Scene(projection);
 
-    camera.moveCamera(vec3(0, 0, 2));
+    camera.moveCamera(vec3(0, 0, 0));
 
     cubeShader = Shader("./resources/shaders/vertexShader.glsl",
                         "./resources/shaders/fragmentShader.glsl");
@@ -174,7 +174,8 @@ void Game::update(float deltaTime) {
     skyboxShader.setMat4("view", mat4(mat3(camera.getViewMatrix())));
 
     checkCameraCollision();
-    printVec3(camera.getCameraPosition());
+    cout << "CAMERA POS" << endl;
+    printVec3(camera.getCameraPosition() + vec3(0.1));
     cout << cube->isColliding(camera.getCameraPosition() - vec3(0.1), camera.getCameraPosition() + vec3(0.1)) << endl;
 }
 

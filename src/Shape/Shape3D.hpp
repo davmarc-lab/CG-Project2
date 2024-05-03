@@ -12,7 +12,7 @@
  * using VAO, geometry and color VBO, mid and other color, modellation matrix.
  */
 class Shape3D {
-public:
+  public:
     /* ---Fields--- */
 
     // Standard VAO buffer.
@@ -166,16 +166,16 @@ public:
         vec3 bot = this->getMinVertex();
         vec3 top = this->getMaxVertex();
 
-        bool botCollisionX = bot.x <= botPoint.x && top.x >= botPoint.x;
-        bool botCollisionY = bot.y <= botPoint.y && top.y >= botPoint.y;
-        bool botCollisionZ = bot.z <= botPoint.z && top.z >= botPoint.z;
+        bool botCollisionX = bot.x <= topPoint.x && top.x >= botPoint.x;
+        bool botCollisionY = bot.y <= topPoint.y && top.y >= botPoint.y;
+        bool botCollisionZ = bot.z <= topPoint.z && top.z >= botPoint.z;
 
-        // BOOOOOOOH
-        bool topCollisionX = bot.x <= topPoint.x && top.x >= topPoint.x;
-        bool topCollisionY = bot.y <= topPoint.y && top.y >= topPoint.y;
-        bool topCollisionZ = bot.z <= topPoint.z && top.z >= topPoint.z;
-        return (botCollisionX && botCollisionY && botCollisionZ) ||
-            (topCollisionX && topCollisionY && topCollisionZ);
+        bool topCollisionX = bot.x <= topPoint.x && top.x >= botPoint.x;
+        bool topCollisionY = bot.y <= topPoint.y && top.y >= botPoint.y;
+        bool topCollisionZ = bot.z <= topPoint.z && top.z >= botPoint.z;
+
+        return (botCollisionX && botCollisionY && botCollisionZ) &&
+               (topCollisionX && topCollisionY && topCollisionZ);
     }
 
     void setDestroyed() { this->isDestroyed = true; }
