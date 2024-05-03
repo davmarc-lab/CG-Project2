@@ -12,7 +12,7 @@
  * using VAO, geometry and color VBO, mid and other color, modellation matrix.
  */
 class Shape3D {
-  public:
+public:
     /* ---Fields--- */
 
     // Standard VAO buffer.
@@ -39,6 +39,9 @@ class Shape3D {
     Color midColor;
     // Transform the model matrix.
     Transform transform;
+
+    vec3 position;
+
     // Texture object.
     Texture texture;
     // Number of vertex of the shape.
@@ -105,8 +108,13 @@ class Shape3D {
     // This metod sets the model matrix.
     void setModelMatrix(mat4 model) { this->transform.setModelMatrix(model); }
 
+    void setPosition(vec3 pos) { this->position = pos; }
+
+    vec3 getPosition() { return this->position; }
+
     void transformMesh(vec3 translateVector, vec3 scaleVector, vec3 rotateAxis,
                        float rotationValue) {
+        this->setPosition(translateVector);
         this->transform.applyTransofrmation(translateVector, scaleVector,
                                             rotateAxis, rotationValue);
     }
@@ -142,7 +150,7 @@ class Shape3D {
                 point.z = p.z;
             }
         }
-        return vec4(point, 1) * this->getModelMatrix();
+        return this->getModelMatrix() * vec4(point, 1);
     }
 
     inline vec3 getMaxVertex() {
@@ -158,7 +166,7 @@ class Shape3D {
                 point.z = p.z;
             }
         }
-        return vec4(point, 1) * this->getModelMatrix();
+        return this->getModelMatrix() * vec4(point, 1);
     }
     bool checkCollision(Shape3D *shape) { return false; }
 
@@ -175,7 +183,7 @@ class Shape3D {
         bool topCollisionZ = bot.z <= topPoint.z && top.z >= botPoint.z;
 
         return (botCollisionX && botCollisionY && botCollisionZ) &&
-               (topCollisionX && topCollisionY && topCollisionZ);
+        (topCollisionX && topCollisionY && topCollisionZ);
     }
 
     void setDestroyed() { this->isDestroyed = true; }

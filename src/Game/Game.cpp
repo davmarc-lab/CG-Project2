@@ -7,6 +7,7 @@
 #include "../Shape/Model.hpp"
 #include "../Window/Crosshair.hpp"
 #include "../Window/Window.hpp"
+#include <GLFW/glfw3.h>
 
 Game::Game(unsigned int width, unsigned int height) {
     this->state = GAME_NONE;
@@ -19,10 +20,12 @@ Game::Game(unsigned int width, unsigned int height) {
 Scene scene;
 Camera camera = Camera();
 Cubemap *skybox = new Cubemap();
-Cube *cube, *tmp;
+Shape3D *cube, *tmp;
 Model *bean;
 Shader cubeShader, modelShader, skyboxShader, outlineShader;
 Crosshair *c;
+
+int lockMovement;
 
 struct Mouse {
     bool firstMouse = true;
@@ -67,8 +70,6 @@ void Game::init(Window *window) {
     cube->createVertexArray();
     cube->attachTexture(texture);
     cube->transformMesh(vec3(0), vec3(BLOCK_DIM), vec3(0), 0);
-
-    printVec3(camera.getCameraPosition() * vec3(1));
 
     tmp = new Cube(color::RED);
     tmp->createVertexArray();
@@ -115,43 +116,60 @@ void Game::init(Window *window) {
     this->state = GAME_ACTIVE;
 }
 
+void lockKey(int key) {
+    if (cube->isColliding(camera.getCameraPosition() + vec3(-0.1),
+                          camera.getCameraPosition() + vec3(0.1))) {
+        lockMovement = key;
+    }
+}
+
 void Game::processInput(float deltaTime, Window window) {
     // camera input
+
     float cameraVelocity = camera.getCameraVelocity() * deltaTime;
     if (glfwGetKey(window.getWindow(), GLFW_KEY_W) == GLFW_PRESS) {
-        auto pos = camera.getCameraPosition() +
-                   cameraVelocity * camera.getCameraFront();
-        camera.moveCamera(pos);
+        lockKey(GLFW_KEY_W);
+        if (lockMovement != GLFW_KEY_W) {
+            auto pos = camera.getCameraPosition() +
+                       cameraVelocity * camera.getCameraFront();
+            camera.moveCamera(pos);
+            lockMovement = GLFW_FALSE;
+        }
     }
     if (glfwGetKey(window.getWindow(), GLFW_KEY_S) == GLFW_PRESS) {
         auto pos = camera.getCameraPosition() -
                    cameraVelocity * camera.getCameraFront();
         camera.moveCamera(pos);
+        lockMovement = GLFW_FALSE;
     }
     if (glfwGetKey(window.getWindow(), GLFW_KEY_A) == GLFW_PRESS) {
         auto pos = camera.getCameraPosition() -
                    cameraVelocity * camera.getCameraRight();
         camera.moveCamera(pos);
+        lockMovement = GLFW_FALSE;
     }
     if (glfwGetKey(window.getWindow(), GLFW_KEY_D) == GLFW_PRESS) {
         auto pos = camera.getCameraPosition() +
                    cameraVelocity * camera.getCameraRight();
         camera.moveCamera(pos);
+        lockMovement = GLFW_FALSE;
     }
     if (glfwGetKey(window.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS) {
         auto pos =
             camera.getCameraPosition() + cameraVelocity * camera.getCameraUp();
         camera.moveCamera(pos);
+        lockMovement = GLFW_FALSE;
     }
     if (glfwGetKey(window.getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         auto pos =
             camera.getCameraPosition() - cameraVelocity * camera.getCameraUp();
         camera.moveCamera(pos);
+        lockMovement = GLFW_FALSE;
     }
 }
 
 void checkCameraCollision() {
-    for (const auto elem: scene.getSceneElements()) {
+    for (const auto elem : scene.getSceneElements()) {
     }
 }
 
@@ -162,21 +180,18 @@ void Game::update(float deltaTime) {
     outlineShader.use();
     outlineShader.setMat4("view", camera.getViewMatrix());
 
-/*     modelShader.use();
-    modelShader.setMat4("view", camera.getViewMatrix());
-    auto model = mat4(1.f);
-    model = translate(model, vec3(0, 0, 2));
-    model = scale(model, vec3(0.1));
-    modelShader.setMat4("model", model); */
+    /*     modelShader.use();
+        modelShader.setMat4("view", camera.getViewMatrix());
+        auto model = mat4(1.f);
+        model = translate(model, vec3(0, 0, 2));
+        model = scale(model, vec3(0.1));
+        modelShader.setMat4("model", model); */
 
     // sending variables to skybox shader
     skyboxShader.use();
     skyboxShader.setMat4("view", mat4(mat3(camera.getViewMatrix())));
 
     checkCameraCollision();
-    cout << "CAMERA POS" << endl;
-    printVec3(camera.getCameraPosition() + vec3(0.1));
-    cout << cube->isColliding(camera.getCameraPosition() - vec3(0.1), camera.getCameraPosition() + vec3(0.1)) << endl;
 }
 
 void Game::render() {
