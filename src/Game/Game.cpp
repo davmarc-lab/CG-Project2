@@ -70,8 +70,6 @@ void Game::init(Window *window) {
 
     printVec3(camera.getCameraPosition() * vec3(1));
 
-    cube->isColliding(camera.getCameraPosition() * vec3(-1), camera.getCameraPosition() * vec3(1));
-
     tmp = new Cube(color::RED);
     tmp->createVertexArray();
     tmp->attachTexture(texture);
@@ -177,7 +175,7 @@ void Game::update(float deltaTime) {
 
     checkCameraCollision();
     printVec3(camera.getCameraPosition());
-    cout << cube->isColliding(vec3(-BLOCK_DIM) * camera.getCameraPosition(), vec3(BLOCK_DIM) * camera.getCameraPosition()) << endl;
+    cout << cube->isColliding(camera.getCameraPosition() - vec3(0.1), camera.getCameraPosition() + vec3(0.1)) << endl;
 }
 
 void Game::render() {

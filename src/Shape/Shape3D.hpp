@@ -162,15 +162,20 @@ public:
     }
     bool checkCollision(Shape3D *shape) { return false; }
 
-    inline bool isColliding(vec3 botLeft, vec3 topRight) {
+    inline bool isColliding(vec3 botPoint, vec3 topPoint) {
         vec3 bot = this->getMinVertex();
         vec3 top = this->getMaxVertex();
-        return botLeft.x <= top.x &&
-            topRight.x >= bot.x &&
-            botLeft.y <= top.y &&
-            topRight.y >= bot.y &&
-            botLeft.z <= top.z &&
-            topRight.z >= bot.z;
+
+        bool botCollisionX = bot.x <= botPoint.x && top.x >= botPoint.x;
+        bool botCollisionY = bot.y <= botPoint.y && top.y >= botPoint.y;
+        bool botCollisionZ = bot.z <= botPoint.z && top.z >= botPoint.z;
+
+        // BOOOOOOOH
+        bool topCollisionX = bot.x <= topPoint.x && top.x >= topPoint.x;
+        bool topCollisionY = bot.y <= topPoint.y && top.y >= topPoint.y;
+        bool topCollisionZ = bot.z <= topPoint.z && top.z >= topPoint.z;
+        return (botCollisionX && botCollisionY && botCollisionZ) ||
+            (topCollisionX && topCollisionY && topCollisionZ);
     }
 
     void setDestroyed() { this->isDestroyed = true; }
