@@ -1,3 +1,4 @@
-bin
-obj
-*.make
+packages
+packages.config
+.vs
+

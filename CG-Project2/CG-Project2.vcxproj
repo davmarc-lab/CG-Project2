@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{304ed5d9-9861-458b-9efc-17ed369a2f88}</ProjectGuid>
+    <RootNamespace>CGProject2</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)CG-Project2\dependencies\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)CG-Project2\dependencies\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)CG-Project2\dependencies\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)CG-Project2\dependencies\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Application\Application.cpp" />
+    <ClCompile Include="Camera\Camera.cpp" />
+    <ClCompile Include="dependencies\include\imgui-file-dialog\ImGuiFileDialog.cpp" />
+    <ClCompile Include="dependencies\include\imgui\imgui.cpp" />
+    <ClCompile Include="dependencies\include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="dependencies\include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="dependencies\include\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="dependencies\include\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="dependencies\include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="dependencies\include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Entity\Cube.cpp" />
+    <ClCompile Include="Entity\Cubemap.cpp" />
+    <ClCompile Include="Entity\Plane.cpp" />
+    <ClCompile Include="Entity\Sphere.cpp" />
+    <ClCompile Include="Entity\Textures\Texture.cpp" />
+    <ClCompile Include="Game\Game.cpp" />
+    <ClCompile Include="Game\IntroState.cpp" />
+    <ClCompile Include="Game\OptionState.cpp" />
+    <ClCompile Include="Game\PlayState.cpp" />
+    <ClCompile Include="glad.c" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Scene\Scene.cpp" />
+    <ClCompile Include="Shader\Shader.cpp" />
+    <ClCompile Include="Text\Text.cpp" />
+    <ClCompile Include="Window\Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Application\Application.hpp" />
+    <ClInclude Include="Camera\Camera.hpp" />
+    <ClInclude Include="Color\Color.hpp" />
+    <ClInclude Include="dependencies\include\glad\glad.h" />
+    <ClInclude Include="dependencies\include\GLFW\glfw3.h" />
+    <ClInclude Include="dependencies\include\GLFW\glfw3native.h" />
+    <ClInclude Include="dependencies\include\imgui-file-dialog\dirent\dirent.h" />
+    <ClInclude Include="dependencies\include\imgui-file-dialog\ImGuiFileDialog.h" />
+    <ClInclude Include="dependencies\include\imgui-file-dialog\ImGuiFileDialogConfig.h" />
+    <ClInclude Include="dependencies\include\imgui\imconfig.h" />
+    <ClInclude Include="dependencies\include\imgui\imgui.h" />
+    <ClInclude Include="dependencies\include\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="dependencies\include\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="dependencies\include\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="dependencies\include\imgui\imgui_internal.h" />
+    <ClInclude Include="dependencies\include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="dependencies\include\imgui\imstb_textedit.h" />
+    <ClInclude Include="dependencies\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="dependencies\include\KHR\khrplatform.h" />
+    <ClInclude Include="Entity\Collider\Collider.hpp" />
+    <ClInclude Include="Entity\Collider\Collision.hpp" />
+    <ClInclude Include="Entity\Collider\CubeCollider.hpp" />
+    <ClInclude Include="Entity\Collider\SphereCollider.hpp" />
+    <ClInclude Include="Entity\Cube.hpp" />
+    <ClInclude Include="Entity\Cubemap.hpp" />
+    <ClInclude Include="Entity\Entity.hpp" />
+    <ClInclude Include="Entity\Plane.hpp" />
+    <ClInclude Include="Entity\Sphere.hpp" />
+    <ClInclude Include="Entity\Textures\Texture.hpp" />
+    <ClInclude Include="Entity\Transform\Transform.hpp" />
+    <ClInclude Include="Game\Game.hpp" />
+    <ClInclude Include="Game\GameState.hpp" />
+    <ClInclude Include="Game\IntroState.hpp" />
+    <ClInclude Include="Game\OptionState.hpp" />
+    <ClInclude Include="Game\PlayState.hpp" />
+    <ClInclude Include="Lib.hpp" />
+    <ClInclude Include="LibCustomGui.hpp" />
+    <ClInclude Include="Menu\ButtonComponent.hpp" />
+    <ClInclude Include="Menu\Component.hpp" />
+    <ClInclude Include="Menu\IGEntity.hpp" />
+    <ClInclude Include="Menu\IGMenu.hpp" />
+    <ClInclude Include="Menu\IGMode.hpp" />
+    <ClInclude Include="Menu\OptionPane.hpp" />
+    <ClInclude Include="Menu\RectComponent.hpp" />
+    <ClInclude Include="Scene\Scene.hpp" />
+    <ClInclude Include="Shader\Shader.hpp" />
+    <ClInclude Include="Text\Text.hpp" />
+    <ClInclude Include="Window\Crosshair.hpp" />
+    <ClInclude Include="Window\Window.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="dependencies\lib\glfw3.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\glm.1.0.1\build\native\glm.targets" Condition="Exists('..\packages\glm.1.0.1\build\native\glm.targets')" />
+    <Import Project="..\packages\freetype2.2.6.0.1\build\native\freetype2.targets" Condition="Exists('..\packages\freetype2.2.6.0.1\build\native\freetype2.targets')" />
+    <Import Project="..\packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets" Condition="Exists('..\packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets')" />
+    <Import Project="..\packages\Assimp.3.0.0\build\native\Assimp.targets" Condition="Exists('..\packages\Assimp.3.0.0\build\native\Assimp.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Questo progetto fa riferimento a uno o più pacchetti NuGet che non sono presenti in questo computer. Usare lo strumento di ripristino dei pacchetti NuGet per scaricarli. Per altre informazioni, vedere http://go.microsoft.com/fwlink/?LinkID=322105. Il file mancante è {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\glm.1.0.1\build\native\glm.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glm.1.0.1\build\native\glm.targets'))" />
+    <Error Condition="!Exists('..\packages\freetype2.2.6.0.1\build\native\freetype2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freetype2.2.6.0.1\build\native\freetype2.targets'))" />
+    <Error Condition="!Exists('..\packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\Assimp.3.0.0\build\native\Assimp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Assimp.3.0.0\build\native\Assimp.targets'))" />
+  </Target>
+</Project>

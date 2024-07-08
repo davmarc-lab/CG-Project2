@@ -1,0 +1,12 @@
+﻿  PlayState.cpp
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Cube.hpp(16,49): warning C4267: '=': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(67,38): warning C4305: 'argomento': troncamento da 'double' a 'float'
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(70,38): warning C4305: 'argomento': troncamento da 'double' a 'float'
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(73,38): warning C4305: 'argomento': troncamento da 'double' a 'float'
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(84,47): warning C4305: 'argomento': troncamento da 'double' a 'float'
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(86,47): warning C4305: 'argomento': troncamento da 'double' a 'float'
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(88,47): warning C4305: 'argomento': troncamento da 'double' a 'float'
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(103,37): warning C4305: 'argomento': troncamento da 'double' a 'float'
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(104,37): warning C4305: 'argomento': troncamento da 'double' a 'float'
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(105,37): warning C4305: 'argomento': troncamento da 'double' a 'float'
+  CG-Project2.vcxproj -> E:\FILES\Università\TerzoAnno\CG-Project2\x64\Debug\CG-Project2.exe
