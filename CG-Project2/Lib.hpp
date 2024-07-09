@@ -4,8 +4,13 @@
 #include <vector>
 #define GLM_ENABLE_EXPERIMENTAL
 
+#ifdef _WIN32
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#else
+#include "dependencies/include/glad/glad.h"
+#include "dependencies/include/GLFW/glfw3.h"
+#endif
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_access.hpp>

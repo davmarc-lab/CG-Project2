@@ -22,7 +22,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef _WIN32
 #include <glad/glad.h>
+#else
+#include "dependencies/include/glad/glad.h"
+#endif /* ifdef _WIN32 */
 
 void _pre_call_callback_default_gl(const char *name, void *funcptr, int len_args, ...) {
     (void) name;

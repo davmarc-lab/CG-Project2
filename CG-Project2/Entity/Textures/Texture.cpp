@@ -4,7 +4,11 @@
 
 // texture header file
 #define STB_IMAGE_IMPLEMENTATION
+#ifdef _WIN32
 #include <texture/stb_image.hpp>
+#else
+#include "../../dependencies/include/texture/stb_image.hpp"
+#endif
 
 Texture::Texture(const char *path) : path(path) {
     this->data = stbi_load(path, &this->width, &this->height, &this->channelsNumber, 0);

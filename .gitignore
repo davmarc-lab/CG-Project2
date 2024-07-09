@@ -1,4 +1,5 @@
 packages
 packages.config
 .vs
-
+bin
+CG-Project2/obj

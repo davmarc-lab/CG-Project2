@@ -1,6 +1,11 @@
 #include "Cubemap.hpp"
 
+#ifdef _WIN32
 #include <texture/stb_image.hpp>
+#else
+#include "../dependencies/include/texture/stb_image.hpp"
+#endif
+
 
 float skyboxVertices[] = {
     // positions
