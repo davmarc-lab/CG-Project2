@@ -7,6 +7,10 @@
 #include "IGMenu.hpp"
 
 #include <vector>
+#ifdef _WIN32
+#include <string>
+#include <sstream>
+#endif
 
 class IGEntity : public IGMenu {
 

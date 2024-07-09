@@ -5,8 +5,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 #ifdef _WIN32
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #else
 #include "dependencies/include/glad/glad.h"
 #include "dependencies/include/GLFW/glfw3.h"
