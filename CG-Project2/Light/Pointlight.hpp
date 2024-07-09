@@ -30,5 +30,5 @@ public:
 
     virtual void sendDataToShader(Shader shader) override;
 
-    ~PointLight();
+    ~PointLight() = default;
 };

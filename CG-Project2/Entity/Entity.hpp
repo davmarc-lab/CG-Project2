@@ -6,6 +6,7 @@
 #include "Textures/Texture.hpp"
 #include "Transform/Transform.hpp"
 #include "Collider/Collider.hpp"
+#include "Material/Material.hpp"
 
 class Entity {
 public:
@@ -17,6 +18,8 @@ public:
     Transform transform;
 
     Texture texture;
+
+    Material material;
 
     Physic physics;
     bool m_static = false;
@@ -149,6 +152,10 @@ public:
 
         glBindVertexArray(0);
     }
+
+    inline Material getMaterial() { return this->material; }
+
+    inline void setMaterial(Material material) { this->material = material; }
 
     virtual void createVertexArray() = 0;
 

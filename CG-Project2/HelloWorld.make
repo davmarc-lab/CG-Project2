@@ -69,6 +69,7 @@ OBJECTS := \
 	$(OBJDIR)/Camera.o \
 	$(OBJDIR)/Cube.o \
 	$(OBJDIR)/Cubemap.o \
+	$(OBJDIR)/Material.o \
 	$(OBJDIR)/Plane.o \
 	$(OBJDIR)/Sphere.o \
 	$(OBJDIR)/Texture.o \
@@ -159,6 +160,9 @@ $(OBJDIR)/Cube.o: Entity/Cube.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Cubemap.o: Entity/Cubemap.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/Material.o: Entity/Material/Material.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Plane.o: Entity/Plane.cpp

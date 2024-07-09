@@ -26,7 +26,7 @@ PlaneEntity *plane;
 Cubemap *skybox;
 Shader cubeShader, planeShader, skyboxShader;
 
-Light* point;
+PointLight* point;
 Shader lightShader;
 
 Scene obj_scene;
@@ -42,7 +42,7 @@ void PlayState::init() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    cubeShader = Shader("./resources/shaders/vertexShader.glsl", "./resources/shaders/fragmentShader.glsl");
+    cubeShader = Shader("./resources/shaders/lightVertexShader.glsl", "./resources/shaders/lightFragmentShader.glsl");
     cubeShader.use();
     cubeShader.setMat4("projection", projection);
 
@@ -54,13 +54,12 @@ void PlayState::init() {
     cube->setScale(vec3(1));
     cube->applyTransformation(vec3(0), vec3(1), vec3(0), 0);
     cube->attachTexture(texture);
-    cube->setCollider(new CubeCollider(cube->getTransform()));
-    cube->setDynamic();
+    cube->setMaterial(material::RED_PLASTIC);
 
     sphere = new Sphere();
     sphere->createVertexArray();
     sphere->setScale(vec3(1));
-    sphere->applyTransformation(vec3(0), vec3(1), vec3(0), 0);
+    sphere->applyTransformation(vec3(2, 0, 0), vec3(1), vec3(0), 0);
 
     planeShader = Shader("./resources/shaders/vertexShader.glsl", "./resources/shaders/fragmentShader.glsl");
     planeShader.use();
@@ -80,7 +79,7 @@ void PlayState::init() {
 
     // add elements to the scene
     obj_scene.addElement(cube, cubeShader);
-    obj_scene.addElement(sphere, planeShader);
+    // obj_scene.addElement(sphere, planeShader);
 
     // imgui
     entityMenu = new IGEntity();
@@ -89,7 +88,8 @@ void PlayState::init() {
 
     // lights
     point = new PointLight();
-    lightShader = Shader("./resources/shaders/lightVertexShader.glsl", "./resources/shaders/lightFragmentShader.glsl");
+    point->setPosition(vec3(0, 2, 0));
+    lightShader = Shader("./resources/shaders/vertexShader.glsl", "./resources/shaders/fragmentShader.glsl");
 }
 
 void PlayState::clean() {}
@@ -357,8 +357,23 @@ void updatePosition(Entity *ent) {
 }
 
 void PlayState::update(GameEngine *engine) {
-    cubeShader.use();
+    updatePosition(cube);
+    point->sendDataToShader(cubeShader);
+    /* cubeShader.setInt("lightType", LightType::POINTLIGHT);
+
+    cubeShader.setVec3("light.position", point->getPosition());
+    cubeShader.setFloat("light.constant", point->getConstant());
+    cubeShader.setFloat("light.linear", point->getLinear());
+    cubeShader.setFloat("light.quadratic", point->getQuadratic());
+
+    cubeShader.setVec3("light.ambient", point->vectors.ambient);
+    cubeShader.setVec3("light.diffuse", point->vectors.diffuse);
+    cubeShader.setVec3("light.specular", point->vectors.specular);
+
+    cubeShader.setMat4("projection", projection);
     cubeShader.setMat4("view", camera.getViewMatrix());
+
+    cubeShader.setVec3("viewPos", camera.getCameraPosition()); */
 
     planeShader.use();
     planeShader.setMat4("view", camera.getViewMatrix());
@@ -366,10 +381,9 @@ void PlayState::update(GameEngine *engine) {
     skyboxShader.use();
     skyboxShader.setMat4("view", mat4(mat3(camera.getViewMatrix())));
 
-    updatePosition(cube);
     updatePosition(sphere);
 
-    point->sendDataToShader(lightShader);
+    // point->sendDataToShader(lightShader);
 }
 
 void PlayState::draw(GameEngine *engine) {

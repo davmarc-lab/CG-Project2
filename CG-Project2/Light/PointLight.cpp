@@ -23,7 +23,6 @@ void PointLight::sendDataToShader(Shader shader) {
 
     shader.setMat4("projection", projection);
     shader.setMat4("view", camera.getViewMatrix());
-    shader.setMat4("model", glm::mat4(1.0f));
     
     shader.setVec3("viewPos", camera.getCameraPosition());
 }
