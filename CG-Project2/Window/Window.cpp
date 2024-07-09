@@ -79,7 +79,7 @@ void Window::terminateWindow()
 
 void Window::processCloseInput()
 {
-    if (glfwGetKey(this->window, GLFW_KEY_P) == GLFW_PRESS)
+    if (glfwGetKey(this->window, GLFW_KEY_Q) == GLFW_PRESS)
     {
         this->closeWindow();
     }

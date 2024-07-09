@@ -1,4 +1,5 @@
 #pragma once
+#include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
@@ -6,28 +7,31 @@
 
 using namespace glm;
 
-const float YAW = -90.0f;
-const float PITCH = 0.0f;
-const float SPEED = 1.0f;
-const float SENSITIVITY = 0.1f;
-const float ZOOM = 45.0f;
+namespace cmr {
+    const float YAW = -90.0f;
+    const float PITCH = 0.0f;
+    const float SPEED = 1.0f;
+    const float SENSITIVITY = 0.02f;
+    const float ZOOM = 45.0f;
+    const vec3 POSITION = vec3(0, 0, 3);
+}
 
 struct CameraVectors {
-    vec3 cameraPos = vec3(0);
+    vec3 cameraPos = cmr::POSITION;
     vec3 cameraFront = vec3(0, 0, -1);
     vec3 cameraUp = vec3(0, 1, 0);
     vec3 cameraRight = vec3(1, 0, 0);
 };
 
 struct CameraInfo {
-    float speed = SPEED;
-    float sensitivity = SENSITIVITY;
-    float zoom = ZOOM;
+    float speed = cmr::SPEED;
+    float sensitivity = cmr::SENSITIVITY;
+    float zoom = cmr::ZOOM;
 };
 
 struct CameraRotation {
-    float pitch = PITCH;    // rotation around x axis
-    float yaw = YAW;      // rotation around y axis
+    float pitch = cmr::PITCH;    // rotation around x axis
+    float yaw = cmr::YAW;      // rotation around y axis
 };
 
 class Camera {
@@ -72,6 +76,12 @@ public:
     inline float getMouseSensitivity() { return this->info.sensitivity; }
 
     inline void setMouseSensitivity(float val) { this->info.sensitivity = val; }
+
+    inline float getCameraZoom() { return this->info.zoom; }
+
+    inline void setCameraZoom(const float zoom) {
+        this->info.zoom = zoom;
+    }
 
     void moveCamera(vec3 position);
 

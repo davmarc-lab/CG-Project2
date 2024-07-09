@@ -2,17 +2,18 @@
 
 #include "../Camera/Camera.hpp"
 #include "../Color/Color.hpp"
+#include "../Entity/Collider/SphereCollider.hpp"
 #include "../Entity/Cube.hpp"
 #include "../Entity/Cubemap.hpp"
-#include "../Entity/Sphere.hpp"
 #include "../Entity/Plane.hpp"
-#include "../Entity/Collider/SphereCollider.hpp"
+#include "../Entity/Sphere.hpp"
 
 #include "../Scene/Scene.hpp"
 
 #include "../Menu/IGEntity.hpp"
 #include "../Menu/IGMenu.hpp"
 #include "../Menu/IGMode.hpp"
+#include "../Menu/IGCamera.hpp"
 
 PlayState PlayState::playState;
 
@@ -26,7 +27,9 @@ Scene s;
 
 InputMode user_mode = InputMode::INTERACT;
 
-IGMenu *entityMenu, *modeMenu;
+IGMenu *entityMenu, *modeMenu, *cameraMenu;
+
+static Mouse mouse;
 
 void PlayState::init() {
     glEnable(GL_DEPTH_TEST);
@@ -52,7 +55,6 @@ void PlayState::init() {
     planeShader.setMat4("projection", projection);
     planeShader.setInt("color", 1);
 
-
     plane = new PlaneEntity(color::RED);
     plane->createVertexArray();
 
@@ -71,6 +73,7 @@ void PlayState::init() {
     // imgui
     entityMenu = new IGEntity(cube);
     modeMenu = new IGMode(&user_mode);
+    cameraMenu = new IGCamera();
 
     camera.moveCamera(vec3(0, 0, 3));
 }
@@ -83,6 +86,26 @@ void PlayState::resume() {}
 
 GLenum val = GL_FALSE;
 
+void clearMouseFunc(GLFWwindow *window, double x, double y) { ImGui_ImplGlfw_CursorPosCallback(window, x, y); }
+
+void passiveMouseFunc(GLFWwindow *window, double x, double y) {
+    if (mouse.first_mouse) {
+        mouse.first_mouse = false;
+        mouse.lastX = x;
+        mouse.lastY = y;
+    }
+
+    auto xoffset = x - mouse.lastX;
+    auto yoffset = y - mouse.lastY;
+
+    mouse.lastX = x;
+    mouse.lastY = y;
+
+    camera.processMouseMovement(xoffset, yoffset);
+
+    // ImGui_ImplGlfw_CursorPosCallback(window, x, y);
+}
+
 void PlayState::handleEvent(GameEngine *engine) {
     auto window = engine->getWindow()->getWindow();
     const float dt = engine->getDeltaTime();
@@ -93,6 +116,33 @@ void PlayState::handleEvent(GameEngine *engine) {
     }
     if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
         user_mode = InputMode::SELECT;
+    }
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+        user_mode = InputMode::PASSIVE;
+    }
+
+    switch (user_mode) {
+    case SELECT:
+        // enable selecting object mode
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetCursorPosCallback(window, clearMouseFunc);
+        break;
+    case INTERACT:
+        // enable movement in the scene, and active mouse movement
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetCursorPosCallback(window, clearMouseFunc);
+        break;
+    case PASSIVE:
+        // enable passive mouse movement
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetCursorPosCallback(window, passiveMouseFunc);
+
+        if (glfwRawMouseMotionSupported())
+            glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+
+        break;
+    default:
+        break;
     }
 
     // Mouse input
@@ -158,4 +208,5 @@ void PlayState::draw(GameEngine *engine) {
 
     entityMenu->render();
     modeMenu->render();
+    cameraMenu->render();
 }

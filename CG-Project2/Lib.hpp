@@ -5,15 +5,15 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 #ifdef _WIN32
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glad/glad.h>
 #else
 #include "dependencies/include/glad/glad.h"
 #include "dependencies/include/GLFW/glfw3.h"
 #endif
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_access.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
@@ -21,31 +21,26 @@
 using namespace std;
 using namespace glm;
 
-inline void debug(string text) {
-    cout << "-- DEBUG -- " << text << endl;
-}
+inline void debug(string text) { cout << "-- DEBUG -- " << text << endl; }
 
-inline void warning(string text) {
-    cout << "-- WARNING -- " << text << endl;
-}
+inline void warning(string text) { cout << "-- WARNING -- " << text << endl; }
 
-inline void printVec3(vec3 vec) {
-    cout << to_string(vec) << endl;
-}
+inline void printVec3(vec3 vec) { cout << to_string(vec) << endl; }
 
-inline void printVec2(vec2 vec) {
-    cout << to_string(vec) << endl;
-}
+inline void printVec2(vec2 vec) { cout << to_string(vec) << endl; }
 
-inline void printMat4(mat4 mat) {
-    cout << to_string(mat) << endl;
-}
+inline void printMat4(mat4 mat) { cout << to_string(mat) << endl; }
 
-const float WIDTH = 1600.f, HEIGHT = 900.f;
+const float WIDTH = 1200.f, HEIGHT = 700.f;
 
 const mat4 textProjection = ortho(0.f, WIDTH, 0.f, HEIGHT);
 
-const mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
+inline mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
+
+// mmmmm
+inline void updatePerspective(float zoom) {
+      projection = glm::perspective(glm::radians(zoom), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
+}
 
 const float BLOCK_DIM = 0.1f;
 const float OUTLINE_DIM = 0.001f;
@@ -90,18 +85,30 @@ struct Physic {
     float motionTime = 0.f;
 };
 
+struct Mouse {
+    bool first_mouse = true;
+    bool active_mode = false;
+    float lastX;
+    float lastY;
+};
+
 enum InputMode {
+    // in select mode user can select objects
     SELECT,
+    // in interact mode user can move in the scene and use imgui windows
     INTERACT,
+    // in passive mode user can move camera using passive mouse motion
+    PASSIVE,
 };
 
 inline string calcInputMode(InputMode mode) {
-    switch (mode)
-    {
+    switch (mode) {
     case SELECT:
         return "Select";
     case INTERACT:
         return "Interact";
+    case PASSIVE:
+        return "Passive";
     default:
         return "None";
     }

@@ -4,11 +4,7 @@
 #include "../Window/Window.hpp"
 #include "PlayState.hpp"
 
-struct Mouse {
-    bool firstMouse = true;
-    float lastX;
-    float lastY;
-} mouse;
+static Mouse mouse;
 
 GameEngine::GameEngine(Window *window, unsigned int width, unsigned int height) {
     this->window = window;
@@ -20,8 +16,8 @@ void mouseMovementCallback(GLFWwindow *window, double xposIn, double yposIn) {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
-    if (mouse.firstMouse) {
-        mouse.firstMouse = false;
+    if (mouse.first_mouse) {
+        mouse.first_mouse = false;
         mouse.lastX = xpos;
         mouse.lastY = ypos;
     }

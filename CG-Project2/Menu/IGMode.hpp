@@ -16,7 +16,11 @@ public:
 		string text = calcInputMode(*this->mode);
 
 		ImGui::Begin("Input Mode");
-		ImGui::Text(text.c_str());
+        ImGui::TextColored(ImVec4(0.92f, 0.78f, 0.2f, 1.f), "Press `v` for Select mode \
+            \nPress `g` for Interact mode \
+            \nPress `p` for Passive mode \
+            \nPress `q` to Quit");
+		ImGui::Text("%s", text.c_str());
 		ImGui::End();
 	}
 
