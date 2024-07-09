@@ -75,14 +75,12 @@ void PlayState::init() {
 
     // add elements to the scene
     obj_scene.addElement(cube, cubeShader);
-    obj_scene.addElement(sphere, cubeShader);
+    obj_scene.addElement(sphere, planeShader);
 
     // imgui
     entityMenu = new IGEntity();
     modeMenu = new IGMode(&user_mode);
     cameraMenu = new IGCamera();
-
-    camera.moveCamera(vec3(0, 0, 3));
 }
 
 void PlayState::clean() {}
@@ -94,6 +92,61 @@ void PlayState::resume() {}
 GLenum val = GL_FALSE;
 
 void clearCursorPosFunc(GLFWwindow *window, double x, double y) { ImGui_ImplGlfw_CursorPosCallback(window, x, y); }
+
+void clearMouseActionFunc(GLFWwindow *window, int button, int action, int mod) { ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod); }
+
+vec3 getTrackBallPoint(float x, float y) {
+    float zTemp;
+    vec3 point;
+
+    point.x = (2.0f * x - WIDTH) / WIDTH;
+    point.y = (HEIGHT - 2.0f * y) / HEIGHT;
+
+    zTemp = 1.0f - pow(point.x, 2.0) - pow(point.y, 2.0);
+    if (zTemp < 0)
+        point.z = 0;
+    else
+        point.z = sqrt(zTemp);
+    return normalize(point);
+}
+
+void mouseActiveMotion(GLFWwindow *window, int button, int action, int mod) {
+    float velocity = camera.getCameraVelocity();
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
+
+    if (button == GLFW_MOUSE_BUTTON_3) {
+        if (action == GLFW_PRESS) {
+            mouse.active_mode = true;
+            vec3 p2 = getTrackBallPoint(x, y);
+            vec3 p1 = getTrackBallPoint(mouse.lastX, mouse.lastY);
+
+            if (!mouse.active_mode) {
+                ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);
+                return;
+            }
+
+            float dx, dy, dz;
+            dx = p2.x - p1.x;
+            dy = p2.y - p1.y;
+            dz = p2.z - p1.z;
+
+            if (dx || dy || dz) {
+                float angle = acos(dot(p1, p2)) * velocity;
+                vec3 rotation_vec = glm::cross(p1, p2);
+
+                // camera.setCameraDirection(vec4(camera.getCameraPosition(), 0) - camera.getCameraTarget());
+                // camera.moveCamera(camera.getCameraTarget() + rotate(glm::mat4(1.0f), glm::radians(-angle), rotation_vec) * camera.getCameraDirection());
+            }
+        } else if (action == GLFW_RELEASE) {
+            mouse.active_mode = false;
+        }
+        mouse.lastX = x;
+        mouse.lastY = y;
+    }
+
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);
+}
 
 void passiveCursorPosFunc(GLFWwindow *window, double x, double y) {
     if (mouse.first_mouse) {
@@ -110,6 +163,7 @@ void passiveCursorPosFunc(GLFWwindow *window, double x, double y) {
 
     camera.processMouseMovement(xoffset, yoffset);
 
+    // this should be useless, because the mouse is hidden when using passive mode
     // ImGui_ImplGlfw_CursorPosCallback(window, x, y);
 }
 
@@ -169,27 +223,32 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
             // closest_intersection
             float ci = 0;
             // this pointer keeps track of the selected object
-            Entity* selected = nullptr;
-            
+            Entity *obj_selected = nullptr;
+            Shader *shader_selected = nullptr;
+
             // check all the element of the scene for intersection with ray
-            for(auto elem : obj_scene.getElements()) {
+            for (auto elem : obj_scene.getElements()) {
                 auto obj = elem.first;
+                auto shader = elem.second;
                 // distance between ray and object
                 float dist = 0.f;
 
                 if (isRayInSphere(ray, obj->getPosition(), 0.7, &dist)) {
-                    if (selected == nullptr || dist <= ci) {
-                        selected = obj;
+                    if (obj_selected == nullptr || dist <= ci) {
+                        obj_selected = obj;
+                        warning("Working on the same shader, it affects all the shaders");
+                        shader_selected = &shader;
                         ci = dist;
                     }
                 }
             }
 
             // updating the observer in IGEntity menu
-            if (selected != nullptr) {
-                entityMenu->changeObserver(selected);
+            if (obj_selected != nullptr) {
+                warning("Shader select doesn't work, maybe due to a bad copy");
+                entityMenu->changeObserver(obj_selected, shader_selected);
             } else {
-                entityMenu->changeObserver(nullptr);
+                entityMenu->changeObserver(nullptr, nullptr);
             }
         }
     }
@@ -217,18 +276,19 @@ void PlayState::handleEvent(GameEngine *engine) {
         // enable selecting object mode
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         glfwSetCursorPosCallback(window, clearCursorPosFunc);
-
         glfwSetMouseButtonCallback(window, selectMouseFunc);
         break;
     case INTERACT:
         // enable movement in the scene, and active mouse movement
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         glfwSetCursorPosCallback(window, clearCursorPosFunc);
+        glfwSetMouseButtonCallback(window, mouseActiveMotion);
         break;
     case PASSIVE:
         // enable passive mouse movement
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetCursorPosCallback(window, passiveCursorPosFunc);
+        glfwSetMouseButtonCallback(window, clearMouseActionFunc);
 
         if (glfwRawMouseMotionSupported())
             glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);

@@ -7,12 +7,12 @@
 #include "IGMenu.hpp"
 
 #include <vector>
-#include <sstream>
 
 class IGEntity : public IGMenu {
 
 private:
-    Entity* observer = nullptr;
+    Entity* obj_observer = nullptr;
+    Shader* shader_observer = nullptr;
 
     enum AXIS {
         X, Y, Z, NONE
@@ -51,23 +51,26 @@ private:
     }
 
 public:
-    IGEntity() : observer(nullptr) {}
+    IGEntity() {}
 
-    IGEntity(Entity* entity) : observer(entity) {}
+    IGEntity(Entity* entity, Shader* shader) : obj_observer(entity), shader_observer(shader) {}
 
-    inline void changeObserver(Entity* e) {
-        this->observer = e;
+    inline void changeObserver(Entity* e, Shader* s) {
+        this->obj_observer = e;
+        this->shader_observer = s;
     }
 
     inline virtual void render() override {
         ImGui::Begin("Entity");
 
-        if (this->observer == nullptr) {
+        if (this->obj_observer == nullptr && this->shader_observer == nullptr) {
             ImGui::TextColored(ImVec4(1, 0, 0, 1), "No Object Selected!");
+        } else if (this->obj_observer == nullptr || this->shader_observer == nullptr) {
+            ImGui::TextColored(ImVec4(1, 0, 0, 1), "Problems while selecting");
         } else {
-            auto pos = this->observer->getPosition();
-            auto scale = this->observer->getScale();
-            auto rot = this->observer->getRotation();
+            auto pos = this->obj_observer->getPosition();
+            auto scale = this->obj_observer->getScale();
+            auto rot = this->obj_observer->getRotation();
 
             static bool lockFlag = false;
             vector<AXIS> scaleAxis;
@@ -75,18 +78,18 @@ public:
             if (ImGui::CollapsingHeader("Transform")) {
                 ImGui::Text("Position:");
                 if (ImGui::DragFloat("x", &pos.x, 0.005, 0.f)) {
-                    this->observer->setMotionTime(0);
+                    this->obj_observer->setMotionTime(0);
                 }
                 if (ImGui::DragFloat("y", &pos.y, 0.005)) {
-                    this->observer->setMotionTime(0);
+                    this->obj_observer->setMotionTime(0);
                 }
                 if (ImGui::DragFloat("z", &pos.z, 0.005)) {
-                    this->observer->setMotionTime(0);
+                    this->obj_observer->setMotionTime(0);
                 }
                 if (ImGui::Button("Reset")) {
                     pos = vec3(0);
                 }
-                this->observer->setPosition(vec3(pos));
+                this->obj_observer->setPosition(vec3(pos));
 
                 ImGui::Text("Scale:");
                 AXIS click;
@@ -107,7 +110,7 @@ public:
                     scale = updateOtherValues(scale, findAxis(scaleAxis));
                 }
 
-                this->observer->setScale(vec3(scale));
+                this->obj_observer->setScale(vec3(scale));
 
                 ImGui::Text("Rotation:");
                 ImGui::DragFloat("x##3", &rot.x, 0.005);
@@ -116,16 +119,17 @@ public:
                 if (ImGui::Button("Reset##3")) {
                     rot = vec3(0);
                 }
-                this->observer->setRotation(vec3(rot));
+                this->obj_observer->setRotation(vec3(rot));
             }
 
             if (ImGui::CollapsingHeader("Shader")) {
-
+                // bad copy of the shader
+                ImGui::Text("%d", this->shader_observer->getId());
             }
 
             if (ImGui::CollapsingHeader("Texture")) {
                 ImGui::Text("Texture File:");
-                ImGui::Text("%s", this->observer->getTexture().getPath());
+                ImGui::Text("%s", this->obj_observer->getTexture().getPath());
                 if (ImGui::Button("Choose Texture")) {
                     IGFD::FileDialogConfig config;
                     config.path = "./resources/textures/";
@@ -164,7 +168,7 @@ public:
                             filePathName = string(res);
                         }
 #endif
-                        this->observer->changeTexture(filePathName);
+                        this->obj_observer->changeTexture(filePathName);
                     }
                     // close
                     ImGuiFileDialog::Instance()->Close();
