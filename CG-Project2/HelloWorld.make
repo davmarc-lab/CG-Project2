@@ -76,6 +76,7 @@ OBJECTS := \
 	$(OBJDIR)/IntroState.o \
 	$(OBJDIR)/OptionState.o \
 	$(OBJDIR)/PlayState.o \
+	$(OBJDIR)/PointLight.o \
 	$(OBJDIR)/Scene.o \
 	$(OBJDIR)/Shader.o \
 	$(OBJDIR)/Text.o \
@@ -179,6 +180,9 @@ $(OBJDIR)/OptionState.o: Game/OptionState.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/PlayState.o: Game/PlayState.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/PointLight.o: Light/PointLight.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Scene.o: Scene/Scene.cpp

@@ -8,13 +8,15 @@
 #include "../Entity/Plane.hpp"
 #include "../Entity/Sphere.hpp"
 
+#include "../Light/Light.hpp"
+#include "../Light/Pointlight.hpp"
+
 #include "../Scene/Scene.hpp"
 
 #include "../Menu/IGCamera.hpp"
 #include "../Menu/IGEntity.hpp"
 #include "../Menu/IGMenu.hpp"
 #include "../Menu/IGMode.hpp"
-#include <algorithm>
 
 PlayState PlayState::playState;
 
@@ -23,6 +25,9 @@ Sphere *sphere;
 PlaneEntity *plane;
 Cubemap *skybox;
 Shader cubeShader, planeShader, skyboxShader;
+
+Light* point;
+Shader lightShader;
 
 Scene obj_scene;
 
@@ -81,6 +86,10 @@ void PlayState::init() {
     entityMenu = new IGEntity();
     modeMenu = new IGMode(&user_mode);
     cameraMenu = new IGCamera();
+
+    // lights
+    point = new PointLight();
+    lightShader = Shader("./resources/shaders/lightVertexShader.glsl", "./resources/shaders/lightFragmentShader.glsl");
 }
 
 void PlayState::clean() {}
@@ -359,6 +368,8 @@ void PlayState::update(GameEngine *engine) {
 
     updatePosition(cube);
     updatePosition(sphere);
+
+    point->sendDataToShader(lightShader);
 }
 
 void PlayState::draw(GameEngine *engine) {
