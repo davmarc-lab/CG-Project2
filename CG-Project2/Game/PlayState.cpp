@@ -31,7 +31,7 @@ InputMode user_mode = InputMode::INTERACT;
 IGMenu *modeMenu, *cameraMenu;
 IGEntity *entityMenu = nullptr;
 
-static Mouse mouse;
+Mouse mouse;
 
 void PlayState::init() {
     glEnable(GL_DEPTH_TEST);
@@ -110,39 +110,46 @@ vec3 getTrackBallPoint(float x, float y) {
     return normalize(point);
 }
 
-void mouseActiveMotion(GLFWwindow *window, int button, int action, int mod) {
-    float velocity = camera.getCameraVelocity();
-    double x, y;
-    glfwGetCursorPos(window, &x, &y);
+void mouseActiveMotion(GLFWwindow *window, double x, double y) {
+    float speed = camera.getTrackballSpeed();
 
+    vec3 p2 = getTrackBallPoint(x, y);
+    vec3 p1 = getTrackBallPoint(mouse.lastX, mouse.lastY);
+
+    if (!mouse.active_mode) {
+        mouse.lastX = x;
+        mouse.lastY = y;
+        ImGui_ImplGlfw_CursorPosCallback(window, x, y);
+        return;
+    }
+
+    float dx, dy, dz;
+    dx = p2.x - p1.x;
+    dy = p2.y - p1.y;
+    dz = p2.z - p1.z;
+
+    if (dx || dy || dz) {
+        float angle = acos(dot(p1, p2)) * speed;
+        vec3 rotation_vec = glm::cross(p1, p2);
+        camera.setCameraDirection(vec4(camera.getCameraPosition(), 0) - vec4(camera.getCameraTarget(), 0));
+        camera.moveCamera(vec4(camera.getCameraTarget(), 0) +
+                          rotate(glm::mat4(1.0f), glm::radians(-angle), rotation_vec) * vec4(camera.getCameraDirection(), 0));
+    }
+    mouse.lastX = x;
+    mouse.lastY = y;
+
+    ImGui_ImplGlfw_CursorPosCallback(window, x, y);
+}
+
+void mouseInputFunc(GLFWwindow* window, int button, int action, int mod) {
+
+    // for trackball input
     if (button == GLFW_MOUSE_BUTTON_3) {
         if (action == GLFW_PRESS) {
             mouse.active_mode = true;
-            vec3 p2 = getTrackBallPoint(x, y);
-            vec3 p1 = getTrackBallPoint(mouse.lastX, mouse.lastY);
-
-            if (!mouse.active_mode) {
-                ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);
-                return;
-            }
-
-            float dx, dy, dz;
-            dx = p2.x - p1.x;
-            dy = p2.y - p1.y;
-            dz = p2.z - p1.z;
-
-            if (dx || dy || dz) {
-                float angle = acos(dot(p1, p2)) * velocity;
-                vec3 rotation_vec = glm::cross(p1, p2);
-
-                // camera.setCameraDirection(vec4(camera.getCameraPosition(), 0) - camera.getCameraTarget());
-                // camera.moveCamera(camera.getCameraTarget() + rotate(glm::mat4(1.0f), glm::radians(-angle), rotation_vec) * camera.getCameraDirection());
-            }
         } else if (action == GLFW_RELEASE) {
             mouse.active_mode = false;
         }
-        mouse.lastX = x;
-        mouse.lastY = y;
     }
 
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);
@@ -281,8 +288,8 @@ void PlayState::handleEvent(GameEngine *engine) {
     case INTERACT:
         // enable movement in the scene, and active mouse movement
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        glfwSetCursorPosCallback(window, clearCursorPosFunc);
-        glfwSetMouseButtonCallback(window, mouseActiveMotion);
+        glfwSetMouseButtonCallback(window, mouseInputFunc);
+        glfwSetCursorPosCallback(window, mouseActiveMotion);
         break;
     case PASSIVE:
         // enable passive mouse movement

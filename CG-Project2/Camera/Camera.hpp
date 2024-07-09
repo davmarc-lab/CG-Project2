@@ -14,6 +14,7 @@ namespace cmr {
     const float SENSITIVITY = 0.02f;
     const float ZOOM = 45.0f;
     const vec3 POSITION = vec3(0, 0, 3);
+    const float TB_SPEED = 20.0f;
 }
 
 struct CameraVectors {
@@ -21,12 +22,15 @@ struct CameraVectors {
     vec3 cameraFront = vec3(0, 0, -1);
     vec3 cameraUp = vec3(0, 1, 0);
     vec3 cameraRight = vec3(1, 0, 0);
+    vec3 direction = vec3(0);
+    vec3 target = vec3(0);
 };
 
 struct CameraInfo {
     float speed = cmr::SPEED;
     float sensitivity = cmr::SENSITIVITY;
     float zoom = cmr::ZOOM;
+    float tb_speed = cmr::TB_SPEED;
 };
 
 struct CameraRotation {
@@ -79,9 +83,19 @@ public:
 
     inline float getCameraZoom() { return this->info.zoom; }
 
-    inline void setCameraZoom(const float zoom) {
-        this->info.zoom = zoom;
-    }
+    inline void setCameraZoom(const float zoom) { this->info.zoom = zoom; }
+
+    inline float getTrackballSpeed() { return this->info.tb_speed; }
+
+    inline void setTrackballSpeed(const float speed) { this->info.tb_speed = speed; }
+
+    inline vec3 getCameraDirection() { return this->vectors.direction; }
+
+    inline void setCameraDirection(vec3 dir) { this->vectors.direction = dir; }
+
+    inline vec3 getCameraTarget() { return this->vectors.target; }
+
+    inline void setCameraTarget(vec3 target) { this->vectors.target = target; }
 
     void moveCamera(vec3 position);
 

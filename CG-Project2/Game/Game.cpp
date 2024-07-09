@@ -4,7 +4,7 @@
 #include "../Window/Window.hpp"
 #include "PlayState.hpp"
 
-static Mouse mouse;
+Mouse input;
 
 GameEngine::GameEngine(Window *window, unsigned int width, unsigned int height) {
     this->window = window;
@@ -16,17 +16,17 @@ void mouseMovementCallback(GLFWwindow *window, double xposIn, double yposIn) {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
-    if (mouse.first_mouse) {
-        mouse.first_mouse = false;
-        mouse.lastX = xpos;
-        mouse.lastY = ypos;
+    if (input.first_mouse) {
+        input.first_mouse = false;
+        input.lastX = xpos;
+        input.lastY = ypos;
     }
 
-    float xoffset = xpos - mouse.lastX;
-    float yoffset = ypos - mouse.lastY;
+    float xoffset = xpos - input.lastX;
+    float yoffset = ypos - input.lastY;
 
-    mouse.lastX = xpos;
-    mouse.lastY = ypos;
+    input.lastX = xpos;
+    input.lastY = ypos;
 
     // camera.processMouseMovement(xoffset, yoffset);
 }

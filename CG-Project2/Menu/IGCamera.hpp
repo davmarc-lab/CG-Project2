@@ -57,6 +57,17 @@ public:
             camera.setMouseSensitivity(cmr::SENSITIVITY);
         }
 
+        // Trackball speed
+        auto speed = camera.getTrackballSpeed();
+        if (ImGui::DragFloat("Trackball speed##1", &speed, 0.5, 0.0f)) {
+            if (speed > 0.f) {
+                camera.setTrackballSpeed(speed);
+            }
+        }
+        if (ImGui::Button("Reset##5")) {
+            camera.setTrackballSpeed(cmr::TB_SPEED);
+        }
+
         ImGui::End();
     }
 
