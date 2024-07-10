@@ -10,12 +10,12 @@ enum LightType
 };
 
 struct LightVectors {
-    glm::vec3 ambient = glm::vec3(0.05f);
+    glm::vec3 ambient = glm::vec3(0.1f);
     glm::vec3 diffuse = glm::vec3(0.8f);
     glm::vec3 specular = glm::vec3(1.f);
 };
 
-struct PointLightInfo {
+struct LightInfo {
     float constant = 1.0f;
     float linear = 0.09f;
     float quadratic = 0.032f;

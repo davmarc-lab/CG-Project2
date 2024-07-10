@@ -1,7 +1,5 @@
 #include "Cube.hpp"
 
-#include "../Light/Pointlight.hpp"
-
 void CubeEntity::buildCube() {
     float vertices[] = {// coords.vertex coord,   texture coord,  coords.normals vectors
                         -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  0.0f,  -1.0f, 0.5f,  -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,  0.0f,  -1.0f,

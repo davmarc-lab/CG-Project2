@@ -2,14 +2,12 @@
 
 #include "../Camera/Camera.hpp"
 #include "../Color/Color.hpp"
-#include "../Entity/Collider/SphereCollider.hpp"
 #include "../Entity/Cube.hpp"
 #include "../Entity/Cubemap.hpp"
 #include "../Entity/Plane.hpp"
 #include "../Entity/Sphere.hpp"
 
-#include "../Light/Light.hpp"
-#include "../Light/Pointlight.hpp"
+#include "../Light/PointLight.hpp"
 
 #include "../Scene/Scene.hpp"
 
@@ -26,7 +24,7 @@ PlaneEntity *plane;
 Cubemap *skybox;
 Shader lightShader, planeShader, skyboxShader;
 
-PointLight pl = PointLight();
+PointLight *pl = new PointLight();
 
 Scene obj_scene;
 
@@ -53,12 +51,12 @@ void PlayState::init() {
     cube->attachTexture(texture);
     cube->setMaterial(material::NONE);
 
-    /* sphere = new Sphere();
+    sphere = new Sphere();
     sphere->createVertexArray();
     sphere->setScale(vec3(1));
     sphere->applyTransformation(vec3(2, 0, 0), vec3(1), vec3(0), 0);
     sphere->attachTexture(texture);
-    sphere->setMaterial(material::NONE); */
+    sphere->setMaterial(material::NONE);
 
     planeShader = Shader("./resources/shaders/vertexShader.glsl", "./resources/shaders/fragmentShader.glsl");
     planeShader.use();
@@ -78,10 +76,10 @@ void PlayState::init() {
 
     // add elements to the scene
     obj_scene.addElement(cube, lightShader);
-    // obj_scene.addElement(sphere, lightShader);
+    obj_scene.addElement(sphere, lightShader);
 
-    pl.setPosition(vec3(1));
-
+    pl->setPosition(vec3(0));
+    obj_scene.addLight(pl);
     // imgui
     entityMenu = new IGEntity();
     modeMenu = new IGMode(&user_mode);
@@ -146,7 +144,7 @@ void mouseActiveMotion(GLFWwindow *window, double x, double y) {
     ImGui_ImplGlfw_CursorPosCallback(window, x, y);
 }
 
-void mouseInputFunc(GLFWwindow* window, int button, int action, int mod) {
+void mouseInputFunc(GLFWwindow *window, int button, int action, int mod) {
 
     // for trackball input
     if (button == GLFW_MOUSE_BUTTON_3) {
@@ -223,6 +221,14 @@ bool isRayInSphere(vec3 ray, vec3 sphere_pos, float sphere_radius, float *id) {
 }
 
 void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
+    // trackball movement
+    if (button == GLFW_MOUSE_BUTTON_3) {
+        if (action == GLFW_PRESS) {
+            mouse.active_mode = true;
+        } else if (action == GLFW_RELEASE) {
+            mouse.active_mode = false;
+        }
+    }
     // select objects
     if (button == GLFW_MOUSE_BUTTON_1) {
         if (action == GLFW_PRESS) {
@@ -286,18 +292,21 @@ void PlayState::handleEvent(GameEngine *engine) {
     switch (user_mode) {
     case SELECT:
         // enable selecting object mode
+        mouse.first_mouse = true;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        glfwSetCursorPosCallback(window, clearCursorPosFunc);
         glfwSetMouseButtonCallback(window, selectMouseFunc);
+        glfwSetCursorPosCallback(window, mouseActiveMotion);
         break;
     case INTERACT:
         // enable movement in the scene, and active mouse movement
+        mouse.first_mouse = true;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         glfwSetMouseButtonCallback(window, mouseInputFunc);
         glfwSetCursorPosCallback(window, mouseActiveMotion);
         break;
     case PASSIVE:
         // enable passive mouse movement
+        mouse.first_mouse = true;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetCursorPosCallback(window, passiveCursorPosFunc);
         glfwSetMouseButtonCallback(window, clearMouseActionFunc);
@@ -364,16 +373,17 @@ void PlayState::update(GameEngine *engine) {
     skyboxShader.setMat4("view", mat4(mat3(camera.getViewMatrix())));
 
     updatePosition(cube);
+    updatePosition(sphere);
 }
 
 void PlayState::draw(GameEngine *engine) {
     skybox->draw(skyboxShader);
     plane->draw(planeShader);
 
-    pl.sendDataToShader(lightShader);
     obj_scene.draw();
 
     entityMenu->render();
     modeMenu->render();
     cameraMenu->render();
 }
+

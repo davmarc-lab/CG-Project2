@@ -2,19 +2,26 @@
 
 #include "Light.hpp"
 
-class PointLight : public Light {
+class SpotLight : public Light {
 private:
-    vec3 position = vec3(1, 1, 1);
-    PointLightInfo info;
+    vec3 position = vec3(0);
+    vec3 direction = vec3(1);
+    LightInfo info;
+    float cutOff = 12.5f;
+    float outer_cutOff = 17.5f;
 
 public:
-    PointLight() {}
+    SpotLight() { this->type = LightType::SPOTLIGHT; }
 
-    PointLight(vec3 position, float constant, float linear, float quadratic);
+    SpotLight(vec3 position, vec3 direction, float constant, float linear, float quadratic);
 
     inline vec3 getPosition() { return this->position; }
 
     inline void setPosition(vec3 pos) { this->position = pos; }
+
+    inline vec3 getDirection() { return this->direction; }
+
+    inline void setDirection(vec3 dir) { this->direction = dir; }
     
     inline float getConstant() { return this->info.constant; }
     
@@ -30,5 +37,5 @@ public:
 
     virtual void sendDataToShader(Shader shader) override;
 
-    ~PointLight() = default;
+    ~SpotLight() = default;
 };

@@ -22,7 +22,7 @@ struct Light {
     float quadratic;
 
     float cutOff;
-    float outerCutOff;
+    float outer_cutOff;
     bool isSmooth;
 };
 
@@ -137,8 +137,8 @@ vec3 calcSpotLight() {
 
     // spotlight intensity
     float theta = dot(lightDir, normalize(-light.direction));
-    float epsilon = light.cutOff - light.outerCutOff;
-    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+    float epsilon = light.cutOff - light.outer_cutOff;
+    float intensity = clamp((theta - light.outer_cutOff) / epsilon, 0.0, 1.0);
 
     // combine results
     vec3 ambient = light.ambient * material.ambient;

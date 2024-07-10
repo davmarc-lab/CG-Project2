@@ -32,6 +32,8 @@ public:
 
     void setIntensity(float intensity) { this->intensity = intensity; } 
 
+    LightType getType() { return this->type; }
+
     /* ---Overrride Methods--- */
     virtual void sendDataToShader(Shader shader) = 0;
 };

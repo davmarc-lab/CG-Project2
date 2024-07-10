@@ -77,7 +77,9 @@ OBJECTS := \
 	$(OBJDIR)/IntroState.o \
 	$(OBJDIR)/OptionState.o \
 	$(OBJDIR)/PlayState.o \
+	$(OBJDIR)/DirectionalLight.o \
 	$(OBJDIR)/PointLight.o \
+	$(OBJDIR)/SpotLight.o \
 	$(OBJDIR)/Scene.o \
 	$(OBJDIR)/Shader.o \
 	$(OBJDIR)/Text.o \
@@ -186,7 +188,13 @@ $(OBJDIR)/OptionState.o: Game/OptionState.cpp
 $(OBJDIR)/PlayState.o: Game/PlayState.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/DirectionalLight.o: Light/DirectionalLight.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/PointLight.o: Light/PointLight.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/SpotLight.o: Light/SpotLight.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Scene.o: Scene/Scene.cpp

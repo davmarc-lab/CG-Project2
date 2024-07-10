@@ -3,12 +3,16 @@
 #include "../Entity/Entity.hpp"
 #include "../Shader/Shader.hpp"
 
+#include "../Light/Light.hpp"
+
 #include <vector>
 
 class Scene {
 private:
 
 	vector<std::pair<Entity*, Shader>> elements;
+
+    vector<Light*> lights;
 
 public:
 	Scene() {}
@@ -19,6 +23,8 @@ public:
 
 	inline vector<std::pair<Entity*, Shader>> getElements() { return this->elements; }
 
+    void addLight(Light* l);
+
 	void draw();
 
 	inline void clear() {
@@ -28,6 +34,7 @@ public:
 		}
 
 		this->elements.clear();
+        this->lights.clear();
 		delete this;
 	}
 

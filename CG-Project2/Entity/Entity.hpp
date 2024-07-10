@@ -21,6 +21,8 @@ public:
 
     Material material;
 
+    bool affected_by_light = true;
+
     Physic physics;
     bool m_static = false;
 
@@ -156,6 +158,12 @@ public:
     inline Material getMaterial() { return this->material; }
 
     inline void setMaterial(Material material) { this->material = material; }
+
+    inline bool isAffectedByLight() { return this->affected_by_light; }
+
+    inline void enableLighting() { this->affected_by_light = true; }
+
+    inline void disableLighting() { this->affected_by_light = false; }
 
     virtual void createVertexArray() = 0;
 
