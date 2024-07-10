@@ -161,9 +161,7 @@ public:
 
     inline bool isAffectedByLight() { return this->affected_by_light; }
 
-    inline void enableLighting() { this->affected_by_light = true; }
-
-    inline void disableLighting() { this->affected_by_light = false; }
+    inline void setLightComputation(bool val) { this->affected_by_light = val; }
 
     virtual void createVertexArray() = 0;
 

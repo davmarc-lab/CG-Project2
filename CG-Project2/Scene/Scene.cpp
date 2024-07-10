@@ -20,7 +20,8 @@ void Scene::addLight(Light *l) {
 void Scene::draw() {
     for (auto e : this->elements) {
         // only 1 light
-        if (this->lights.size() >= 1) {
+        // if the light is not used disable light computing
+        if (this->lights.size() >= 1 && e.first->isAffectedByLight()) {
             this->lights[0]->sendDataToShader(e.second);
         }
         e.first->draw(e.second);

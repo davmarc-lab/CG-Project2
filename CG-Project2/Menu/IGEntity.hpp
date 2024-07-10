@@ -172,9 +172,14 @@ public:
 #endif
                         this->obj_observer->changeTexture(filePathName);
                     }
+
                     // close
                     ImGuiFileDialog::Instance()->Close();
                 }
+            }
+            bool aff_lights = this->obj_observer->isAffectedByLight();
+            if (ImGui::Checkbox("Affected By Lights", &aff_lights)) {
+                this->obj_observer->setLightComputation(aff_lights);
             }
         }
 

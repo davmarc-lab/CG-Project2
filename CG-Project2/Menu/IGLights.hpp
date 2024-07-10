@@ -11,8 +11,6 @@ class IGLights : public IGMenu {
 private:
     vector<Light *> lights;
 
-    unsigned int id = 0;
-
     inline void renderDirectional(DirectionalLight *l) {
         auto dir = l->getDirection();
         if (ImGui::DragFloat3("Direction", &dir.x, 0.005f)) {
@@ -148,7 +146,6 @@ public:
                     break;
             }
             ImGui::PopID();
-            this->id++;
         }
         ImGui::End();
     }
