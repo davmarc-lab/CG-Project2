@@ -1,5 +1,7 @@
 #include "Cube.hpp"
 
+#include "../Light/Pointlight.hpp"
+
 void CubeEntity::buildCube() {
     float vertices[] = {// coords.vertex coord,   texture coord,  coords.normals vectors
                         -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  0.0f,  -1.0f, 0.5f,  -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,  0.0f,  -1.0f,
@@ -65,8 +67,25 @@ void CubeEntity::createVertexArray() {
 }
 
 void CubeEntity::draw(Shader shader) {
+    PointLight l = PointLight();
+    l.setPosition(vec3(0, 0, 0));
     shader.use();
-    shader.setMat4("model", this->transform.getModelMatrix());
+
+    shader.setInt("lightType", LightType::POINTLIGHT);
+    shader.setVec3("light.position", l.getPosition());
+
+    shader.setVec3("light.ambient", l.getAmbient());
+    shader.setVec3("light.diffuse", l.getDiffuse());
+    shader.setVec3("light.specular", l.getSpecular());
+
+    shader.setFloat("light.constant", l.getConstant());
+    shader.setFloat("light.linear", l.getLinear());
+    shader.setFloat("light.quadratic", l.getQuadratic());
+
+    shader.setFloat("material.shininess", 32.0f);
+
+    shader.setMat4("projection", projection);
+    shader.setMat4("model", this->getModelMatrix());
 
     glBindVertexArray(this->buffers.vao);
     glDrawArrays(GL_TRIANGLES, 0, this->coords.vertex.size());

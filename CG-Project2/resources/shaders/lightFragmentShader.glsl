@@ -26,7 +26,6 @@ struct Light {
     bool isSmooth;
 };
 
-in vec4 vertexColor;
 in vec2 TexCoord;
 in vec3 FragPos;
 

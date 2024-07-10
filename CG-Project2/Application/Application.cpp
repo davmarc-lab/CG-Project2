@@ -64,7 +64,6 @@ void Application::launch() {
 		}
 
 		glfwSwapBuffers(window.getWindow());
-
 	}
 
 	ImGui_ImplOpenGL3_Shutdown();
