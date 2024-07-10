@@ -3,5 +3,6 @@ packages.config
 .vs
 bin
 CG-Project2/obj
-x64
+CG-Project2/x64/
+x64/
 

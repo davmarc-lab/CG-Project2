@@ -1,76 +1,27 @@
-﻿  Application.cpp
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Application\Application.cpp(11,62): warning C4244: 'argomento': conversione da 'const float' a 'int'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Application\Application.cpp(11,49): warning C4244: 'argomento': conversione da 'const float' a 'int'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Application\Application.cpp(12,57): warning C4244: 'argomento': conversione da 'const float' a 'unsigned int'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Application\Application.cpp(12,44): warning C4244: 'argomento': conversione da 'const float' a 'unsigned int'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Application\Application.cpp(42,22): warning C4244: 'inizializzazione': conversione da 'double' a 'float'. Possibile perdita di dati.
-  Cube.cpp
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Cube.hpp(16,49): warning C4267: '=': conversione da 'size_t' a 'int'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Cube.cpp(86,59): warning C4267: 'argomento': conversione da 'size_t' a 'GLsizei'. Possibile perdita di dati.
-  Cubemap.cpp
-  Plane.cpp
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Plane.cpp(81,59): warning C4267: 'argomento': conversione da 'size_t' a 'GLsizei'. Possibile perdita di dati.
-  Sphere.cpp
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Sphere.cpp(11,13): warning C4244: 'inizializzazione': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Sphere.cpp(45,9): warning C4267: 'inizializzazione': conversione da 'size_t' a 'int'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Sphere.cpp(99,59): warning C4267: 'argomento': conversione da 'size_t' a 'GLsizei'. Possibile perdita di dati.
-  Texture.cpp
-  Game.cpp
-  IntroState.cpp
-  OptionState.cpp
-  PlayState.cpp
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Cube.hpp(16,49): warning C4267: '=': conversione da 'size_t' a 'int'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGCamera.hpp(39,56): warning C4305: 'argomento': troncamento da 'double' a 'float'
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGCamera.hpp(50,55): warning C4305: 'argomento': troncamento da 'double' a 'float'
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(82,51): warning C4305: 'argomento': troncamento da 'double' a 'float'
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(85,51): warning C4305: 'argomento': troncamento da 'double' a 'float'
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(88,51): warning C4305: 'argomento': troncamento da 'double' a 'float'
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(99,60): warning C4305: 'argomento': troncamento da 'double' a 'float'
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(101,60): warning C4305: 'argomento': troncamento da 'double' a 'float'
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(103,60): warning C4305: 'argomento': troncamento da 'double' a 'float'
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(118,50): warning C4305: 'argomento': troncamento da 'double' a 'float'
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(119,50): warning C4305: 'argomento': troncamento da 'double' a 'float'
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Menu\IGEntity.hpp(120,50): warning C4305: 'argomento': troncamento da 'double' a 'float'
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(118,38): warning C4244: '=': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(129,36): warning C4244: 'argomento': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(129,33): warning C4244: 'argomento': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(133,23): warning C4244: '=': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(134,23): warning C4244: '=': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(151,19): warning C4244: '=': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(152,19): warning C4244: '=': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(174,23): warning C4244: '=': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(175,23): warning C4244: '=': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(181,19): warning C4244: '=': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(182,19): warning C4244: '=': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(184,42): warning C4244: 'argomento': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(184,33): warning C4244: 'argomento': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(191,22): warning C4244: '=': conversione da 'float' a 'int'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(247,26): warning C4244: 'inizializzazione': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(248,26): warning C4244: 'inizializzazione': conversione da 'double' a 'float'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(250,48): warning C4244: 'argomento': conversione da 'float' a 'int'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(250,40): warning C4244: 'argomento': conversione da 'float' a 'int'. Possibile perdita di dati.
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp(264,60): warning C4305: 'argomento': troncamento da 'double' a 'float'
-  DirectionalLight.cpp
-  PointLight.cpp
-  SpotLight.cpp
-  Scene.cpp
-  Shader.cpp
-  Text.cpp
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Text\Text.cpp(80,21): warning C4244: 'inizializzazione': conversione da 'T' a 'float'. Possibile perdita di dati.
-          with
-          [
-              T=int
-          ]
-E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Text\Text.cpp(81,22): warning C4244: 'inizializzazione': conversione da 'T' a 'float'. Possibile perdita di dati.
-          with
-          [
-              T=int
-          ]
-  Window.cpp
-  imgui_impl_opengl3.cpp
-  main.cpp
-  Generazione del codice in corso...
-  glad.c
+﻿  Cubemap.cpp
+  LINK : E:\FILES\Università\TerzoAnno\CG-Project2\x64\Debug\CG-Project2.exe non trovato o non compilato dall'ultimo collegamento incrementale; verrà eseguito il collegamento completo
+freetype26d.lib(ftinit.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(ftinit.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(ftbase.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(ftbase.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(autofit.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(autofit.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(truetype.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(truetype.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(type1.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(type1.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(cff.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(cff.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(type1cid.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(type1cid.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(pfr.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(pfr.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(type42.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(type42.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(winfnt.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(winfnt.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(pcf.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(pcf.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(psaux.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(psaux.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(psmodule.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(psmodule.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(pshinter.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(pshinter.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(raster.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(raster.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(sfnt.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(sfnt.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(smooth.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(smooth.obj)' o in ''; oggetto collegato senza informazioni di debug
 freetype26d.lib(bdf.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(bdf.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(ftsystem.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(ftsystem.obj)' o in ''; oggetto collegato senza informazioni di debug
 freetype26d.lib(ftdebug.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(ftdebug.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(ftbitmap.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(ftbitmap.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(ftgzip.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(ftgzip.obj)' o in ''; oggetto collegato senza informazioni di debug
+freetype26d.lib(ftlzw.obj) : warning LNK4099: impossibile trovare il PDB '' con 'freetype26d.lib(ftlzw.obj)' o in ''; oggetto collegato senza informazioni di debug
+LINK : warning LNK4098: la libreria predefinita 'MSVCRT' è in conflitto con l'utilizzo di altre librerie; usare /NODEFAULTLIB:libreria
   CG-Project2.vcxproj -> E:\FILES\Università\TerzoAnno\CG-Project2\x64\Debug\CG-Project2.exe
