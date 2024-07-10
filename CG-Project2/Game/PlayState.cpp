@@ -26,6 +26,7 @@ Cubemap *skybox;
 Shader lightShader, planeShader, skyboxShader;
 
 SpotLight *pl = new SpotLight();
+PointLight *ll = new PointLight();
 
 Scene obj_scene;
 
@@ -81,7 +82,9 @@ void PlayState::init() {
 
     pl->setPosition(vec3(0));
     pl->setDirection(vec3(0, 1, 0));
+    ll->setPosition(vec3(1));
     obj_scene.addLight(pl);
+    obj_scene.addLight(ll);
 
     // imgui
     entityMenu = new IGEntity();

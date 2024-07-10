@@ -11,7 +11,7 @@ bool Scene::removeElement(Entity *e) {
 void Scene::addLight(Light *l) {
     if (this->lights.size() > 1) {
         warning("Cannot work with multiple lights");
-        return;
+        // return;
     }
 
     this->lights.push_back(l);

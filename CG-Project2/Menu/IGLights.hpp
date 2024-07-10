@@ -11,35 +11,37 @@ class IGLights : public IGMenu {
 private:
     vector<Light *> lights;
 
+    unsigned int id = 0;
+
     inline void renderDirectional(DirectionalLight *l) {
         auto dir = l->getDirection();
-        if (ImGui::DragFloat3("Direction##1", &dir.x, 0.005f)) {
+        if (ImGui::DragFloat3("Direction", &dir.x, 0.005f)) {
             l->setDirection(dir);
         }
     }
 
     inline void renderPoint(PointLight *l) {
         auto pos = l->getPosition();
-        if (ImGui::DragFloat3("Position##1", &pos.x, 0.005f)) {
+        if (ImGui::DragFloat3("Position", &pos.x, 0.005f)) {
             l->setPosition(pos);
         }
 
         auto con = l->getConstant();
-        if (ImGui::DragFloat("Constant##1", &con, 0.005f)) {
+        if (ImGui::DragFloat("Constant", &con, 0.005f)) {
             if (con > 0) {
                 l->setConstant(con);
             }
         }
 
         auto lin = l->getLinear();
-        if (ImGui::DragFloat("Linear##1", &lin, 0.001f)) {
+        if (ImGui::DragFloat("Linear", &lin, 0.0001f)) {
             if (lin > 0) {
                 l->setLinear(lin);
             }
         }
 
         auto quad = l->getQuadratic();
-        if (ImGui::DragFloat("Quadratic##1", &quad, 0.001f)) {
+        if (ImGui::DragFloat("Quadratic", &quad, 0.0001f)) {
             if (quad > 0) {
                 l->setQuadratic(quad);
             }
@@ -48,44 +50,44 @@ private:
 
     inline void renderSpot(SpotLight *l) {
         auto pos = l->getPosition();
-        if (ImGui::DragFloat3("Position##1", &pos.x, 0.005f)) {
+        if (ImGui::DragFloat3("Position", &pos.x, 0.005f)) {
             l->setPosition(pos);
         }
 
         auto dir = l->getDirection();
-        if (ImGui::DragFloat3("Direction##1", &dir.x, 0.005f)) {
+        if (ImGui::DragFloat3("Direction", &dir.x, 0.005f)) {
             l->setDirection(dir);
         }
         auto con = l->getConstant();
-        if (ImGui::DragFloat("Constant##1", &con, 0.005f)) {
+        if (ImGui::DragFloat("Constant", &con, 0.0005f)) {
             if (con > 0) {
                 l->setConstant(con);
             }
         }
 
         auto lin = l->getLinear();
-        if (ImGui::DragFloat("Linear##1", &lin, 0.0001f)) {
+        if (ImGui::DragFloat("Linear", &lin, 0.0001f)) {
             if (lin > 0) {
                 l->setLinear(lin);
             }
         }
 
         auto quad = l->getQuadratic();
-        if (ImGui::DragFloat("Quadratic##1", &quad, 0.0001f)) {
+        if (ImGui::DragFloat("Quadratic", &quad, 0.0001f)) {
             if (quad > 0) {
                 l->setQuadratic(quad);
             }
         }
 
         auto coff = l->getCutOff();
-        if (ImGui::DragFloat("CutOff##1", &coff, 0.005f)) {
+        if (ImGui::DragFloat("CutOff", &coff, 0.05f)) {
             if (coff > 0) {
                 l->setCutOff(coff);
             }
         }
 
         auto out = l->getOuterCutOff();
-        if (ImGui::DragFloat("Outer CutOff##1", &out, 0.005f)) {
+        if (ImGui::DragFloat("Outer CutOff", &out, 0.05f)) {
             if (out > 0) {
                 l->setOuterCutOff(out);
             }
@@ -100,35 +102,35 @@ public:
     inline virtual void render() override {
         ImGui::Begin("Lights");
         for (auto l : this->lights) {
-
+            ImGui::PushID(l);
             auto type = getLightTypeName(l->getType());
 
             ImGui::Text("%s Light", type.c_str());
 
             auto col = l->getColor();
-            if (ImGui::ColorEdit3("Color##1", &col.x)) {
+            if (ImGui::ColorEdit3("Color", &col.x)) {
                 l->setColor(col);
             }
 
             auto intens = l->getIntensity();
-            if (ImGui::DragFloat("Intensity##1", &intens, 0.05f, 0.0f)) {
+            if (ImGui::DragFloat("Intensity", &intens, 0.05f, 0.0f)) {
                 if (intens > 0) {
                     l->setIntensity(intens);
                 }
             }
 
             auto amb = l->getAmbient();
-            if (ImGui::DragFloat3("Ambient##1", &amb.x, 0.05f, 0.0f, 1.0f)) {
+            if (ImGui::DragFloat3("Ambient", &amb.x, 0.005f, 0.0f, 1.0f)) {
                 l->setAmbient(amb);
             }
 
             auto diff = l->getDiffuse();
-            if (ImGui::DragFloat3("Diffuse##1", &diff.x, 0.05f, 0.0f, 1.0f)) {
+            if (ImGui::DragFloat3("Diffuse", &diff.x, 0.005f, 0.0f, 1.0f)) {
                 l->setDiffuse(diff);
             }
 
             auto spec = l->getSpecular();
-            if (ImGui::DragFloat3("Specular##1", &spec.x, 0.05f, 0.0f, 1.0f)) {
+            if (ImGui::DragFloat3("Specular", &spec.x, 0.005f, 0.0f, 1.0f)) {
                 l->setSpecular(spec);
             }
 
@@ -145,6 +147,8 @@ public:
                 default:
                     break;
             }
+            ImGui::PopID();
+            this->id++;
         }
         ImGui::End();
     }
