@@ -145,6 +145,7 @@
     <ClCompile Include="dependencies\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Entity\Cube.cpp" />
     <ClCompile Include="Entity\Cubemap.cpp" />
+    <ClCompile Include="Entity\Material\Material.cpp" />
     <ClCompile Include="Entity\Plane.cpp" />
     <ClCompile Include="Entity\Sphere.cpp" />
     <ClCompile Include="Entity\Textures\Texture.cpp" />
@@ -153,6 +154,9 @@
     <ClCompile Include="Game\OptionState.cpp" />
     <ClCompile Include="Game\PlayState.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="Light\DirectionalLight.cpp" />
+    <ClCompile Include="Light\PointLight.cpp" />
+    <ClCompile Include="Light\SpotLight.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Shader\Shader.cpp" />
@@ -186,6 +190,7 @@
     <ClInclude Include="Entity\Cube.hpp" />
     <ClInclude Include="Entity\Cubemap.hpp" />
     <ClInclude Include="Entity\Entity.hpp" />
+    <ClInclude Include="Entity\Material\Material.hpp" />
     <ClInclude Include="Entity\Plane.hpp" />
     <ClInclude Include="Entity\Sphere.hpp" />
     <ClInclude Include="Entity\Textures\Texture.hpp" />
@@ -197,9 +202,16 @@
     <ClInclude Include="Game\PlayState.hpp" />
     <ClInclude Include="Lib.hpp" />
     <ClInclude Include="LibCustomGui.hpp" />
+    <ClInclude Include="LibLightStruct.hpp" />
+    <ClInclude Include="Light\DirectionalLight.hpp" />
+    <ClInclude Include="Light\Light.hpp" />
+    <ClInclude Include="Light\Pointlight.hpp" />
+    <ClInclude Include="Light\SpotLight.hpp" />
     <ClInclude Include="Menu\ButtonComponent.hpp" />
     <ClInclude Include="Menu\Component.hpp" />
+    <ClInclude Include="Menu\IGCamera.hpp" />
     <ClInclude Include="Menu\IGEntity.hpp" />
+    <ClInclude Include="Menu\IGLights.hpp" />
     <ClInclude Include="Menu\IGMenu.hpp" />
     <ClInclude Include="Menu\IGMode.hpp" />
     <ClInclude Include="Menu\OptionPane.hpp" />

@@ -35,7 +35,7 @@ const float WIDTH = 1200.f, HEIGHT = 700.f;
 
 const mat4 textProjection = ortho(0.f, WIDTH, 0.f, HEIGHT);
 
-inline mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
+static mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
 
 // mmmmm
 inline void updatePerspective(float zoom) {

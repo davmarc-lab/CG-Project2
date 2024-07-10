@@ -90,6 +90,18 @@
     <ClCompile Include="Scene\Scene.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Light\PointLight.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity\Material\Material.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Light\DirectionalLight.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Light\SpotLight.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\include\glad\glad.h">
@@ -237,6 +249,30 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Menu\IGMode.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="LibLightStruct.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu\IGCamera.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Light\Light.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Light\Pointlight.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\Material\Material.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu\IGLights.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Light\DirectionalLight.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Light\SpotLight.hpp">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

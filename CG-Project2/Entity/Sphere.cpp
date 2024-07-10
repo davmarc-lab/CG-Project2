@@ -83,6 +83,18 @@ void Sphere::draw(Shader shader) {
     shader.use();
     shader.setMat4("model", this->transform.getModelMatrix());
 
+	shader.setVec3("material.ambient", this->material.getAmbient());
+	shader.setVec3("material.diffuse", this->material.getDiffuse());
+	shader.setVec3("material.specular", this->material.getSpecular());
+
+	shader.setFloat("material.shininess", this->material.getShininess());
+
+	if (this->texture.getPath() != "None") {
+		// bind texture
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, this->texture.getId());
+	}
+
     glBindVertexArray(this->buffers.vao);
     glDrawElements(GL_TRIANGLES, (this->index.size() - 1) * sizeof(GLuint), GL_UNSIGNED_INT, 0);
 

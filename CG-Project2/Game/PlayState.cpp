@@ -43,21 +43,24 @@ void PlayState::init() {
 
     lightShader = Shader("./resources/shaders/lightVertexShader.glsl", "./resources/shaders/lightFragmentShader.glsl");
     lightShader.use();
-    Texture texture = Texture("./resources/textures/web-dirt.png");
-    texture.createTexture();
+    Texture cube_texture = Texture("./resources/textures/web-dirt.png");
+    cube_texture.createTexture();
 
     cube = new CubeEntity();
     cube->createVertexArray();
     cube->setScale(vec3(1));
     cube->applyTransformation(vec3(0, 1, 0), vec3(1), vec3(0), 0);
-    cube->attachTexture(texture);
+    cube->attachTexture(cube_texture);
     cube->setMaterial(material::NONE);
+
+    Texture sphere_texture = Texture("./resources/textures/web-dirt.png");
+    sphere_texture.createTexture();
 
     sphere = new Sphere();
     sphere->createVertexArray();
     sphere->setScale(vec3(1));
     sphere->applyTransformation(vec3(2, 0, 0), vec3(1), vec3(0), 0);
-    sphere->attachTexture(texture);
+    sphere->attachTexture(sphere_texture);
     sphere->setMaterial(material::NONE);
 
     planeShader = Shader("./resources/shaders/vertexShader.glsl", "./resources/shaders/fragmentShader.glsl");

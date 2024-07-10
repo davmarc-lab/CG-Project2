@@ -76,6 +76,12 @@ void CubeEntity::draw(Shader shader) {
     shader.setMat4("projection", projection);
     shader.setMat4("model", this->getModelMatrix());
 
+    if (this->texture.getPath() != "None") {
+        // bind texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, this->texture.getId());
+    }
+
     glBindVertexArray(this->buffers.vao);
     glDrawArrays(GL_TRIANGLES, 0, this->coords.vertex.size());
     glBindVertexArray(0);

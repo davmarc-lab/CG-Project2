@@ -10,6 +10,7 @@ E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\dependencies\include\imgu
 E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\dependencies\include\imgui\imgui_widgets.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\imgui_widgets.obj
 E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Cube.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\Cube.obj
 E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Cubemap.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\Cubemap.obj
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Material\Material.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\Material.obj
 E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Plane.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\Plane.obj
 E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Sphere.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\Sphere.obj
 E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Entity\Textures\Texture.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\Texture.obj
@@ -18,6 +19,9 @@ E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\IntroState.cpp;E:\FI
 E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\OptionState.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\OptionState.obj
 E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Game\PlayState.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\PlayState.obj
 E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\glad.c;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\glad.obj
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Light\DirectionalLight.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\DirectionalLight.obj
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Light\PointLight.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\PointLight.obj
+E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Light\SpotLight.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\SpotLight.obj
 E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\main.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\main.obj
 E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Scene\Scene.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\Scene.obj
 E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\Shader\Shader.cpp;E:\FILES\Università\TerzoAnno\CG-Project2\CG-Project2\x64\Debug\Shader.obj
