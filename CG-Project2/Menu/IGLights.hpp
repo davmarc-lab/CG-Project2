@@ -1,0 +1,153 @@
+#pragma once
+
+#include "IGMenu.hpp"
+
+#include "../Light/DirectionalLight.hpp"
+#include "../Light/Light.hpp"
+#include "../Light/PointLight.hpp"
+#include "../Light/SpotLight.hpp"
+
+class IGLights : public IGMenu {
+private:
+    vector<Light *> lights;
+
+    inline void renderDirectional(DirectionalLight *l) {
+        auto dir = l->getDirection();
+        if (ImGui::DragFloat3("Direction##1", &dir.x, 0.005f)) {
+            l->setDirection(dir);
+        }
+    }
+
+    inline void renderPoint(PointLight *l) {
+        auto pos = l->getPosition();
+        if (ImGui::DragFloat3("Position##1", &pos.x, 0.005f)) {
+            l->setPosition(pos);
+        }
+
+        auto con = l->getConstant();
+        if (ImGui::DragFloat("Constant##1", &con, 0.005f)) {
+            if (con > 0) {
+                l->setConstant(con);
+            }
+        }
+
+        auto lin = l->getLinear();
+        if (ImGui::DragFloat("Linear##1", &lin, 0.001f)) {
+            if (lin > 0) {
+                l->setLinear(lin);
+            }
+        }
+
+        auto quad = l->getQuadratic();
+        if (ImGui::DragFloat("Quadratic##1", &quad, 0.001f)) {
+            if (quad > 0) {
+                l->setQuadratic(quad);
+            }
+        }
+    }
+
+    inline void renderSpot(SpotLight *l) {
+        auto pos = l->getPosition();
+        if (ImGui::DragFloat3("Position##1", &pos.x, 0.005f)) {
+            l->setPosition(pos);
+        }
+
+        auto dir = l->getDirection();
+        if (ImGui::DragFloat3("Direction##1", &dir.x, 0.005f)) {
+            l->setDirection(dir);
+        }
+        auto con = l->getConstant();
+        if (ImGui::DragFloat("Constant##1", &con, 0.005f)) {
+            if (con > 0) {
+                l->setConstant(con);
+            }
+        }
+
+        auto lin = l->getLinear();
+        if (ImGui::DragFloat("Linear##1", &lin, 0.0001f)) {
+            if (lin > 0) {
+                l->setLinear(lin);
+            }
+        }
+
+        auto quad = l->getQuadratic();
+        if (ImGui::DragFloat("Quadratic##1", &quad, 0.0001f)) {
+            if (quad > 0) {
+                l->setQuadratic(quad);
+            }
+        }
+
+        auto coff = l->getCutOff();
+        if (ImGui::DragFloat("CutOff##1", &coff, 0.005f)) {
+            if (coff > 0) {
+                l->setCutOff(coff);
+            }
+        }
+
+        auto out = l->getOuterCutOff();
+        if (ImGui::DragFloat("Outer CutOff##1", &out, 0.005f)) {
+            if (out > 0) {
+                l->setOuterCutOff(out);
+            }
+        }
+    }
+
+public:
+    IGLights() {}
+
+    IGLights(vector<Light *> lights) : lights(lights) {}
+
+    inline virtual void render() override {
+        ImGui::Begin("Lights");
+        for (auto l : this->lights) {
+
+            auto type = getLightTypeName(l->getType());
+
+            ImGui::Text("%s Light", type.c_str());
+
+            auto col = l->getColor();
+            if (ImGui::ColorEdit3("Color##1", &col.x)) {
+                l->setColor(col);
+            }
+
+            auto intens = l->getIntensity();
+            if (ImGui::DragFloat("Intensity##1", &intens, 0.05f, 0.0f)) {
+                if (intens > 0) {
+                    l->setIntensity(intens);
+                }
+            }
+
+            auto amb = l->getAmbient();
+            if (ImGui::DragFloat3("Ambient##1", &amb.x, 0.05f, 0.0f, 1.0f)) {
+                l->setAmbient(amb);
+            }
+
+            auto diff = l->getDiffuse();
+            if (ImGui::DragFloat3("Diffuse##1", &diff.x, 0.05f, 0.0f, 1.0f)) {
+                l->setDiffuse(diff);
+            }
+
+            auto spec = l->getSpecular();
+            if (ImGui::DragFloat3("Specular##1", &spec.x, 0.05f, 0.0f, 1.0f)) {
+                l->setSpecular(spec);
+            }
+
+            switch (l->getType()) {
+                case LightType::DIRECTIONAL:
+                    renderDirectional((DirectionalLight *)l);
+                    break;
+                case LightType::POINTLIGHT:
+                    renderPoint((PointLight *)l);
+                    break;
+                case LightType::SPOTLIGHT:
+                    renderSpot((SpotLight *)l);
+                    break;
+                default:
+                    break;
+            }
+        }
+        ImGui::End();
+    }
+
+    ~IGLights() = default;
+};

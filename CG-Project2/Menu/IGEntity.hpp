@@ -2,8 +2,6 @@
 
 #include "../Entity/Entity.hpp"
 
-#include "../LibCustomGui.hpp"
-
 #include "IGMenu.hpp"
 
 #include <vector>

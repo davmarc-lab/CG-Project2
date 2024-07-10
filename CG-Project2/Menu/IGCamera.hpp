@@ -3,7 +3,6 @@
 #include "IGMenu.hpp"
 
 #include "../Lib.hpp"
-#include "../LibCustomGui.hpp"
 
 class IGCamera : public IGMenu {
 public:

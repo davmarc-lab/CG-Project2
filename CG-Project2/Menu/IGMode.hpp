@@ -3,7 +3,6 @@
 #include "IGMenu.hpp"
 
 #include "../Lib.hpp"
-#include "../LibCustomGui.hpp"
 
 class IGMode : public IGMenu {
 private:
@@ -12,7 +11,7 @@ public:
 
 	IGMode(InputMode* mode) : mode(mode) {}
 
-	virtual void render() {
+	inline virtual void render() override {
 		string text = calcInputMode(*this->mode);
 
 		ImGui::Begin("Input Mode");

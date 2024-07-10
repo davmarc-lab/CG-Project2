@@ -25,6 +25,8 @@ public:
 
     void addLight(Light* l);
 
+    inline vector<Light*> getLights() { return this->lights; }
+
 	void draw();
 
 	inline void clear() {

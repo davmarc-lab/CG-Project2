@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <glm/vec3.hpp>
 
 enum LightType
@@ -21,3 +22,15 @@ struct LightInfo {
     float quadratic = 0.032f;
 };
 
+inline std::string getLightTypeName(LightType type) {
+    switch (type) {
+        case LightType::DIRECTIONAL:
+            return "Directional";
+        case LightType::POINTLIGHT:
+            return "Point";
+        case LightType::SPOTLIGHT:
+            return "Spot";
+    }
+
+    return "No Name";
+}

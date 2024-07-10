@@ -7,7 +7,7 @@
 #include "../Entity/Plane.hpp"
 #include "../Entity/Sphere.hpp"
 
-#include "../Light/PointLight.hpp"
+#include "../Light/SpotLight.hpp"
 
 #include "../Scene/Scene.hpp"
 
@@ -15,6 +15,7 @@
 #include "../Menu/IGEntity.hpp"
 #include "../Menu/IGMenu.hpp"
 #include "../Menu/IGMode.hpp"
+#include "../Menu/IGLights.hpp"
 
 PlayState PlayState::playState;
 
@@ -24,13 +25,13 @@ PlaneEntity *plane;
 Cubemap *skybox;
 Shader lightShader, planeShader, skyboxShader;
 
-PointLight *pl = new PointLight();
+SpotLight *pl = new SpotLight();
 
 Scene obj_scene;
 
 InputMode user_mode = InputMode::INTERACT;
 
-IGMenu *modeMenu, *cameraMenu;
+IGMenu *modeMenu, *cameraMenu, *lightsMenu;
 IGEntity *entityMenu = nullptr;
 
 Mouse mouse;
@@ -79,11 +80,14 @@ void PlayState::init() {
     obj_scene.addElement(sphere, lightShader);
 
     pl->setPosition(vec3(0));
+    pl->setDirection(vec3(0, 1, 0));
     obj_scene.addLight(pl);
+
     // imgui
     entityMenu = new IGEntity();
     modeMenu = new IGMode(&user_mode);
     cameraMenu = new IGCamera();
+    lightsMenu = new IGLights(obj_scene.getLights());
 }
 
 void PlayState::clean() {}
@@ -385,5 +389,6 @@ void PlayState::draw(GameEngine *engine) {
     entityMenu->render();
     modeMenu->render();
     cameraMenu->render();
+    lightsMenu->render();
 }
 

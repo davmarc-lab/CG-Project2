@@ -35,6 +35,14 @@ public:
 
     inline void setQuadratic(const float val) { this->info.quadratic = val; }
 
+    inline float getCutOff() { return this->cutOff; }
+
+    inline void setCutOff(float val) { this->cutOff = val; }
+
+    inline float getOuterCutOff() { return this->outer_cutOff; }
+
+    inline void setOuterCutOff(float val) { this->outer_cutOff = val; }
+
     virtual void sendDataToShader(Shader shader) override;
 
     ~SpotLight() = default;
