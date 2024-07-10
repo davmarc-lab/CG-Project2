@@ -4,7 +4,7 @@
 
 class PointLight : public Light {
 private:
-    vec3 position = vec3(0);
+    vec3 position = vec3(1, 1, 1);
     PointLightInfo info;
 
 public:

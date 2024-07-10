@@ -7,7 +7,7 @@
 
 class Scene {
 private:
-	
+
 	vector<std::pair<Entity*, Shader>> elements;
 
 public:

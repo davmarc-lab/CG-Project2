@@ -11,8 +11,8 @@ void PointLight::sendDataToShader(Shader shader) {
     shader.use();
 
     shader.setInt("lightType", LightType::POINTLIGHT);
-
     shader.setVec3("light.position", this->position);
+
     shader.setFloat("light.constant", this->info.constant);
     shader.setFloat("light.linear", this->info.linear);
     shader.setFloat("light.quadratic", this->info.quadratic);
@@ -22,7 +22,4 @@ void PointLight::sendDataToShader(Shader shader) {
     shader.setVec3("light.specular", this->vectors.specular);
 
     shader.setMat4("projection", projection);
-    shader.setMat4("view", camera.getViewMatrix());
-    
-    shader.setVec3("viewPos", camera.getCameraPosition());
 }

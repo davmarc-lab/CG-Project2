@@ -26,6 +26,8 @@ PlaneEntity *plane;
 Cubemap *skybox;
 Shader lightShader, planeShader, skyboxShader;
 
+PointLight pl = PointLight();
+
 Scene obj_scene;
 
 InputMode user_mode = InputMode::INTERACT;
@@ -41,24 +43,22 @@ void PlayState::init() {
 
     lightShader = Shader("./resources/shaders/lightVertexShader.glsl", "./resources/shaders/lightFragmentShader.glsl");
     lightShader.use();
-    lightShader.setInt("material.diffuse", 0);
-    lightShader.setInt("material.specular", 1);
     Texture texture = Texture("./resources/textures/web-dirt.png");
     texture.createTexture();
 
     cube = new CubeEntity();
     cube->createVertexArray();
     cube->setScale(vec3(1));
-    cube->applyTransformation(vec3(0), vec3(1), vec3(0), 0);
+    cube->applyTransformation(vec3(0, 1, 0), vec3(1), vec3(0), 0);
     cube->attachTexture(texture);
-    cube->setMaterial(material::RED_PLASTIC);
+    cube->setMaterial(material::NONE);
 
     /* sphere = new Sphere();
     sphere->createVertexArray();
     sphere->setScale(vec3(1));
     sphere->applyTransformation(vec3(2, 0, 0), vec3(1), vec3(0), 0);
     sphere->attachTexture(texture);
-    sphere->setMaterial(material::RED_PLASTIC); */
+    sphere->setMaterial(material::NONE); */
 
     planeShader = Shader("./resources/shaders/vertexShader.glsl", "./resources/shaders/fragmentShader.glsl");
     planeShader.use();
@@ -79,6 +79,8 @@ void PlayState::init() {
     // add elements to the scene
     obj_scene.addElement(cube, lightShader);
     // obj_scene.addElement(sphere, lightShader);
+
+    pl.setPosition(vec3(1));
 
     // imgui
     entityMenu = new IGEntity();
@@ -368,6 +370,7 @@ void PlayState::draw(GameEngine *engine) {
     skybox->draw(skyboxShader);
     plane->draw(planeShader);
 
+    pl.sendDataToShader(lightShader);
     obj_scene.draw();
 
     entityMenu->render();

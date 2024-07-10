@@ -53,8 +53,8 @@ namespace material {
             glm::vec3(0.60f,0.60f,0.50f),
             32.0f);
 
-    const Material NONE(glm::vec3(0.0f),
-            glm::vec3(0.0f),
-            glm::vec3(0.0f),
-            0.0f);
+    const Material NONE(glm::vec3(1.0f),
+            glm::vec3(1.0f),
+            glm::vec3(1.0f),
+            32.0f);
 }

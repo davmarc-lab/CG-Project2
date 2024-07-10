@@ -67,22 +67,13 @@ void CubeEntity::createVertexArray() {
 }
 
 void CubeEntity::draw(Shader shader) {
-    PointLight l = PointLight();
-    l.setPosition(vec3(0, 0, 0));
     shader.use();
 
-    shader.setInt("lightType", LightType::POINTLIGHT);
-    shader.setVec3("light.position", l.getPosition());
+    shader.setVec3("material.ambient", this->material.getAmbient());
+    shader.setVec3("material.diffuse", this->material.getDiffuse());
+    shader.setVec3("material.specular", this->material.getSpecular());
 
-    shader.setVec3("light.ambient", l.getAmbient());
-    shader.setVec3("light.diffuse", l.getDiffuse());
-    shader.setVec3("light.specular", l.getSpecular());
-
-    shader.setFloat("light.constant", l.getConstant());
-    shader.setFloat("light.linear", l.getLinear());
-    shader.setFloat("light.quadratic", l.getQuadratic());
-
-    shader.setFloat("material.shininess", 32.0f);
+    shader.setFloat("material.shininess", this->material.getShininess());
 
     shader.setMat4("projection", projection);
     shader.setMat4("model", this->getModelMatrix());
