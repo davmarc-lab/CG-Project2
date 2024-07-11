@@ -13,7 +13,7 @@ endif
 ifeq ($(config),debug)
   RESCOMP = windres
   TARGETDIR = bin/Debug
-  TARGET = $(TARGETDIR)/HelloWorld.exe
+  TARGET = $(TARGETDIR)/HelloWorld
   OBJDIR = obj/Debug
   DEFINES += -DDEBUG
   INCLUDES +=
@@ -40,7 +40,7 @@ endif
 ifeq ($(config),release)
   RESCOMP = windres
   TARGETDIR = bin/Release
-  TARGET = $(TARGETDIR)/HelloWorld.exe
+  TARGET = $(TARGETDIR)/HelloWorld
   OBJDIR = obj/Release
   DEFINES += -DNDEBUG
   INCLUDES +=

@@ -79,8 +79,8 @@ void PlayState::init() {
     skybox->createVertexArray();
 
     // add elements to the scene
-    obj_scene.addElement(cube, lightShader);
-    obj_scene.addElement(sphere, lightShader);
+    obj_scene.addElement(cube, &lightShader);
+    obj_scene.addElement(sphere, &lightShader);
 
     pl->setPosition(vec3(0));
     pl->setDirection(vec3(0, 1, 0));
@@ -265,7 +265,7 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
                     if (obj_selected == nullptr || dist <= ci) {
                         obj_selected = obj;
                         warning("Working on the same shader, it affects all the shaders");
-                        shader_selected = &shader;
+                        shader_selected = shader;
                         ci = dist;
                     }
                 }
