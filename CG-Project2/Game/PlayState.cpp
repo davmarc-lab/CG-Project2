@@ -42,7 +42,6 @@ void PlayState::init() {
     glDepthFunc(GL_LESS);
 
     lightShader = Shader("./resources/shaders/lightVertexShader.glsl", "./resources/shaders/lightFragmentShader.glsl");
-    lightShader.use();
     Texture cube_texture = Texture("./resources/textures/web-dirt.png");
     cube_texture.createTexture();
 
@@ -86,6 +85,7 @@ void PlayState::init() {
     pl->setPosition(vec3(0));
     pl->setDirection(vec3(0, 1, 0));
     ll->setPosition(vec3(1));
+
     obj_scene.addLight(pl);
     obj_scene.addLight(ll);
 

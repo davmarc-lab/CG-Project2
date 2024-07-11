@@ -31,12 +31,17 @@ struct Light {
 in vec2 TexCoord;
 in vec3 FragPos;
 
-// Color of each vertex.
+// Color of each vertex
 out vec4 FragColor;
-// Texture sampler.
+
+// Texture sampler
 uniform sampler2D ourTexture;
-// Normal vector.
+
+// Normal vector
 in vec3 Normal;
+
+// Entity affected by light
+uniform bool affectedByLights;
 
 // Light parameters
 uniform int lightType;
@@ -158,16 +163,21 @@ void main()
 {
     vec3 result;
 
-    switch (lightType) {
-        case 0:
-        result = calcDirectionalLight();
-        break;
-        case 1:
-        result = calcPointLight();
-        break;
-        case 2:
-        result = calcSpotLight();
-        break;
+    if (affectedByLights) {
+        switch (lightType) {
+            case 0:
+            result = calcDirectionalLight();
+            break;
+            case 1:
+            result = calcPointLight();
+            break;
+            case 2:
+            result = calcSpotLight();
+            break;
+        }
+    } else {
+        result = texture(ourTexture, TexCoord).rgb;
     }
+
     FragColor = vec4(result, 1.0);
 }

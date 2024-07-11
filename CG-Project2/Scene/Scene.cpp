@@ -10,7 +10,7 @@ bool Scene::removeElement(Entity *e) {
 
 void Scene::addLight(Light *l) {
     if (this->lights.size() > 1) {
-        warning("Cannot work with multiple lights");
+        warning("Multiple lights still doesn't work");
         // return;
     }
 
@@ -18,12 +18,21 @@ void Scene::addLight(Light *l) {
 }
 
 void Scene::draw() {
+
     for (auto e : this->elements) {
-        // only 1 light
-        // if the light is not used disable light computing
-        if (this->lights.size() >= 1 && e.first->isAffectedByLight()) {
-            this->lights[0]->sendDataToShader(e.second);
+        // If there is a light in the scene check if the entity is affected by lights
+        if (this->lights.size() >= 1) {
+            // send data to shader to compute lights or not
+            e.second.use();
+            e.second.setBool("affectedByLights", e.first->isAffectedByLight());
+            
+            // if the entity is affected by lights, send lights data
+            if (e.first->isAffectedByLight()) {
+                this->lights[0]->sendDataToShader(e.second);
+            }
         }
+
+
         e.first->draw(e.second);
     }
 }
