@@ -7,9 +7,8 @@ language("C++")
 targetdir("bin/%{cfg.buildcfg}")
 
 files({ "**.hpp", "**.h", "**.cpp", "**.c" })
-removefiles({ "opengl.cpp" })
 
-links({ "GL", "glfw", "X11", "freetype", "assimp", "Xrandr", "Xi", "dl" })
+links({ "glm", "GL", "glfw", "X11", "freetype", "assimp", "Xrandr", "Xi", "dl" })
 
 filter("configurations:Debug")
 defines({ "DEBUG" })

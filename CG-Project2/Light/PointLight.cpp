@@ -11,6 +11,7 @@ void PointLight::sendDataToShader(Shader shader) {
     shader.use();
 
     shader.setInt("lightType", this->type);
+    shader.setVec3("light.color", this->color);
     shader.setVec3("light.position", this->position);
 
     shader.setFloat("light.constant", this->info.constant);

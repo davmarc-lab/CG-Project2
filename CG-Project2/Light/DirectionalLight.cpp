@@ -8,6 +8,8 @@ void DirectionalLight::sendDataToShader(Shader shader) {
     shader.use();
 
     shader.setInt("lightType", this->type);
+    shader.setVec3("light.color", this->color);
+
     shader.setVec3("light.direction", this->direction);
 
     shader.setVec3("light.ambient", this->vectors.ambient);

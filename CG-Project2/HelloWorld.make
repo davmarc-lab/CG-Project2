@@ -13,7 +13,7 @@ endif
 ifeq ($(config),debug)
   RESCOMP = windres
   TARGETDIR = bin/Debug
-  TARGET = $(TARGETDIR)/HelloWorld
+  TARGET = $(TARGETDIR)/HelloWorld.exe
   OBJDIR = obj/Debug
   DEFINES += -DDEBUG
   INCLUDES +=
@@ -22,7 +22,7 @@ ifeq ($(config),debug)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += -lGL -lglfw -lX11 -lfreetype -lassimp -lXrandr -lXi -ldl
+  LIBS += -lglm -lGL -lglfw -lX11 -lfreetype -lassimp -lXrandr -lXi -ldl
   LDDEPS +=
   ALL_LDFLAGS += $(LDFLAGS)
   LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
@@ -40,7 +40,7 @@ endif
 ifeq ($(config),release)
   RESCOMP = windres
   TARGETDIR = bin/Release
-  TARGET = $(TARGETDIR)/HelloWorld
+  TARGET = $(TARGETDIR)/HelloWorld.exe
   OBJDIR = obj/Release
   DEFINES += -DNDEBUG
   INCLUDES +=
@@ -49,7 +49,7 @@ ifeq ($(config),release)
   ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O2
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += -lGL -lglfw -lX11 -lfreetype -lassimp -lXrandr -lXi -ldl
+  LIBS += -lglm -lGL -lglfw -lX11 -lfreetype -lassimp -lXrandr -lXi -ldl
   LDDEPS +=
   ALL_LDFLAGS += $(LDFLAGS) -s
   LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
