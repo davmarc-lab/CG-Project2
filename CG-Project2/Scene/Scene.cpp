@@ -19,6 +19,8 @@ void Scene::addLight(Light *l) {
 
 void Scene::draw() {
 
+    int index = 0;
+
     for (auto e : this->elements) {
         // If there is a light in the scene check if the entity is affected by lights
         if (this->lights.size() >= 1) {
@@ -28,10 +30,14 @@ void Scene::draw() {
             
             // if the entity is affected by lights, send lights data
             if (e.first->isAffectedByLight()) {
-                this->lights[0]->sendDataToShader(*e.second);
+                e.second->setInt("num_lights", this->lights.size());
+                index = 0;
+                for (auto l: this->lights) {
+                    l->sendDataToShader(*e.second, index);
+                    index++;
+                }
             }
         }
-
 
         e.first->draw(*e.second);
     }

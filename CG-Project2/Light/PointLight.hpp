@@ -28,7 +28,7 @@ public:
 
     inline void setQuadratic(const float val) { this->info.quadratic = val; }
 
-    virtual void sendDataToShader(Shader shader) override;
+    virtual void sendDataToShader(Shader shader, int index) override;
 
     ~PointLight() = default;
 };

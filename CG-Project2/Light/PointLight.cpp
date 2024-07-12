@@ -7,20 +7,22 @@ PointLight::PointLight(vec3 position, float constant, float linear, float quadra
     this->info.quadratic = quadratic;
 }
 
-void PointLight::sendDataToShader(Shader shader) {
+void PointLight::sendDataToShader(Shader shader, int index) {
     shader.use();
 
-    shader.setInt("lightType", this->type);
-    shader.setVec3("light.color", this->color);
-    shader.setVec3("light.position", this->position);
+    shader.setInt("lights[" + to_string(index) + "].lightType", this->type);
+    shader.setInt("max_num_lights", max_lights);
 
-    shader.setFloat("light.constant", this->info.constant);
-    shader.setFloat("light.linear", this->info.linear);
-    shader.setFloat("light.quadratic", this->info.quadratic);
+    shader.setVec3("lights[" + to_string(index) + "].color", this->color);
+    shader.setVec3("lights[" + to_string(index) + "].position", this->position);
 
-    shader.setVec3("light.ambient", this->vectors.ambient);
-    shader.setVec3("light.diffuse", this->vectors.diffuse);
-    shader.setVec3("light.specular", this->vectors.specular);
+    shader.setFloat("lights[" + to_string(index) + "].constant", this->info.constant);
+    shader.setFloat("lights[" + to_string(index) + "].linear", this->info.linear);
+    shader.setFloat("lights[" + to_string(index) + "].quadratic", this->info.quadratic);
+
+    shader.setVec3("lights[" + to_string(index) + "].ambient", this->vectors.ambient);
+    shader.setVec3("lights[" + to_string(index) + "].diffuse", this->vectors.diffuse);
+    shader.setVec3("lights[" + to_string(index) + "].specular", this->vectors.specular);
 
     shader.setMat4("projection", projection);
 }

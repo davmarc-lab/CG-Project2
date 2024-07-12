@@ -5,6 +5,7 @@
 
 #include "../Light/Light.hpp"
 
+#include <cassert>
 #include <vector>
 
 class Scene {

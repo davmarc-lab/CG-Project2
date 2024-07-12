@@ -10,3 +10,5 @@
  - [ ] Make a scene for all IGMenus
  - [ ] Refactor for loops (don't allocate variables inside loops
  - [ ] Fix some warning in Light and Entity for Shader (now it uses pointers)
+ - [ ] Consider if using a Shader Storage Buffer is useful for lights computing (at the moment I don't think so)
+

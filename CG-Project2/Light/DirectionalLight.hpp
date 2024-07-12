@@ -13,7 +13,7 @@ public:
 
     inline void setDirection(vec3 dir) { this->direction = dir; }
 
-    virtual void sendDataToShader(Shader shader) override;
+    virtual void sendDataToShader(Shader shader, int index) override;
 
     ~DirectionalLight() = default;
 };

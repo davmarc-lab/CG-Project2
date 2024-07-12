@@ -1,5 +1,7 @@
 #version 330 core
 
+#define MAX_LIGHTS 32
+
 // Materials structure
 struct Material {
     vec3 ambient;
@@ -10,6 +12,8 @@ struct Material {
 
 // Light structure
 struct Light {
+    int lightType;
+
     vec3 color;
 
     vec3 position;
@@ -44,41 +48,42 @@ in vec3 Normal;
 uniform bool affectedByLights;
 
 // Light parameters
-uniform int lightType;
+uniform int max_num_lights;
+uniform int num_lights;
 
 uniform vec3 viewPos;
 
 uniform Material material;
-uniform Light light;
+uniform Light lights[MAX_LIGHTS];
 
-vec3 execPhongAlgorithm() {
-    // ambient
-    vec3 ambient = light.color * light.ambient * material.ambient;
+// vec3 execPhongAlgorithm(Light light) {
+//     // ambient
+//     vec3 ambient = light.color * light.ambient * material.ambient;
+//
+//     // diffuse
+//     vec3 norm = normalize(Normal);
+//     vec3 lightDir;
+//
+//     if (lightType == 0) // calculating direcitonal light
+//     {
+//         lightDir = normalize(-light.direction);
+//     }
+//     else {
+//         lightDir = normalize(light.position - FragPos);
+//     }
+//     float diff = max(dot(norm, lightDir), 0.0);
+//     vec3 diffuse = light.color * light.diffuse * material.diffuse * diff;
+//
+//     // specular
+//     vec3 viewDir = normalize(viewPos - FragPos);
+//     vec3 reflectDir = reflect(-lightDir, norm);
+//     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+//     vec3 specular = light.color * light.specular * material.shininess * spec;
+//
+//     return texture(ourTexture, TexCoord).rgb * (ambient + diffuse + specular);
+// }
 
-    // diffuse
-    vec3 norm = normalize(Normal);
-    vec3 lightDir;
-
-    if (lightType == 0) // calculating direcitonal light
-    {
-        lightDir = normalize(-light.direction);
-    }
-    else {
-        lightDir = normalize(light.position - FragPos);
-    }
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = light.color * light.diffuse * material.diffuse * diff;
-
-    // specular
-    vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec3 specular = light.color * light.specular * material.shininess * spec;
-
-    return texture(ourTexture, TexCoord).rgb * (ambient + diffuse + specular);
-}
-
-vec3 calcDirectionalLight() {
+vec3 calcDirectionalLight(Light light) {
     vec3 norm = normalize(Normal);
 
     // ambient
@@ -95,10 +100,10 @@ vec3 calcDirectionalLight() {
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     vec3 specular = light.color * light.specular * spec * material.specular;
 
-    return texture(ourTexture, TexCoord).rgb * (ambient + diffuse + specular);
+    return (ambient + diffuse + specular);
 }
 
-vec3 calcPointLight() {
+vec3 calcPointLight(Light light) {
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - FragPos);
     vec3 viewDir = normalize(viewPos - FragPos);
@@ -123,10 +128,10 @@ vec3 calcPointLight() {
     diffuse *= attenuation;
     specular *= attenuation;
 
-    return texture(ourTexture, TexCoord).rgb * (ambient + diffuse + specular);
+    return (ambient + diffuse + specular);
 }
 
-vec3 calcSpotLight() {
+vec3 calcSpotLight(Light light) {
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - FragPos);
     vec3 viewDir = normalize(viewPos - FragPos);
@@ -156,28 +161,32 @@ vec3 calcSpotLight() {
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
 
-    return texture(ourTexture, TexCoord).rgb * (ambient + diffuse + specular);
+    return (ambient + diffuse + specular);
 }
 
-void main()
-{
-    vec3 result;
+void main() {
+    vec3 result = vec3(0);
 
     if (affectedByLights) {
-        switch (lightType) {
-            case 0:
-            result = calcDirectionalLight();
-            break;
-            case 1:
-            result = calcPointLight();
-            break;
-            case 2:
-            result = calcSpotLight();
-            break;
+        if (max_num_lights >= 1) {
+            // calc multiple lights
+            for (int i = 0; i < num_lights && i < max_num_lights; i++) {
+                switch (lights[i].lightType) {
+                    case 0:
+                    result += calcDirectionalLight(lights[i]);
+                    break;
+                    case 1:
+                    result += calcPointLight(lights[i]);
+                    break;
+                    case 2:
+                    result += calcSpotLight(lights[i]);
+                    break;
+                }
+            }
         }
     } else {
         result = texture(ourTexture, TexCoord).rgb;
     }
 
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(result * texture(ourTexture, TexCoord).rgb, 1.0);
 }

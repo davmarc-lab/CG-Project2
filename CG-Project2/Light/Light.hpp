@@ -5,6 +5,8 @@
 
 #include "../Shader/Shader.hpp"
 
+extern int max_lights;
+
 class Light {
 public:
     vec3 color = vec3(1.0f);
@@ -34,6 +36,10 @@ public:
 
     LightType getType() { return this->type; }
 
+    inline string addIndexToString(string before, int index, string after) {
+        return before + "[" + to_string(index) + "]." + after;
+    }
+
     /* ---Overrride Methods--- */
-    virtual void sendDataToShader(Shader shader) = 0;
+    virtual void sendDataToShader(Shader shader, int index) = 0;
 };

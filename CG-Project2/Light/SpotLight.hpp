@@ -43,7 +43,7 @@ public:
 
     inline void setOuterCutOff(float val) { this->outer_cutOff = val; }
 
-    virtual void sendDataToShader(Shader shader) override;
+    virtual void sendDataToShader(Shader shader, int index) override;
 
     ~SpotLight() = default;
 };

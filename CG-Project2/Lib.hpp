@@ -42,6 +42,8 @@ inline void updatePerspective(float zoom) {
       projection = glm::perspective(glm::radians(zoom), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
 }
 
+inline int max_lights = 4;
+
 const float BLOCK_DIM = 0.1f;
 const float OUTLINE_DIM = 0.001f;
 const float MARGIN_CUBE = -0.01f;

@@ -7,6 +7,8 @@
 #include "../Light/PointLight.hpp"
 #include "../Light/SpotLight.hpp"
 
+extern int max_lights;
+
 class IGLights : public IGMenu {
 private:
     vector<Light *> lights;
@@ -99,6 +101,14 @@ public:
 
     inline virtual void render() override {
         ImGui::Begin("Lights");
+    
+        if (ImGui::CollapsingHeader("Settings")) {
+            ImGui::InputInt("Max Lights in Scene", &max_lights, 1, 5);
+            if (max_lights < 0) {
+                max_lights = 0;
+            }
+        }
+
         for (auto l : this->lights) {
             ImGui::PushID(l);
             auto type = getLightTypeName(l->getType());

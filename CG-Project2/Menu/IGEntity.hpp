@@ -127,7 +127,6 @@ public:
 
             if (ImGui::CollapsingHeader("Shader")) {
                 // bad copy of the shader
-                cout << this->shader_observer->getId() << endl;
                 ImGui::Text("%d", this->shader_observer->getId());
             }
 
