@@ -44,7 +44,6 @@ void Application::launch() {
 		lastFrame = currentFrame;
 
 		// handle input
-		window.processCloseInput();
 		game.processInput();
 
 		// update game

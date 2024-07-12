@@ -2,7 +2,6 @@
 #include "GameState.hpp"
 
 #include "../Window/Window.hpp"
-#include "PlayState.hpp"
 
 Mouse input;
 
@@ -37,18 +36,6 @@ void GameEngine::changeState(GameState *state) {
     // empty state buffer
     if (!this->states.empty()) {
         this->states.back()->clean();
-    }
-
-    // when loading play state set mouse movement callback
-    if (state == PlayState::instance()) {
-        // glfwSetInputMode(this->window->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        // glfwSetCursorPosCallback(this->window->getWindow(), mouseMovementCallback);
-
-        if (glfwRawMouseMotionSupported())
-            glfwSetInputMode(this->window->getWindow(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-
-        GLFWcursor *cursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
-        glfwSetCursor(this->window->getWindow(), cursor);
     }
 
     this->states.push_back(state);

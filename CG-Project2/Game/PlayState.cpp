@@ -7,8 +7,6 @@
 #include "../Entity/Plane.hpp"
 #include "../Entity/Sphere.hpp"
 
-#include "../Light/SpotLight.hpp"
-
 #include "../Scene/Scene.hpp"
 
 #include "../Menu/IGCamera.hpp"
@@ -16,6 +14,8 @@
 #include "../Menu/IGMenu.hpp"
 #include "../Menu/IGMode.hpp"
 #include "../Menu/IGLights.hpp"
+
+#include "Game.hpp"
 
 PlayState PlayState::playState;
 
@@ -289,14 +289,18 @@ void PlayState::handleEvent(GameEngine *engine) {
     const float dt = engine->getDeltaTime();
 
     // Change mode
-    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_G)) {
         user_mode = InputMode::INTERACT;
     }
-    if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_V)) {
         user_mode = InputMode::SELECT;
     }
-    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_P)) {
         user_mode = InputMode::PASSIVE;
+    }
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_Q)) {
+        this->clean();
+        engine->quit();
     }
 
     switch (user_mode) {

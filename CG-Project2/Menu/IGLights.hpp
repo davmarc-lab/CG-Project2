@@ -2,8 +2,8 @@
 
 #include "IGMenu.hpp"
 
-#include "../Light/DirectionalLight.hpp"
 #include "../Light/Light.hpp"
+#include "../Light/DirectionalLight.hpp"
 #include "../Light/PointLight.hpp"
 #include "../Light/SpotLight.hpp"
 
@@ -101,60 +101,60 @@ public:
 
     inline virtual void render() override {
         ImGui::Begin("Lights");
-    
-        if (ImGui::CollapsingHeader("Settings")) {
-            ImGui::InputInt("Max Lights in Scene", &max_lights, 1, 5);
-            if (max_lights < 0) {
-                max_lights = 0;
-            }
+
+        ImGui::TextWrapped("Settings");
+
+        ImGui::InputInt("Max Lights in Scene", &max_lights, 1, 5);
+        if (max_lights < 0) {
+            max_lights = 0;
         }
 
         for (auto l : this->lights) {
             ImGui::PushID(l);
             auto type = getLightTypeName(l->getType());
+            if (ImGui::CollapsingHeader(string(type + " Light").c_str())) {
+                auto col = l->getColor();
+                if (ImGui::ColorEdit3("Color", &col.x)) {
+                    l->setColor(col);
+                }
 
-            ImGui::Text("%s Light", type.c_str());
+                auto intens = l->getIntensity();
+                if (ImGui::DragFloat("Intensity", &intens, 0.05f, 0.0f)) {
+                    if (intens > 0) {
+                        l->setIntensity(intens);
+                    }
+                }
 
-            auto col = l->getColor();
-            if (ImGui::ColorEdit3("Color", &col.x)) {
-                l->setColor(col);
-            }
+                auto amb = l->getAmbient();
+                if (ImGui::DragFloat3("Ambient", &amb.x, 0.005f, 0.0f, 1.0f)) {
+                    l->setAmbient(amb);
+                }
 
-            auto intens = l->getIntensity();
-            if (ImGui::DragFloat("Intensity", &intens, 0.05f, 0.0f)) {
-                if (intens > 0) {
-                    l->setIntensity(intens);
+                auto diff = l->getDiffuse();
+                if (ImGui::DragFloat3("Diffuse", &diff.x, 0.005f, 0.0f, 1.0f)) {
+                    l->setDiffuse(diff);
+                }
+
+                auto spec = l->getSpecular();
+                if (ImGui::DragFloat3("Specular", &spec.x, 0.005f, 0.0f, 1.0f)) {
+                    l->setSpecular(spec);
+                }
+
+                switch (l->getType()) {
+                    case LightType::DIRECTIONAL:
+                        renderDirectional((DirectionalLight *)l);
+                        break;
+                    case LightType::POINTLIGHT:
+                        renderPoint((PointLight *)l);
+                        break;
+                    case LightType::SPOTLIGHT:
+                        renderSpot((SpotLight *)l);
+                        break;
+                    default:
+                        break;
                 }
             }
 
-            auto amb = l->getAmbient();
-            if (ImGui::DragFloat3("Ambient", &amb.x, 0.005f, 0.0f, 1.0f)) {
-                l->setAmbient(amb);
-            }
-
-            auto diff = l->getDiffuse();
-            if (ImGui::DragFloat3("Diffuse", &diff.x, 0.005f, 0.0f, 1.0f)) {
-                l->setDiffuse(diff);
-            }
-
-            auto spec = l->getSpecular();
-            if (ImGui::DragFloat3("Specular", &spec.x, 0.005f, 0.0f, 1.0f)) {
-                l->setSpecular(spec);
-            }
-
-            switch (l->getType()) {
-                case LightType::DIRECTIONAL:
-                    renderDirectional((DirectionalLight *)l);
-                    break;
-                case LightType::POINTLIGHT:
-                    renderPoint((PointLight *)l);
-                    break;
-                case LightType::SPOTLIGHT:
-                    renderSpot((SpotLight *)l);
-                    break;
-                default:
-                    break;
-            }
             ImGui::PopID();
         }
         ImGui::End();

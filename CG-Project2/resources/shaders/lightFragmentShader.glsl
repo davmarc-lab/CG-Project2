@@ -13,6 +13,7 @@ struct Material {
 // Light structure
 struct Light {
     int lightType;
+    float intensity;
 
     vec3 color;
 

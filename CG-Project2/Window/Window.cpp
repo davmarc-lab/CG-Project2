@@ -8,15 +8,13 @@ using namespace std;
 /*
     This constructor creates a window with width w and height h
 */
-Window::Window(const char *name, int w, int h)
-{
+Window::Window(const char *name, int w, int h) {
     this->width = w;
     this->height = h;
     this->windowName = name;
     this->resolution = vec2(this->width, this->height);
 
-    if (this->initializeWindow() != 0)
-    {
+    if (this->initializeWindow() != 0) {
         cout << "Cannot start the application, due to GLFW error" << endl;
     }
 }
@@ -24,13 +22,9 @@ Window::Window(const char *name, int w, int h)
 /*
     Update vieport dimension, usually used after resize window event
 */
-void framebuffer_size_callback(GLFWwindow *window, int w, int h)
-{
-    glViewport(0, 0, w, h);
-}
+void framebuffer_size_callback(GLFWwindow *window, int w, int h) { glViewport(0, 0, w, h); }
 
-int Window::initializeWindow()
-{
+int Window::initializeWindow() {
     // initialize GLFW contents
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -39,8 +33,7 @@ int Window::initializeWindow()
 
     // creates a GLFW window
     this->window = glfwCreateWindow(this->width, this->height, this->windowName, NULL, NULL);
-    if (this->window == NULL)
-    {
+    if (this->window == NULL) {
         cout << "Failed to create GLFW window." << endl;
         glfwTerminate();
         return -1;
@@ -51,8 +44,7 @@ int Window::initializeWindow()
     glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
 
     // checks if glad library has been loaded correctly
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         cout << "Failed to initialize GLAD" << endl;
         glfwTerminate();
         return -2;
@@ -65,22 +57,13 @@ int Window::initializeWindow()
     return 0;
 }
 
-void Window::closeWindow()
-{
+void Window::closeWindow() {
     // delete all vao, vbo, ebo arrays
     glfwSetWindowShouldClose(this->window, true);
 }
 
-void Window::terminateWindow()
-{
+void Window::terminateWindow() {
     // terminate GLFW window
     glfwTerminate();
 }
 
-void Window::processCloseInput()
-{
-    if (glfwGetKey(this->window, GLFW_KEY_Q) == GLFW_PRESS)
-    {
-        this->closeWindow();
-    }
-}

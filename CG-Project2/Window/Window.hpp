@@ -21,8 +21,6 @@ public:
 
     void terminateWindow();
 
-    void processCloseInput();
-
     inline char *getWindowName() { return (char *)this->windowName; };
 
     inline GLFWwindow *getWindow() { return this->window; };
