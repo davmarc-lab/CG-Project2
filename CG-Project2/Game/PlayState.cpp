@@ -47,8 +47,8 @@ void PlayState::init() {
 
     cube = new CubeEntity();
     cube->createVertexArray();
+    cube->setPosition(vec3(0, 1, 0));
     cube->setScale(vec3(1));
-    cube->applyTransformation(vec3(0, 1, 0), vec3(1), vec3(0), 0);
     cube->attachTexture(cube_texture);
     cube->setMaterial(material::NONE);
 
@@ -57,8 +57,8 @@ void PlayState::init() {
 
     sphere = new Sphere();
     sphere->createVertexArray();
+    sphere->setPosition(vec3(2, 0, 0));
     sphere->setScale(vec3(1));
-    sphere->applyTransformation(vec3(2, 0, 0), vec3(1), vec3(0), 0);
     sphere->attachTexture(sphere_texture);
     sphere->setMaterial(material::NONE);
 
@@ -368,7 +368,7 @@ void PlayState::handleEvent(GameEngine *engine) {
 
 void updatePosition(Entity *ent) {
     // reset model matrix
-    ent->setModelMatrix(ent->refreshModelMatrix());
+    // ent->setModelMatrix(ent->refreshModelMatrix());
 }
 
 void PlayState::update(GameEngine *engine) {

@@ -35,10 +35,9 @@ void PlaneEntity::buildPlane() {
         this->coords.colors.push_back(this->color.getColorVector());
     }
 
-    this->setPosition(vec3(0));
-    this->setScale(vec3(100, 0.1, 100));
+    this->setPosition(vec3(0, -1, 0));
+    this->setScale(vec3(100, 0.00001f, 100));
     this->setRotation(vec3(0));
-    this->transform.applyTransofrmation(vec3(0, -1, 0), vec3(100, 0.1, 100), vec3(0), 0);
 
     this->setCollider(new CubeCollider(&this->transform));
     this->setStatic();

@@ -19,7 +19,7 @@ public:
 
     Texture texture;
 
-    Material material;
+    Material material = material::NONE;
 
     bool affected_by_light = true;
 
@@ -78,11 +78,9 @@ public:
 
     inline mat4 getModelMatrix() { return this->transform.getModelMatrix(); }
 
-    inline mat4 refreshModelMatrix() { return this->transform.refreshModelMatrix(); }
+    // inline mat4 refreshModelMatrix() { return this->transform.refreshModelMatrix(); }
 
     inline void setModelMatrix(const mat4 transform) { this->transform.setModelMatrix(transform); }
-
-    virtual void applyTransformation(const vec3 translate, const vec3 scale, const vec3 rotAxis, float rotValue) = 0;
 
     inline Transform* getTransform() { return &this->transform; }
 

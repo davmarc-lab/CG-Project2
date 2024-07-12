@@ -67,16 +67,18 @@ void CubeEntity::createVertexArray() {
 void CubeEntity::draw(Shader shader) {
     shader.use();
 
-    shader.setVec3("material.ambient", this->material.getAmbient());
-    shader.setVec3("material.diffuse", this->material.getDiffuse());
-    shader.setVec3("material.specular", this->material.getSpecular());
-
-    shader.setFloat("material.shininess", this->material.getShininess());
-
+    // Entity model and projection
     shader.setMat4("projection", projection);
     shader.setMat4("model", this->getModelMatrix());
 
-    if (this->texture.getPath() != "None") {
+    // Entity material
+    shader.setVec3("material.ambient", this->material.getAmbient());
+    shader.setVec3("material.diffuse", this->material.getDiffuse());
+    shader.setVec3("material.specular", this->material.getSpecular());
+    shader.setFloat("material.shininess", this->material.getShininess());
+
+    // Lights
+    if (string(this->texture.getPath()) != "None") {
         // bind texture
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, this->texture.getId());

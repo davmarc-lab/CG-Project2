@@ -89,7 +89,7 @@ void Sphere::draw(Shader shader) {
 
 	shader.setFloat("material.shininess", this->material.getShininess());
 
-	if (this->texture.getPath() != "None") {
+	if (string(this->texture.getPath()) != "None") {
 		// bind texture
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, this->texture.getId());
