@@ -2,6 +2,8 @@
 
 #include "Light.hpp"
 
+#include "../Entity/Sphere.hpp"
+
 class SpotLight : public Light {
 private:
     vec3 position = vec3(0);
@@ -42,6 +44,17 @@ public:
     inline float getOuterCutOff() { return this->outer_cutOff; }
 
     inline void setOuterCutOff(float val) { this->outer_cutOff = val; }
+
+    inline virtual void initCaster() override {
+        this->casterShader = Shader("./resources/shaders/casterVertexShader.glsl", "./resources/shaders/casterFragmentShader.glsl");
+
+        // create light caster
+        this->caster = new Sphere();
+        this->caster->createVertexArray();
+        this->caster->setPosition(this->position);
+        this->caster->setScale(vec3(0.1));
+
+    }
 
     virtual void sendDataToShader(Shader shader, int index) override;
 

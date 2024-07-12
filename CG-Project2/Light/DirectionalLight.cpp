@@ -20,9 +20,3 @@ void DirectionalLight::sendDataToShader(Shader shader, int index) {
     shader.setVec3("lights[" + to_string(index) + "].specular", this->vectors.specular);
 }
 
-void DirectionalLight::drawCaster() {
-    if (this->caster == nullptr) {
-        // cout << "No caster Attached" << endl;
-        return;
-    }
-}

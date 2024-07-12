@@ -26,7 +26,7 @@ Cubemap *skybox;
 Shader lightShader, planeShader, skyboxShader;
 
 PointLight *pl = new PointLight();
-PointLight *ll = new PointLight();
+SpotLight *ll = new SpotLight();
 
 Scene obj_scene;
 
@@ -84,8 +84,8 @@ void PlayState::init() {
 
     pl->setPosition(vec3(-2, 1, 0));
     pl->initCaster();
-    // pl->setDirection(vec3(0, 1, 0));
     ll->setPosition(vec3(1));
+    ll->setDirection(vec3(0, 1, 0));
     ll->initCaster();
 
     obj_scene.addLight(pl);

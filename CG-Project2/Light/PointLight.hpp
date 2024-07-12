@@ -32,7 +32,7 @@ public:
 
     inline void setQuadratic(const float val) { this->info.quadratic = val; }
 
-    inline void initCaster() {
+    inline virtual void initCaster() override {
         this->casterShader = Shader("./resources/shaders/casterVertexShader.glsl", "./resources/shaders/casterFragmentShader.glsl");
 
         // create light caster

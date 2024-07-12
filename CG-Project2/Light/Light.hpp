@@ -49,6 +49,8 @@ public:
     }
 
     /* ---Overrride Methods--- */
+    virtual void initCaster() = 0;
+
     virtual void sendDataToShader(Shader shader, int index) = 0;
 
     virtual void drawCaster() = 0;

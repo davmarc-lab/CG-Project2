@@ -13,9 +13,13 @@ public:
 
     inline void setDirection(vec3 dir) { this->direction = dir; }
 
+    inline virtual void initCaster() override {
+        warning("No need caster for Directional light");
+    }
+
     virtual void sendDataToShader(Shader shader, int index) override;
 
-    virtual void drawCaster() override;
+    virtual void drawCaster() override {}
 
     ~DirectionalLight() = default;
 };
