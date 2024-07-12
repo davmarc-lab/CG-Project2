@@ -1,6 +1,6 @@
 #include "Scene.hpp"
 
-void Scene::addElement(Entity *e, Shader* s) { this->elements.push_back(std::make_pair(e, s)); }
+void Scene::addElement(Entity *e, Shader *s) { this->elements.push_back(std::make_pair(e, s)); }
 
 bool Scene::removeElement(Entity *e) {
     warning("Remove Element NOT Implemented");
@@ -27,12 +27,12 @@ void Scene::draw() {
             // send data to shader to compute lights or not
             e.second->use();
             e.second->setBool("affectedByLights", e.first->isAffectedByLight());
-            
+
             // if the entity is affected by lights, send lights data
             if (e.first->isAffectedByLight()) {
                 e.second->setInt("num_lights", this->lights.size());
                 index = 0;
-                for (auto l: this->lights) {
+                for (auto l : this->lights) {
                     l->sendDataToShader(*e.second, index);
                     index++;
                 }
@@ -40,5 +40,14 @@ void Scene::draw() {
         }
 
         e.first->draw(*e.second);
+    }
+
+    if (this->lights.size() >= 1) {
+        // draw light caster
+        for (auto l: this->getLights()) {
+            if (l->showCaster()) {
+                l->drawCaster();
+            }
+        }
     }
 }

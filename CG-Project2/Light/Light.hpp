@@ -3,6 +3,7 @@
 #include "../Lib.hpp"
 #include "../LibLightStruct.hpp"
 
+#include "../Entity/Entity.hpp"
 #include "../Shader/Shader.hpp"
 
 extern int max_lights;
@@ -13,6 +14,11 @@ public:
     float intensity = 1.0f;
     LightVectors vectors;
     LightType type;
+
+    Entity* caster;
+    Shader casterShader;
+    bool show_caster = true;
+
 
     vec3 getAmbient() { return this->vectors.ambient; }
 
@@ -36,10 +42,14 @@ public:
 
     LightType getType() { return this->type; }
 
+    bool showCaster() { return this->show_caster; }
+
     inline string addIndexToString(string before, int index, string after) {
         return before + "[" + to_string(index) + "]." + after;
     }
 
     /* ---Overrride Methods--- */
     virtual void sendDataToShader(Shader shader, int index) = 0;
+
+    virtual void drawCaster() = 0;
 };

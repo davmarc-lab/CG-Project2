@@ -60,7 +60,6 @@ public:
     inline void changeObserver(Entity* e, Shader* s) {
         this->obj_observer = e;
         this->shader_observer = s;
-        cout << this->shader_observer->getId() << endl;
     }
 
     inline virtual void render() override {

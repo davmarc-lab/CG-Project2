@@ -1,6 +1,6 @@
 #include "PointLight.hpp"
 
-PointLight::PointLight(vec3 position, float constant, float linear, float quadratic) {
+PointLight::PointLight(vec3 position, float constant, float linear, float quadratic) : PointLight() {
     this->position = position;
     this->info.constant = constant;
     this->info.linear = linear;
@@ -25,4 +25,18 @@ void PointLight::sendDataToShader(Shader shader, int index) {
     shader.setVec3("lights[" + to_string(index) + "].specular", this->vectors.specular);
 
     shader.setMat4("projection", projection);
+}
+
+void PointLight::drawCaster() {
+    if (this->caster == nullptr) {
+        warning("No Caster Attached");
+        return;
+    }
+
+    this->casterShader.use();
+    this->casterShader.setVec3("light_color", this->getColor());
+    this->casterShader.setMat4("projection", projection);
+    this->casterShader.setMat4("view", camera.getViewMatrix());
+    this->casterShader.setMat4("model", this->caster->getModelMatrix());
+    this->caster->draw(this->casterShader);
 }

@@ -45,5 +45,7 @@ public:
 
     virtual void sendDataToShader(Shader shader, int index) override;
 
+    virtual void drawCaster() override;
+
     ~SpotLight() = default;
 };

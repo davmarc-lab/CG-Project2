@@ -1,6 +1,7 @@
 #include "SpotLight.hpp"
 
 SpotLight::SpotLight(vec3 position, vec3 direction, float constant, float linear, float quadratic) {
+    this->casterShader = Shader("./resources/shaders/casterVertexShader.glsl", "./resources/shaders/casterFragmentShader.glsl");
     this->position = position;
     this->direction = direction;
     this->info.constant = constant;
@@ -31,4 +32,11 @@ void SpotLight::sendDataToShader(Shader shader, int index) {
     shader.setFloat("lights[" + to_string(index) + "].outer_cutOff", this->outer_cutOff);
 
     shader.setMat4("projection", projection);
+}
+
+void SpotLight::drawCaster() {
+    if (this->caster == nullptr) {
+        // cout << "No caster Attached" << endl;
+        return;
+    }
 }

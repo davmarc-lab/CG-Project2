@@ -83,8 +83,10 @@ void PlayState::init() {
     obj_scene.addElement(sphere, &lightShader);
 
     pl->setPosition(vec3(-2, 1, 0));
+    pl->initCaster();
     // pl->setDirection(vec3(0, 1, 0));
     ll->setPosition(vec3(1));
+    ll->initCaster();
 
     obj_scene.addLight(pl);
     obj_scene.addLight(ll);
@@ -273,7 +275,6 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
 
             // updating the observer in IGEntity menu
             if (obj_selected != nullptr) {
-                warning("Shader select doesn't work, maybe due to a bad copy");
                 entityMenu->changeObserver(obj_selected, shader_selected);
             } else {
                 entityMenu->changeObserver(nullptr, nullptr);

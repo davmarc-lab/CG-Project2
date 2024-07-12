@@ -49,7 +49,7 @@ const float OUTLINE_DIM = 0.001f;
 const float MARGIN_CUBE = -0.01f;
 const float OFFSET_CUBE = 0.000001f;
 
-static Camera camera = Camera();
+inline Camera camera = Camera();
 
 struct Buffers {
     GLuint vao;
