@@ -12,3 +12,4 @@
  - [ ] Fix some warning in Light and Entity for Shader (now it uses pointers)
  - [ ] Consider if using a Shader Storage Buffer is useful for lights computing (at the moment I don't think so)
  - [ ] Improve light caster light effect
+ - [ ] Instead of setting a CustomView matrix, you can send the reference of the static camera and should be fine using a Camera* object in the lights scene and not in every light

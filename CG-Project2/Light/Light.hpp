@@ -19,6 +19,8 @@ public:
     Shader casterShader;
     bool show_caster = true;
 
+    mat4 custom_view = mat4(1.0f);
+
 
     vec3 getAmbient() { return this->vectors.ambient; }
 
@@ -43,6 +45,10 @@ public:
     LightType getType() { return this->type; }
 
     bool showCaster() { return this->show_caster; }
+
+    inline mat4 getCustomView() { return this->custom_view; }
+
+    inline void setCustomView(mat4 view) { this->custom_view = view; }
 
     inline string addIndexToString(string before, int index, string after) {
         return before + "[" + to_string(index) + "]." + after;

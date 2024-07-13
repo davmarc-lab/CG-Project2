@@ -361,7 +361,6 @@ void PlayState::handleEvent(GameEngine *engine) {
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         // cube jump
-        // PhysicWorld::jump(cube, dt);
         auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraUp();
         camera.moveCamera(pos);
     }
@@ -387,8 +386,9 @@ void PlayState::update(GameEngine *engine) {
     skyboxShader.use();
     skyboxShader.setMat4("view", mat4(mat3(camera.getViewMatrix())));
 
-    updatePosition(cube);
-    updatePosition(sphere);
+    // send custom view matrix to lights
+    pl->setCustomView(camera.getViewMatrix());
+    ll->setCustomView(camera.getViewMatrix());
 }
 
 void PlayState::draw(GameEngine *engine) {
