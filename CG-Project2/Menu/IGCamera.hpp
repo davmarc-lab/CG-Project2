@@ -13,15 +13,13 @@ public:
 
         // Camera FOV
         auto zoom = camera.getCameraZoom();
-        if (ImGui::DragFloat("Zoom##1", &zoom, 0.5f)) {
-            if (zoom >= 20.f) {
-                camera.setCameraZoom(zoom);
-                updatePerspective(zoom);
-            }
+        if (ImGui::DragFloat("Fov##1", &zoom, 0.5f, 20.f, 120.f)) {
+            camera.setCameraZoom(zoom);
+            updatePerspective(zoom);
         }
         if (ImGui::Button("Reset##1")) {
             camera.setCameraZoom(cmr::ZOOM);
-            updatePerspective(zoom);
+            updatePerspective(cmr::ZOOM);
         }
 
         // Camera position
@@ -33,7 +31,7 @@ public:
             camera.moveCamera(cmr::POSITION);
         }
         // Camera Rotation ?
-        
+
         // Camera velocity
         auto velocity = camera.getCameraVelocity();
         if (ImGui::DragFloat("Velocity##1", &velocity, 0.005, 0.0f)) {

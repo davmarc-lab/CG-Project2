@@ -35,21 +35,21 @@ const float WIDTH = 1200.f, HEIGHT = 700.f;
 
 const mat4 textProjection = ortho(0.f, WIDTH, 0.f, HEIGHT);
 
-static mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
+inline mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
 
 // mmmmm
 inline void updatePerspective(float zoom) {
       projection = glm::perspective(glm::radians(zoom), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
 }
 
-static int max_lights = 4;
+inline int max_lights = 4;
 
 const float BLOCK_DIM = 0.1f;
 const float OUTLINE_DIM = 0.001f;
 const float MARGIN_CUBE = -0.01f;
 const float OFFSET_CUBE = 0.000001f;
 
-static Camera camera = Camera();
+inline Camera camera = Camera();
 
 struct Buffers {
     GLuint vao;
