@@ -10,6 +10,12 @@ enum LightType
     SPOTLIGHT
 };
 
+enum LightComp {
+    PHONG,
+    BLINN,
+    NONE
+};
+
 struct LightVectors {
     glm::vec3 ambient = glm::vec3(0.1f);
     glm::vec3 diffuse = glm::vec3(0.8f);

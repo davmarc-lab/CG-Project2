@@ -28,7 +28,7 @@ void Scene::draw() {
         if (this->lights.size() >= 1) {
             // send data to shader to compute lights or not
             e.second->use();
-            e.second->setBool("affectedByLights", e.first->isAffectedByLight());
+            e.second->setInt("light_comp", e.first->getLightComputation());
 
             // if the entity is affected by lights, send lights data
             if (e.first->isAffectedByLight()) {

@@ -94,6 +94,7 @@ struct Mouse {
     float lastY;
 };
 
+
 enum InputMode {
     // in select mode user can select objects
     SELECT,

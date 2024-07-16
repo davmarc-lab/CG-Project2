@@ -46,7 +46,7 @@ uniform sampler2D ourTexture;
 in vec3 Normal;
 
 // Entity affected by light
-uniform bool affectedByLights;
+uniform int light_comp;
 
 // Light parameters
 uniform int max_num_lights;
@@ -57,65 +57,27 @@ uniform vec3 viewPos;
 uniform Material material;
 uniform Light lights[MAX_LIGHTS];
 
-// vec3 execPhongAlgorithm(Light light) {
-//     // ambient
-//     vec3 ambient = light.color * light.ambient * material.ambient;
-//
-//     // diffuse
-//     vec3 norm = normalize(Normal);
-//     vec3 lightDir;
-//
-//     if (lightType == 0) // calculating direcitonal light
-//     {
-//         lightDir = normalize(-light.direction);
-//     }
-//     else {
-//         lightDir = normalize(light.position - FragPos);
-//     }
-//     float diff = max(dot(norm, lightDir), 0.0);
-//     vec3 diffuse = light.color * light.diffuse * material.diffuse * diff;
-//
-//     // specular
-//     vec3 viewDir = normalize(viewPos - FragPos);
-//     vec3 reflectDir = reflect(-lightDir, norm);
-//     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-//     vec3 specular = light.color * light.specular * material.shininess * spec;
-//
-//     return texture(ourTexture, TexCoord).rgb * (ambient + diffuse + specular);
-// }
+vec3 norm = vec3(0);
+vec3 lightDir = vec3(0);
+float diff = 0.f;
+vec3 viewDir = vec3(0);
+vec3 reflectDir = vec3(0);
+float spec = 0.f;
 
 vec3 calcDirectionalLight(Light light) {
-    vec3 norm = normalize(Normal);
-
     // ambient
     vec3 ambient = light.color * light.ambient * material.ambient;
 
     // diffuse
-    vec3 lightDir = normalize(-light.direction);
-    float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = light.color * light.diffuse * diff * material.diffuse;
 
     // specular
-    vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     vec3 specular = light.color * light.specular * spec * material.specular;
 
     return (ambient + diffuse + specular);
 }
 
 vec3 calcPointLight(Light light) {
-    vec3 norm = normalize(Normal);
-    vec3 lightDir = normalize(light.position - FragPos);
-    vec3 viewDir = normalize(viewPos - FragPos);
-
-    // diffuse shading
-    float diff = max(dot(norm, lightDir), 0.0);
-
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-
     // attenuation
     float distance = length(light.position - FragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
@@ -133,17 +95,6 @@ vec3 calcPointLight(Light light) {
 }
 
 vec3 calcSpotLight(Light light) {
-    vec3 norm = normalize(Normal);
-    vec3 lightDir = normalize(light.position - FragPos);
-    vec3 viewDir = normalize(viewPos - FragPos);
-
-    // diffuse shading
-    float diff = max(dot(norm, lightDir), 0.0);
-
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-
     // attenuation
     float distance = length(light.position - FragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
@@ -167,11 +118,18 @@ vec3 calcSpotLight(Light light) {
 
 void main() {
     vec3 result = vec3(0);
+    norm = normalize(Normal);
+    viewDir = normalize(viewPos - FragPos);
 
-    if (affectedByLights) {
+    if (light_comp != 2) {
         if (max_num_lights >= 1) {
             // calc multiple lights
             for (int i = 0; i < num_lights && i < max_num_lights; i++) {
+                lightDir = normalize(lights[i].position - FragPos);
+                diff = max(dot(norm, lightDir), 0.0);
+                reflectDir = light_comp == 1 ? normalize(lightDir + viewDir) : reflect(-lightDir, norm);
+                spec = pow(max(light_comp == 1 ? dot(norm, reflectDir) : dot(viewDir, reflectDir), 0.0), material.shininess);
+
                 switch (lights[i].lightType) {
                     case 0:
                     result += calcDirectionalLight(lights[i]);

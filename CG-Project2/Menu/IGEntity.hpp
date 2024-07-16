@@ -6,19 +6,20 @@
 
 #include <vector>
 #ifdef _WIN32
-#include <string>
 #include <sstream>
+#include <string>
 #endif
 
 class IGEntity : public IGMenu {
 
 private:
-    Entity* obj_observer = nullptr;
-    Shader* shader_observer = nullptr;
+    Entity *obj_observer = nullptr;
+    Shader *shader_observer = nullptr;
 
-    enum AXIS {
-        X, Y, Z, NONE
-    };
+    const char* light_models[3] = { "Phong", "Blinn-Phong", "None" };
+    int selected_model = 0;
+
+    enum AXIS { X, Y, Z, NONE };
 
     inline vec3 updateOtherValues(vec3 vec, AXIS axis) {
         float val = 0.f;
@@ -47,7 +48,7 @@ private:
     inline AXIS findAxis(vector<AXIS> scaleAxis) {
         for (const auto elem : scaleAxis) {
             if (elem != AXIS::NONE)
-            return elem;
+                return elem;
         }
         return AXIS::NONE;
     }
@@ -55,11 +56,12 @@ private:
 public:
     IGEntity() {}
 
-    IGEntity(Entity* entity, Shader* shader) : obj_observer(entity), shader_observer(shader) {}
+    IGEntity(Entity *entity, Shader *shader) : obj_observer(entity), shader_observer(shader) {}
 
-    inline void changeObserver(Entity* e, Shader* s) {
+    inline void changeObserver(Entity *e, Shader *s) {
         this->obj_observer = e;
         this->shader_observer = s;
+        this->selected_model = e->getLightComputation();
     }
 
     inline virtual void render() override {
@@ -177,9 +179,20 @@ public:
                     ImGuiFileDialog::Instance()->Close();
                 }
             }
-            bool aff_lights = this->obj_observer->isAffectedByLight();
-            if (ImGui::Checkbox("Affected By Lights", &aff_lights)) {
-                this->obj_observer->setLightComputation(aff_lights);
+
+            if (ImGui::BeginCombo("Light Model", this->light_models[this->selected_model])) {
+                for (int n = 0; n < IM_ARRAYSIZE(this->light_models); n++) {
+                    const bool is_selected = (this->selected_model == n);
+                    if (ImGui::Selectable(this->light_models[n], is_selected)) {
+                        this->selected_model = n;
+                        this->obj_observer->setLightComputation(this->selected_model);
+                    }
+
+                    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
             }
         }
 

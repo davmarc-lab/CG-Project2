@@ -53,7 +53,7 @@ void PlayState::init() {
     cube->setPosition(vec3(0, 1, 0));
     cube->setScale(vec3(1));
     cube->attachTexture(cube_texture);
-    cube->setMaterial(material::NONE);
+    // cube->setMaterial(material::NONE);
 
     Texture sphere_texture = Texture("./resources/textures/web-dirt.png");
     sphere_texture.createTexture();
@@ -63,7 +63,7 @@ void PlayState::init() {
     sphere->setPosition(vec3(2, 0, 0));
     sphere->setScale(vec3(1));
     sphere->attachTexture(sphere_texture);
-    sphere->setMaterial(material::NONE);
+    // sphere->setMaterial(material::NONE);
 
     planeShader = Shader("./resources/shaders/vertexShader.glsl", "./resources/shaders/fragmentShader.glsl");
     planeShader.use();
@@ -101,7 +101,7 @@ void PlayState::init() {
     obj = new Object("./resources/models/backpack/backpack.obj", Flip::VERTICALLY);
     obj->setPosition(vec3(0));
     obj->setScale(vec3(0.5));
-    obj->setMaterial(material::NONE);
+    // obj->setMaterial(material::NONE);
     obj_scene.addElement(obj, &lightShader);
 
     // imgui

@@ -21,7 +21,7 @@ public:
 
     Material material = material::NONE;
 
-    bool affected_by_light = true;
+    int comp = LightComp::PHONG;
 
     Physic physics;
     bool m_static = false;
@@ -157,9 +157,11 @@ public:
 
     inline void setMaterial(Material material) { this->material = material; }
 
-    inline bool isAffectedByLight() { return this->affected_by_light; }
+    inline bool isAffectedByLight() { return this->comp != LightComp::NONE; }
 
-    inline void setLightComputation(bool val) { this->affected_by_light = val; }
+    inline void setLightComputation(int val) { this->comp = val; }
+
+    inline int getLightComputation() { return this->comp; }
 
     virtual void createVertexArray() = 0;
 
