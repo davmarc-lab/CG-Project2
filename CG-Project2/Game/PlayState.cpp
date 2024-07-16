@@ -101,6 +101,7 @@ void PlayState::init() {
     obj = new Object("./resources/models/backpack/backpack.obj", Flip::VERTICALLY);
     obj->setPosition(vec3(0));
     obj->setScale(vec3(0.5));
+    obj->setMaterial(material::NONE);
     obj_scene.addElement(obj, &modelShader);
 
     // imgui

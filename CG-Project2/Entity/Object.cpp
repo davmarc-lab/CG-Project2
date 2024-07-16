@@ -20,6 +20,12 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
 void Object::draw(Shader shader) {
     shader.use();
     shader.setMat4("model", this->getModelMatrix());
+    // Object material
+    shader.setVec3("material.ambient", this->material.getAmbient());
+    shader.setVec3("material.diffuse", this->material.getDiffuse());
+    shader.setVec3("material.specular", this->material.getSpecular());
+    shader.setFloat("material.shininess", this->material.getShininess());
+
     for (int i = 0; i < this->meshes.size(); i++) {
         this->meshes[i].draw(shader);
     }

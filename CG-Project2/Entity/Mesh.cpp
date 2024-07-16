@@ -25,27 +25,27 @@ void Mesh::createVertexArray() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(InfoVertex), (void *)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(InfoVertex), (void *)offsetof(InfoVertex, normal));
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(InfoVertex), (void *)offsetof(InfoVertex, texCoords));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(InfoVertex), (void *)offsetof(InfoVertex, texCoords));
     glEnableVertexAttribArray(2);
 
-    // vertex tangent
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(InfoVertex), (void *)offsetof(InfoVertex, normal));
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(InfoVertex), (void *)offsetof(InfoVertex, tangent));
+
+    // vertex tangent
+    // glEnableVertexAttribArray(3);
+    // glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(InfoVertex), (void *)offsetof(InfoVertex, tangent));
 
     // vertex bitangent
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(InfoVertex), (void *)offsetof(InfoVertex, biTangent));
+    // glEnableVertexAttribArray(4);
+    // glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(InfoVertex), (void *)offsetof(InfoVertex, biTangent));
 
     // ids
-    glEnableVertexAttribArray(5);
-    glVertexAttribIPointer(5, 4, GL_INT, sizeof(InfoVertex), (void *)offsetof(InfoVertex, m_BoneIDs));
+    // glEnableVertexAttribArray(5);
+    // glVertexAttribIPointer(5, 4, GL_INT, sizeof(InfoVertex), (void *)offsetof(InfoVertex, m_BoneIDs));
 
     // weights
-    glEnableVertexAttribArray(6);
-    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(InfoVertex), (void *)offsetof(InfoVertex, m_Weights));
+    // glEnableVertexAttribArray(6);
+    // glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(InfoVertex), (void *)offsetof(InfoVertex, m_Weights));
 
     glBindVertexArray(0);
 }
