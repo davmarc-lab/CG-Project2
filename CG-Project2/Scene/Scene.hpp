@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Entity/Entity.hpp"
+#include "../Entity/Object.hpp"
 #include "../Shader/Shader.hpp"
 
 #include "../Light/Light.hpp"
@@ -12,6 +13,7 @@ class Scene {
 private:
 
 	vector<std::pair<Entity*, Shader*>> elements;
+	vector<std::pair<Object*, Shader*>> custom_obj;
 
     vector<Light*> lights;
 
@@ -19,6 +21,8 @@ public:
 	Scene() {}
 
 	void addElement(Entity* e, Shader* shader);
+
+	void addCustomObj(Object* m, Shader* shader);
 
 	bool removeElement(Entity* e);
 
@@ -37,6 +41,7 @@ public:
 		}
 
 		this->elements.clear();
+        this->custom_obj.clear();
         this->lights.clear();
 		delete this;
 	}

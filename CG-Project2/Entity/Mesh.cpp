@@ -56,6 +56,8 @@ void Mesh::draw(Shader shader) {
     unsigned int nnormal = 1;
     unsigned int nheight = 1;
 
+    shader.use();
+
     for (int i = 0; i < this->texture.size(); i++) {
         glActiveTexture(GL_TEXTURE0 + i); // activate the proper texture unit
 

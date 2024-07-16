@@ -18,6 +18,8 @@ Object::Object(const char *path, Flip flip, bool gamma) : gammaCorrection(gamma)
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
 
 void Object::draw(Shader shader) {
+    shader.use();
+    shader.setMat4("model", this->getModelMatrix());
     for (int i = 0; i < this->meshes.size(); i++) {
         this->meshes[i].draw(shader);
     }
@@ -177,4 +179,3 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
 
     return textureID;
 }
-

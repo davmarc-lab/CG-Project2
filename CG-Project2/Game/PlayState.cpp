@@ -6,6 +6,7 @@
 #include "../Entity/Cubemap.hpp"
 #include "../Entity/Plane.hpp"
 #include "../Entity/Sphere.hpp"
+#include "../Entity/Object.hpp"
 
 #include "../Scene/Scene.hpp"
 
@@ -23,10 +24,12 @@ CubeEntity *cube;
 Sphere *sphere;
 PlaneEntity *plane;
 Cubemap *skybox;
-Shader lightShader, planeShader, skyboxShader;
+Shader lightShader, planeShader, skyboxShader, modelShader;
 
 PointLight *pl = new PointLight();
 SpotLight *ll = new SpotLight();
+
+Object* obj;
 
 Scene obj_scene;
 
@@ -82,7 +85,7 @@ void PlayState::init() {
     obj_scene.addElement(cube, &lightShader);
     obj_scene.addElement(sphere, &lightShader);
 
-    pl->setPosition(vec3(-2, 1, 0));
+    pl->setPosition(vec3(0, -2, 0));
     pl->initCaster();
     ll->setPosition(vec3(1));
     ll->setDirection(vec3(0, 1, 0));
@@ -90,6 +93,15 @@ void PlayState::init() {
 
     obj_scene.addLight(pl);
     obj_scene.addLight(ll);
+
+    modelShader = Shader("./resources/shaders/lightVertexShader.glsl", "./resources/shaders/lightFragmentShader.glsl");
+    modelShader.use();
+    modelShader.setMat4("projection", projection);
+
+    obj = new Object("./resources/models/backpack/backpack.obj", Flip::VERTICALLY);
+    obj->setPosition(vec3(0));
+    obj->setScale(vec3(0.5));
+    obj_scene.addElement(obj, &modelShader);
 
     // imgui
     entityMenu = new IGEntity();
@@ -379,6 +391,10 @@ void PlayState::update(GameEngine *engine) {
     lightShader.use();
     lightShader.setMat4("view", camera.getViewMatrix());
     lightShader.setVec3("viewPos", camera.getCameraPosition());
+
+    modelShader.use();
+    modelShader.setMat4("view", camera.getViewMatrix());
+    modelShader.setVec3("viewPos", camera.getCameraPosition());
 
     planeShader.use();
     planeShader.setMat4("view", camera.getViewMatrix());

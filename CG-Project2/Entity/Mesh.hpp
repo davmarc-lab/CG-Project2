@@ -23,21 +23,21 @@ struct InfoTexture {
     string path;
 };
 
-class Mesh
-{
-    private:
-        GLuint vao;
-        GLuint vbo;
-        GLuint ebo;
-        vector<InfoVertex> vertex;
-        vector<unsigned int> index;
-        vector<InfoTexture> texture;
+class Mesh {
+private:
+    GLuint vao;
+    GLuint vbo;
+    GLuint ebo;
+    vector<InfoVertex> vertex;
+    vector<unsigned int> index;
+    vector<InfoTexture> texture;
 
-        void createVertexArray();
-    public:
-        Mesh() {}
+    void createVertexArray();
 
-        Mesh(vector<InfoVertex> vertex, vector<unsigned int> index, vector<InfoTexture> texture);
+public:
+    Mesh() {}
 
-        void draw(Shader shader);
+    Mesh(vector<InfoVertex> vertex, vector<unsigned int> index, vector<InfoTexture> texture);
+
+    void draw(Shader shader);
 };

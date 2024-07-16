@@ -2,6 +2,8 @@
 
 void Scene::addElement(Entity *e, Shader *s) { this->elements.push_back(std::make_pair(e, s)); }
 
+void Scene::addCustomObj(Object *o, Shader *s) { this->custom_obj.push_back(std::make_pair(o, s)); }
+
 bool Scene::removeElement(Entity *e) {
     warning("Remove Element NOT Implemented");
 
@@ -44,7 +46,7 @@ void Scene::draw() {
 
     if (this->lights.size() >= 1) {
         // draw light caster
-        for (auto l: this->getLights()) {
+        for (auto l : this->getLights()) {
             if (l->showCaster()) {
                 l->drawCaster();
             }

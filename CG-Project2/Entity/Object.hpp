@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Entity.hpp"
 #include "Mesh.hpp"
 
 #include <assimp/Importer.hpp>
@@ -12,7 +13,7 @@
 
 enum Flip { VERTICALLY, KEEP };
 
-class Object {
+class Object : public Entity {
 private:
     vector<InfoTexture> textures_loaded;
     vector<Mesh> meshes;
@@ -33,5 +34,7 @@ public:
 
     Object() {}
 
-    void draw(Shader shader);
+    virtual void createVertexArray() override {}
+
+    virtual void draw(Shader shader) override;
 };
