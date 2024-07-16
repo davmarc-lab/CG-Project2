@@ -102,7 +102,7 @@ void PlayState::init() {
     obj->setPosition(vec3(0));
     obj->setScale(vec3(0.5));
     obj->setMaterial(material::NONE);
-    obj_scene.addElement(obj, &modelShader);
+    obj_scene.addElement(obj, &lightShader);
 
     // imgui
     entityMenu = new IGEntity();
