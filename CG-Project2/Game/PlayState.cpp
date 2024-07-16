@@ -4,21 +4,23 @@
 #include "../Color/Color.hpp"
 #include "../Entity/Cube.hpp"
 #include "../Entity/Cubemap.hpp"
+#include "../Entity/Object.hpp"
 #include "../Entity/Plane.hpp"
 #include "../Entity/Sphere.hpp"
-#include "../Entity/Object.hpp"
 
 #include "../Scene/Scene.hpp"
 
 #include "../Menu/IGCamera.hpp"
 #include "../Menu/IGEntity.hpp"
+#include "../Menu/IGLights.hpp"
 #include "../Menu/IGMenu.hpp"
 #include "../Menu/IGMode.hpp"
-#include "../Menu/IGLights.hpp"
+#include "../Menu/IGMousePopup.hpp"
 
 #include "Game.hpp"
 
 PlayState PlayState::playState;
+string mouse_popup_name = "Menu";
 
 CubeEntity *cube;
 Sphere *sphere;
@@ -29,7 +31,7 @@ Shader lightShader, planeShader, skyboxShader, modelShader;
 PointLight *pl = new PointLight();
 SpotLight *ll = new SpotLight();
 
-Object* obj;
+Object *obj;
 
 Scene obj_scene;
 
@@ -37,6 +39,9 @@ InputMode user_mode = InputMode::INTERACT;
 
 IGMenu *modeMenu, *cameraMenu, *lightsMenu;
 IGEntity *entityMenu = nullptr;
+IGMousePopup* mousePopup = new IGMousePopup(mouse_popup_name.c_str());
+
+bool show_popup = false;
 
 Mouse mouse;
 
@@ -101,7 +106,7 @@ void PlayState::init() {
     obj = new Object("./resources/models/backpack/backpack.obj", Flip::VERTICALLY);
     obj->setPosition(vec3(0));
     obj->setScale(vec3(0.5));
-    // obj->setMaterial(material::NONE);
+    obj->setMaterial(material::NONE);
     obj_scene.addElement(obj, &lightShader);
 
     // imgui
@@ -178,6 +183,28 @@ void mouseInputFunc(GLFWwindow *window, int button, int action, int mod) {
         } else if (action == GLFW_RELEASE) {
             mouse.active_mode = false;
         }
+    }
+
+    // you can handle your ImGui::popup here
+    // that's because you cannot see the mouse in passive mode
+    // in select mode with left click you select objects
+
+    // seg fault in IsPopupOpen :/
+    /* if (user_mode == InputMode::INTERACT) {
+        // handle mouse input using ImGui
+        if (button == GLFW_MOUSE_BUTTON_2) {
+            // open popup
+            show_popup = true;
+        }
+
+        // left click out of the popup
+        if (show_popup && button == GLFW_MOUSE_BUTTON_1 && ImGui::IsPopupOpen(popup_name.c_str())) {
+            show_popup = false;
+        }
+    } */
+
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+        ImGui::OpenPopup(mousePopup->getPopupStringId());
     }
 
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);
@@ -271,14 +298,14 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
 
             // check all the element of the scene for intersection with ray
             for (auto elem : obj_scene.getElements()) {
-                auto obj = elem.first;
+                auto current = elem.first;
                 auto shader = elem.second;
                 // distance between ray and object
                 float dist = 0.f;
 
-                if (isRayInSphere(ray, obj->getPosition(), 0.7, &dist)) {
+                if (isRayInSphere(ray, current->getPosition(), 0.7, &dist)) {
                     if (obj_selected == nullptr || dist <= ci) {
-                        obj_selected = obj;
+                        obj_selected = current;
                         warning("Working on the same shader, it affects all the shaders");
                         shader_selected = shader;
                         ci = dist;
@@ -418,5 +445,6 @@ void PlayState::draw(GameEngine *engine) {
     modeMenu->render();
     cameraMenu->render();
     lightsMenu->render();
+    mousePopup->render();
 }
 
