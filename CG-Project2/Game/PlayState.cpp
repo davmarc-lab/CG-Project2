@@ -33,17 +33,22 @@ SpotLight *ll = new SpotLight();
 
 Object *obj;
 
+Entity *obj_selected = nullptr;
+Shader *shader_selected = nullptr;
+
 Scene obj_scene;
 
 InputMode user_mode = InputMode::INTERACT;
 
 IGMenu *modeMenu, *cameraMenu, *lightsMenu;
 IGEntity *entityMenu = nullptr;
-IGMousePopup* mousePopup = new IGMousePopup(mouse_popup_name.c_str());
+IGMousePopup *mousePopup = new IGMousePopup(mouse_popup_name.c_str());
 
 bool show_popup = false;
 
 Mouse mouse;
+
+ActionManager *action_manager = ActionManager::instance();
 
 void PlayState::init() {
     glEnable(GL_DEPTH_TEST);
@@ -174,6 +179,14 @@ void mouseActiveMotion(GLFWwindow *window, double x, double y) {
     ImGui_ImplGlfw_CursorPosCallback(window, x, y);
 }
 
+// This function detects if right click of the mouse is pressed and opens a popup
+void imGuiMouse2Popup() {
+    // If you open moultiple popup it broke
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+        ImGui::OpenPopup(mousePopup->getPopupStringId());
+    }
+}
+
 void mouseInputFunc(GLFWwindow *window, int button, int action, int mod) {
 
     // for trackball input
@@ -203,9 +216,7 @@ void mouseInputFunc(GLFWwindow *window, int button, int action, int mod) {
         }
     } */
 
-    if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-        ImGui::OpenPopup(mousePopup->getPopupStringId());
-    }
+    imGuiMouse2Popup();
 
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);
 }
@@ -293,8 +304,8 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
             // closest_intersection
             float ci = 0;
             // this pointer keeps track of the selected object
-            Entity *obj_selected = nullptr;
-            Shader *shader_selected = nullptr;
+            obj_selected = nullptr;
+            shader_selected = nullptr;
 
             // check all the element of the scene for intersection with ray
             for (auto elem : obj_scene.getElements()) {
@@ -317,10 +328,12 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
             if (obj_selected != nullptr) {
                 entityMenu->changeObserver(obj_selected, shader_selected);
             } else {
-                entityMenu->changeObserver(nullptr, nullptr);
+                entityMenu->resetObserver();
             }
         }
     }
+
+    imGuiMouse2Popup();
 
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);
 }
@@ -416,6 +429,27 @@ void updatePosition(Entity *ent) {
 }
 
 void PlayState::update(GameEngine *engine) {
+    if (action_manager->isActionPresent()) {
+        for (auto act : action_manager->getActions()) {
+            switch (act) {
+            case Action::ADD_ENTITY:
+                break;
+            case Action::DEL_ENTITY:
+                if (obj_selected != nullptr) {
+                    obj_scene.removeElement(obj_selected, shader_selected);
+                    obj_selected = nullptr;
+                    shader_selected = nullptr;
+                    entityMenu->resetObserver();
+                    // seg fault somewhere
+                }
+                break;
+            default:
+                break;
+            }
+        }
+        action_manager->clear();
+    }
+
     lightShader.use();
     lightShader.setMat4("view", camera.getViewMatrix());
     lightShader.setVec3("viewPos", camera.getCameraPosition());
@@ -447,4 +481,3 @@ void PlayState::draw(GameEngine *engine) {
     lightsMenu->render();
     mousePopup->render();
 }
-

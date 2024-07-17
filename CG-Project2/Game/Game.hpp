@@ -2,6 +2,8 @@
 
 #include "../Window/Window.hpp"
 
+#include "../Action/ActionManager.hpp"
+
 class GameState;
 
 class GameEngine {

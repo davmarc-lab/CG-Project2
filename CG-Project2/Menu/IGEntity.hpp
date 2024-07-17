@@ -64,6 +64,11 @@ public:
         this->selected_model = e->getLightComputation();
     }
 
+    inline void resetObserver() {
+        this->obj_observer = nullptr;
+        this->shader_observer = nullptr;
+    }
+
     inline virtual void render() override {
         ImGui::Begin("Entity");
 

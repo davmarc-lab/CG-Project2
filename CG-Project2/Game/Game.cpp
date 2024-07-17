@@ -26,8 +26,6 @@ void mouseMovementCallback(GLFWwindow *window, double xposIn, double yposIn) {
 
     input.lastX = xpos;
     input.lastY = ypos;
-
-    // camera.processMouseMovement(xoffset, yoffset);
 }
 
 void GameEngine::init() { this->running = true; }

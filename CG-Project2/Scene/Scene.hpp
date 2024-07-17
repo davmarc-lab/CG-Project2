@@ -24,7 +24,7 @@ public:
 
 	void addCustomObj(Object* m, Shader* shader);
 
-	bool removeElement(Entity* e);
+	bool removeElement(Entity* e, Shader* s);
 
 	inline vector<std::pair<Entity*, Shader*>> getElements() { return this->elements; }
 

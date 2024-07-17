@@ -4,18 +4,12 @@ void Scene::addElement(Entity *e, Shader *s) { this->elements.push_back(std::mak
 
 void Scene::addCustomObj(Object *o, Shader *s) { this->custom_obj.push_back(std::make_pair(o, s)); }
 
-bool Scene::removeElement(Entity *e) {
-    warning("Remove Element NOT Implemented");
-
+bool Scene::removeElement(Entity *e, Shader *s) {
+    this->elements.erase(std::remove(this->elements.begin(), this->elements.end(), pair(e, s)), this->elements.end());
     return false;
 }
 
 void Scene::addLight(Light *l) {
-    if (this->lights.size() > 1) {
-        warning("Multiple lights still doesn't work");
-        // return;
-    }
-
     this->lights.push_back(l);
 }
 
