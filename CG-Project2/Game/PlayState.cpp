@@ -333,7 +333,7 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
                 if (isRayInSphere(ray, caster->getCaster()->getPosition(), 0.7, &dist)) {
                     if (obj_selected == nullptr || dist <= ci) {
                         obj_selected = caster->getCaster();
-                        debug_log->addLog(LogType::SELECT_WARNING, "Working on the same shader, it affects all the shaders");
+                        debug_log->addLog(LogType::ERROR, "Working on the same shader, it affects all the shaders");
                         shader_selected = caster->getShader();
                         ci = dist;
                     }

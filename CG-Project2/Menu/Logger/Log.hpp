@@ -21,6 +21,19 @@ inline ImVec4 getLogColor(LogType t) {
     }
 }
 
+inline std::string getLogLongText(LogType t) {
+    switch (t) {
+    case LogType::SELECT_WARNING: {
+        return "Select W";
+    }
+    case LogType::ERROR: {
+        return "Error";
+    }
+    default:
+        return "Empty";
+    }
+}
+
 inline std::string getLogText(LogType t) {
     switch (t) {
     case LogType::SELECT_WARNING: {
