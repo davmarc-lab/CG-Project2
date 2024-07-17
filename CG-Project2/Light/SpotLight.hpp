@@ -17,10 +17,6 @@ public:
 
     SpotLight(vec3 position, vec3 direction, float constant, float linear, float quadratic);
 
-    inline vec3 getPosition() { return this->position; }
-
-    inline void setPosition(vec3 pos) { this->position = pos; }
-
     inline vec3 getDirection() { return this->direction; }
 
     inline void setDirection(vec3 dir) { this->direction = dir; }

@@ -66,13 +66,13 @@ float spec = 0.f;
 
 vec3 calcDirectionalLight(Light light) {
     // ambient
-    vec3 ambient = light.color * light.ambient * material.ambient;
+    vec3 ambient = light.intensity * light.color * light.ambient * material.ambient;
 
     // diffuse
-    vec3 diffuse = light.color * light.diffuse * diff * material.diffuse;
+    vec3 diffuse = light.intensity * light.color * light.diffuse * diff * material.diffuse;
 
     // specular
-    vec3 specular = light.color * light.specular * spec * material.specular;
+    vec3 specular = light.intensity * light.color * light.specular * spec * material.specular;
 
     return (ambient + diffuse + specular);
 }
@@ -83,9 +83,9 @@ vec3 calcPointLight(Light light) {
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
     // combine results
-    vec3 ambient = light.color * light.ambient * material.ambient;
-    vec3 diffuse = light.color * light.diffuse * diff * material.diffuse;
-    vec3 specular = light.color * light.specular * spec * material.specular;
+    vec3 ambient = light.intensity * light.color * light.ambient * material.ambient;
+    vec3 diffuse = light.intensity * light.color * light.diffuse * diff * material.diffuse;
+    vec3 specular = light.intensity * light.color * light.specular * spec * material.specular;
 
     ambient *= attenuation;
     diffuse *= attenuation;
@@ -105,9 +105,9 @@ vec3 calcSpotLight(Light light) {
     float intensity = clamp((theta - light.outer_cutOff) / epsilon, 0.0, 1.0);
 
     // combine results
-    vec3 ambient = light.color * light.ambient * material.ambient;
-    vec3 diffuse = light.color * light.diffuse * diff * material.diffuse;
-    vec3 specular = light.color * light.specular * spec * material.specular;
+    vec3 ambient = light.intensity * light.color * light.ambient * material.ambient;
+    vec3 diffuse = light.intensity * light.color * light.diffuse * diff * material.diffuse;
+    vec3 specular = light.intensity * light.color * light.specular * spec * material.specular;
 
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;

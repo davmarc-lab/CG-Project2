@@ -1,7 +1,7 @@
 #include "SpotLight.hpp"
 
 SpotLight::SpotLight(vec3 position, vec3 direction, float constant, float linear, float quadratic) : SpotLight() {
-    this->position = position;
+    this->position = position; this->caster->setPosition(position);
     this->direction = direction;
     this->info.constant = constant;
     this->info.linear = linear;
@@ -12,11 +12,12 @@ void SpotLight::sendDataToShader(Shader shader, int index) {
     shader.use();
 
     shader.setInt("lights[" + to_string(index) + "].lightType", this->type);
+    shader.setFloat("lights[" + to_string(index) + "].intensity", this->intensity);
     shader.setInt("max_num_lights", max_lights);
 
     shader.setVec3("lights[" + to_string(index) + "].color", this->color);
 
-    shader.setVec3("lights[" + to_string(index) + "].position", this->position);
+    shader.setVec3("lights[" + to_string(index) + "].position", this->caster->getPosition());
     shader.setVec3("lights[" + to_string(index) + "].direction", this->direction);
 
     shader.setFloat("lights[" + to_string(index) + "].constant", this->info.constant);

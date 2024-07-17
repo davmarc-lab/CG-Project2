@@ -11,6 +11,9 @@ void Scene::addCustomObj(Object *o, Shader *s) { this->custom_obj.push_back(std:
 
 bool Scene::removeElement(Entity *e, Shader *s) {
     this->elements.erase(std::remove(this->elements.begin(), this->elements.end(), pair(e, s)), this->elements.end());
+    
+    warning("TODO - support for removing lights");
+
     return false;
 }
 

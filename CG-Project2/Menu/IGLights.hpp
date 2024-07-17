@@ -21,10 +21,6 @@ private:
     }
 
     inline void renderPoint(PointLight *l) {
-        auto pos = l->getPosition();
-        if (ImGui::DragFloat3("Position", &pos.x, 0.005f)) {
-            l->setPosition(pos);
-        }
 
         auto con = l->getConstant();
         if (ImGui::DragFloat("Constant", &con, 0.005f)) {
@@ -49,11 +45,6 @@ private:
     }
 
     inline void renderSpot(SpotLight *l) {
-        auto pos = l->getPosition();
-        if (ImGui::DragFloat3("Position", &pos.x, 0.005f)) {
-            l->setPosition(pos);
-        }
-
         auto dir = l->getDirection();
         if (ImGui::DragFloat3("Direction", &dir.x, 0.005f)) {
             l->setDirection(dir);

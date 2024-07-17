@@ -44,6 +44,14 @@ public:
 
     LightType getType() { return this->type; }
 
+    inline vec3 getPosition() { return this->caster == nullptr ? vec3(0) : this->caster->getPosition(); }
+
+    inline void setPosition(vec3 pos) { if (this->caster != nullptr) this->caster->setPosition(pos); }
+
+    inline Entity* getCaster() { return this->caster; }
+
+    inline Shader* getShader() { return &this->casterShader; }
+
     bool showCaster() { return this->show_caster; }
 
     inline mat4 getCustomView() { return this->custom_view; }

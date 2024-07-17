@@ -96,11 +96,11 @@ void PlayState::init() {
     obj_scene.addElement(cube, &lightShader);
     obj_scene.addElement(sphere, &lightShader);
 
-    pl->setPosition(vec3(0, -2, 0));
     pl->initCaster();
+    pl->setPosition(vec3(0, -2, 0));
+    ll->initCaster();
     ll->setPosition(vec3(1));
     ll->setDirection(vec3(0, 1, 0));
-    ll->initCaster();
 
     obj_scene.addLight(pl);
     obj_scene.addLight(ll);
@@ -325,6 +325,19 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
                 }
             }
 
+            for (auto caster : obj_scene.getLights()) {
+                float dist = 0.f;
+
+                if (isRayInSphere(ray, caster->getCaster()->getPosition(), 0.7, &dist)) {
+                    if (obj_selected == nullptr || dist <= ci) {
+                        obj_selected = caster->getCaster();
+                        warning("Working on the same shader, it affects all the shaders");
+                        shader_selected = caster->getShader();
+                        ci = dist;
+                    }
+                }
+            }
+
             // updating the observer in IGEntity menu
             if (obj_selected != nullptr) {
                 entityMenu->changeObserver(obj_selected, shader_selected);
@@ -424,11 +437,6 @@ void PlayState::handleEvent(GameEngine *engine) {
     }
 }
 
-void updatePosition(Entity *ent) {
-    // reset model matrix
-    // ent->setModelMatrix(ent->refreshModelMatrix());
-}
-
 void PlayState::update(GameEngine *engine) {
     if (action_manager->isActionPresent()) {
         for (auto act : action_manager->getActions()) {
@@ -449,7 +457,6 @@ void PlayState::update(GameEngine *engine) {
                     obj_selected = nullptr;
                     shader_selected = nullptr;
                     entityMenu->resetObserver();
-                    // seg fault somewhere
                 }
                 break;
             default:
@@ -478,6 +485,52 @@ void PlayState::update(GameEngine *engine) {
     ll->setCustomView(camera.getViewMatrix());
 }
 
+void showObjectPicker() {
+    IGFD::FileDialogConfig config;
+    config.path = "./resources/models/";
+    ImGuiFileDialog::Instance()->OpenDialog("ChooseObject", "Choose Object File", ".obj", config);
+
+    if (ImGuiFileDialog::Instance()->Display("ChooseObject")) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+
+            // Windows parser -- TODO resource manager
+#ifdef _WIN32
+            {
+                // make custom path for windows
+                std::vector<std::string> words;
+                std::string word;
+                std::istringstream stream(filePathName);
+                bool start_writing = false, add_sep = true;
+                string res = "./";
+
+                while (std::getline(stream, word, '\\')) {
+                    std::istringstream subStream(word);
+                    if (!start_writing && word == "resources") {
+                        start_writing = true;
+                    }
+
+                    if (start_writing) {
+                        res.append(word);
+                        res.append("/");
+                    }
+                }
+
+                if (!res.empty()) {
+                    res.pop_back();
+                }
+                filePathName = string(res);
+            }
+#endif
+            obj_scene.addElement(new Object(filePathName.c_str()), &lightShader);
+        }
+        // close
+        ImGuiFileDialog::Instance()->Close();
+        show_object_picker = false;
+    }
+}
+
 void PlayState::draw(GameEngine *engine) {
     skybox->draw(skyboxShader);
     plane->draw(planeShader);
@@ -491,47 +544,6 @@ void PlayState::draw(GameEngine *engine) {
     mousePopup->render();
 
     if (show_object_picker) {
-        IGFD::FileDialogConfig config;
-        config.path = "./resources/models/";
-        ImGuiFileDialog::Instance()->OpenDialog("ChooseObject", "Choose Object File", ".obj", config);
-        if (ImGuiFileDialog::Instance()->Display("ChooseObject")) {
-            if (ImGuiFileDialog::Instance()->IsOk()) {
-                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-
-                // Windows parser -- TODO resource manager
-#ifdef _WIN32
-                {
-                    // make custom path for windows
-                    std::vector<std::string> words;
-                    std::string word;
-                    std::istringstream stream(filePathName);
-                    bool start_writing = false, add_sep = true;
-                    string res = "./";
-
-                    while (std::getline(stream, word, '\\')) {
-                        std::istringstream subStream(word);
-                        if (!start_writing && word == "resources") {
-                            start_writing = true;
-                        }
-
-                        if (start_writing) {
-                            res.append(word);
-                            res.append("/");
-                        }
-                    }
-
-                    if (!res.empty()) {
-                        res.pop_back();
-                    }
-                    filePathName = string(res);
-                }
-#endif
-                obj_scene.addElement(new Object(filePathName.c_str()), &lightShader);
-            }
-            // close
-            ImGuiFileDialog::Instance()->Close();
-            show_object_picker = false;
-        }
+        showObjectPicker();
     }
 }

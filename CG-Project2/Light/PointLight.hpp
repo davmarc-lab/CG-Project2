@@ -16,10 +16,6 @@ public:
 
     PointLight(vec3 position, float constant, float linear, float quadratic);
 
-    inline vec3 getPosition() { return this->position; }
-
-    inline void setPosition(vec3 pos) { this->position = pos; }
-
     inline float getConstant() { return this->info.constant; }
 
     inline void setConstant(const float val) { this->info.constant = val; }
