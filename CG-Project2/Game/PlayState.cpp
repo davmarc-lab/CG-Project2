@@ -45,6 +45,7 @@ IGEntity *entityMenu = nullptr;
 IGMousePopup *mousePopup = new IGMousePopup(mouse_popup_name.c_str());
 
 bool show_popup = false;
+bool show_object_picker = false;
 
 Mouse mouse;
 
@@ -432,8 +433,16 @@ void PlayState::update(GameEngine *engine) {
     if (action_manager->isActionPresent()) {
         for (auto act : action_manager->getActions()) {
             switch (act) {
-            case Action::ADD_ENTITY:
+            case Action::ADD_CUBE_ENTITY:
+                obj_scene.addElement(new CubeEntity(), &lightShader);
                 break;
+            case Action::ADD_SPHERE_ENTITY:
+                obj_scene.addElement(new Sphere(), &lightShader);
+                break;
+            case Action::ADD_OBJECT_ENTITY: {
+                show_object_picker = true;
+                break;
+            }
             case Action::DEL_ENTITY:
                 if (obj_selected != nullptr) {
                     obj_scene.removeElement(obj_selected, shader_selected);
@@ -480,4 +489,49 @@ void PlayState::draw(GameEngine *engine) {
     cameraMenu->render();
     lightsMenu->render();
     mousePopup->render();
+
+    if (show_object_picker) {
+        IGFD::FileDialogConfig config;
+        config.path = "./resources/models/";
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseObject", "Choose Object File", ".obj", config);
+        if (ImGuiFileDialog::Instance()->Display("ChooseObject")) {
+            if (ImGuiFileDialog::Instance()->IsOk()) {
+                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+
+                // Windows parser -- TODO resource manager
+#ifdef _WIN32
+                {
+                    // make custom path for windows
+                    std::vector<std::string> words;
+                    std::string word;
+                    std::istringstream stream(filePathName);
+                    bool start_writing = false, add_sep = true;
+                    string res = "./";
+
+                    while (std::getline(stream, word, '\\')) {
+                        std::istringstream subStream(word);
+                        if (!start_writing && word == "resources") {
+                            start_writing = true;
+                        }
+
+                        if (start_writing) {
+                            res.append(word);
+                            res.append("/");
+                        }
+                    }
+
+                    if (!res.empty()) {
+                        res.pop_back();
+                    }
+                    filePathName = string(res);
+                }
+#endif
+                obj_scene.addElement(new Object(filePathName.c_str()), &lightShader);
+            }
+            // close
+            ImGuiFileDialog::Instance()->Close();
+            show_object_picker = false;
+        }
+    }
 }

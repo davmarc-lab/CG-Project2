@@ -13,6 +13,8 @@ Object::Object(const char *path, Flip flip, bool gamma) : gammaCorrection(gamma)
         stbi_set_flip_vertically_on_load(true);
     }
     this->loadModel(path);
+
+    this->m_isInstaced = true;
 }
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);

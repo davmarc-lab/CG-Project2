@@ -77,6 +77,8 @@ void Cubemap::createVertexArray() {
 
     // generate texture
     this->id = loadCubemap();
+
+    this->m_isInstaced = true;
 }
 
 void Cubemap::draw(Shader shader) {

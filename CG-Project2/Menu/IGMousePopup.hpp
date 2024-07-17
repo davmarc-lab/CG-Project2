@@ -4,17 +4,16 @@
 
 #include "../Action/ActionManager.hpp"
 
-ActionManager *am = ActionManager::instance();
+inline ActionManager *am = ActionManager::instance();
 
 class IGMousePopup : public IGMenu {
-private:
+  private:
     const char *string_id;
 
     const char *actions[2] = {"Add", "Remove"};
+    const char *add_actions[3] = {"Cube", "Sphere", "Object"};
 
-    int action_selected = -1;
-
-public:
+  public:
     IGMousePopup(const char *id) : string_id(id) {}
 
     inline const char *getPopupStringId() { return this->string_id; }
@@ -23,20 +22,39 @@ public:
         if (ImGui::BeginPopup(this->string_id)) {
             ImGui::SeparatorText("Utility Menu");
 
-            for (int i = 0; i < IM_ARRAYSIZE(actions); i++)
-                if (ImGui::Selectable(actions[i])) {
-                    action_selected = i;
-                    switch (i) {
-                        case 0:
-                            am->addAction(Action::ADD_ENTITY);
-                            break;
+            for (int i = 0; i < IM_ARRAYSIZE(actions); i++) {
+                if (i == 0) {
+                    if (ImGui::BeginMenu(actions[0])) {
+                        for (int i = 0; i < IM_ARRAYSIZE(add_actions); i++) {
+                            if (ImGui::Selectable(add_actions[i])) {
+                                switch (i) {
+                                    case 0:
+                                        am->addAction(Action::ADD_CUBE_ENTITY);
+                                        break;
+                                    case 1:
+                                        am->addAction(Action::ADD_SPHERE_ENTITY);
+                                        break;
+                                    case 2:
+                                        am->addAction(Action::ADD_OBJECT_ENTITY);
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
+                        ImGui::EndMenu();
+                    }
+                } else {
+                    if (ImGui::Selectable(actions[i])) {
+                        switch (i) {
                         case 1:
                             am->addAction(Action::DEL_ENTITY);
-                        break;
+                            break;
                         default:
                             break;
+                        }
                     }
                 }
+            }
 
             ImGui::EndPopup();
         }

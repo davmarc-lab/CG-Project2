@@ -29,6 +29,7 @@ public:
     Collider* collider;
 
     int nvertex;
+    bool m_isInstaced = false;
 
     Entity() {}
 
@@ -162,6 +163,8 @@ public:
     inline void setLightComputation(int val) { this->comp = val; }
 
     inline int getLightComputation() { return this->comp; }
+
+    inline bool isInstanced() { return this->m_isInstaced; }
 
     virtual void createVertexArray() = 0;
 

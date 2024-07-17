@@ -15,4 +15,5 @@
  - [ ] Improve light caster light effect
  - [ ] Instead of setting a CustomView matrix, you can send the reference of the static camera and should be fine using a Camera* object in the lights scene and not in every light
  - [ ] Fix ImGui Popups level, to understand try creating a new popup (IGMenuPopup)
-    - [ ] Add a static event queue to implement selected action in IGMenuPopup
+    - [X] Add a static event queue to implement selected action in IGMenuPopup
+ - [ ] Implement a ResourceManager

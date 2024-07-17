@@ -77,6 +77,8 @@ void Sphere::createVertexArray() {
     glGenBuffers(1, &this->buffers.ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers.ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->index.size() * sizeof(GLuint), this->index.data(), GL_STATIC_DRAW);
+
+    this->m_isInstaced = true;
 }
 
 void Sphere::draw(Shader shader) {

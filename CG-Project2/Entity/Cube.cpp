@@ -62,6 +62,8 @@ void CubeEntity::createVertexArray() {
 
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
     glEnableVertexAttribArray(3);
+
+    this->m_isInstaced = true;
 }
 
 void CubeEntity::draw(Shader shader) {

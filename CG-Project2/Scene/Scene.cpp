@@ -1,6 +1,11 @@
 #include "Scene.hpp"
 
-void Scene::addElement(Entity *e, Shader *s) { this->elements.push_back(std::make_pair(e, s)); }
+void Scene::addElement(Entity *e, Shader *s) {
+    if (!e->isInstanced()) {
+        e->createVertexArray();
+    }
+    this->elements.push_back(std::make_pair(e, s));
+}
 
 void Scene::addCustomObj(Object *o, Shader *s) { this->custom_obj.push_back(std::make_pair(o, s)); }
 
