@@ -334,10 +334,11 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
                 }
             }
 
+            debug_log->addLog(LogType::EMPTY, "Sphere radius value (0.1f) could be incorrect");
             for (auto caster : obj_scene.getLights()) {
                 float dist = 0.f;
 
-                if (isRayInSphere(ray, caster->getCaster()->getPosition(), 0.7, &dist)) {
+                if (isRayInSphere(ray, caster->getCaster()->getPosition(), 0.1f, &dist)) {
                     if (obj_selected == nullptr || dist <= ci) {
                         obj_selected = caster->getCaster();
                         debug_log->addLog(LogType::ERROR, "Working on the same shader, it affects all the shaders");

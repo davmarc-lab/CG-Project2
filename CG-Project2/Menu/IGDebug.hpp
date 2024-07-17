@@ -8,13 +8,13 @@
 
 #include <set>
 
-#define NUM_LOG_TYPES 4
+#define NUM_LOG_TYPES 6
 
 class IGDebug : private IGMenu {
   private:
     std::vector<std::pair<LogType, std::string>> logs;
 
-    LogType log_types[NUM_LOG_TYPES] = {LogType::GENERAL_EVENT, LogType::SELECT_WARNING, LogType::ERROR, LogType::EMPTY};
+    LogType log_types[NUM_LOG_TYPES] = {LogType::GENERAL_EVENT, LogType::MISSING_IMPLEMENTATION, LogType::MISSING_CASTER, LogType::SELECT_WARNING, LogType::ERROR, LogType::EMPTY};
     std::set<LogType> active_log_filter;
 
     bool track_logs = true;

@@ -1,5 +1,7 @@
 #include "SpotLight.hpp"
 
+#include "../Menu/IGDebug.hpp"
+
 SpotLight::SpotLight(vec3 position, vec3 direction, float constant, float linear, float quadratic) : SpotLight() {
     this->position = position; this->caster->setPosition(position);
     this->direction = direction;
@@ -36,7 +38,7 @@ void SpotLight::sendDataToShader(Shader shader, int index) {
 
 void SpotLight::drawCaster() {
     if (this->caster == nullptr) {
-        warning("No Caster Attached");
+        IGDebug::instance()->addLog(LogType::MISSING_CASTER, "No Caster Attached");
         return;
     }
 

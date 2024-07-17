@@ -18,3 +18,4 @@
     - [X] Add a static event queue to implement selected action in IGMenuPopup
  - [ ] Implement a ResourceManager
  - [ ] Implement a better method to manage Debug Logs, also find a way to implement time stamps
+

@@ -2,20 +2,20 @@
 
 #include "Collider.hpp"
 
+#include "../../Menu/IGDebug.hpp"
+
 class SphereCollider : public Collider {
-private:
+  private:
     Transform *transform;
 
-public:
-    SphereCollider(Transform* transform) : transform(transform) {}
+  public:
+    SphereCollider(Transform *transform) : transform(transform) {}
 
     virtual void createCollider(const vector<vec3> coords) {
-        warning("No need to create a collider for a Sphere, get sphere radius and multiply by scale vector");
+        IGDebug::instance()->addLog(LogType::MISSING_IMPLEMENTATION, "No Implemetation for Sphere Collider");
     }
-    
-    virtual bool testCollision(Transform* transform,
-        Collider* collider,
-        Transform* colliderTransform) {
+
+    virtual bool testCollision(Transform *transform, Collider *collider, Transform *colliderTransform) {
 
         // all spheres radius are 1
         auto sphere = transform->getScale() * vec3(1.0f);
