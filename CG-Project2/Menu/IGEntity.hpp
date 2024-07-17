@@ -85,6 +85,7 @@ public:
             vector<AXIS> scaleAxis;
 
             if (ImGui::CollapsingHeader("Transform")) {
+                ImGui::SeparatorText("Position");
                 ImGui::Text("Position:");
                 if (ImGui::DragFloat("x", &pos.x, 0.005, 0.f)) {
                     this->obj_observer->setMotionTime(0);
@@ -100,6 +101,7 @@ public:
                 }
                 this->obj_observer->setPosition(vec3(pos));
 
+                ImGui::SeparatorText("Scale");
                 ImGui::Text("Scale:");
                 AXIS click;
 
@@ -121,6 +123,7 @@ public:
 
                 this->obj_observer->setScale(vec3(scale));
 
+                ImGui::SeparatorText("Rotation");
                 ImGui::Text("Rotation:");
                 ImGui::DragFloat("x##3", &rot.x, 0.005);
                 ImGui::DragFloat("y##3", &rot.y, 0.005);
@@ -137,6 +140,8 @@ public:
             }
 
             if (ImGui::CollapsingHeader("Texture")) {
+                ImGui::SeparatorText("Texture Source File");
+
                 ImGui::Text("Texture File:");
                 ImGui::Text("%s", this->obj_observer->getTexture().getPath());
                 if (ImGui::Button("Choose Texture")) {
@@ -185,19 +190,21 @@ public:
                 }
             }
 
-            if (ImGui::BeginCombo("Light Model", this->light_models[this->selected_model])) {
-                for (int n = 0; n < IM_ARRAYSIZE(this->light_models); n++) {
-                    const bool is_selected = (this->selected_model == n);
-                    if (ImGui::Selectable(this->light_models[n], is_selected)) {
-                        this->selected_model = n;
-                        this->obj_observer->setLightComputation(this->selected_model);
-                    }
+            if (ImGui::CollapsingHeader("Light Complexity")) {
+                if (ImGui::BeginCombo("Light Model", this->light_models[this->selected_model])) {
+                    for (int n = 0; n < IM_ARRAYSIZE(this->light_models); n++) {
+                        const bool is_selected = (this->selected_model == n);
+                        if (ImGui::Selectable(this->light_models[n], is_selected)) {
+                            this->selected_model = n;
+                            this->obj_observer->setLightComputation(this->selected_model);
+                        }
 
-                    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-                    if (is_selected)
-                        ImGui::SetItemDefaultFocus();
+                        // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                        if (is_selected)
+                            ImGui::SetItemDefaultFocus();
+                    }
+                    ImGui::EndCombo();
                 }
-                ImGui::EndCombo();
             }
         }
 

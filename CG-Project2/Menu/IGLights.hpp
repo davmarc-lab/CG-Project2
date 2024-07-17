@@ -2,18 +2,19 @@
 
 #include "IGMenu.hpp"
 
-#include "../Light/Light.hpp"
 #include "../Light/DirectionalLight.hpp"
+#include "../Light/Light.hpp"
 #include "../Light/PointLight.hpp"
 #include "../Light/SpotLight.hpp"
 
 extern int max_lights;
 
 class IGLights : public IGMenu {
-private:
+  private:
     vector<Light *> lights;
 
     inline void renderDirectional(DirectionalLight *l) {
+        ImGui::SeparatorText("Directional Light##1");
         auto dir = l->getDirection();
         if (ImGui::DragFloat3("Direction", &dir.x, 0.005f)) {
             l->setDirection(dir);
@@ -21,6 +22,7 @@ private:
     }
 
     inline void renderPoint(PointLight *l) {
+        ImGui::SeparatorText("Point Light");
 
         auto con = l->getConstant();
         if (ImGui::DragFloat("Constant", &con, 0.005f)) {
@@ -45,6 +47,8 @@ private:
     }
 
     inline void renderSpot(SpotLight *l) {
+        ImGui::SeparatorText("Spot Light");
+
         auto dir = l->getDirection();
         if (ImGui::DragFloat3("Direction", &dir.x, 0.005f)) {
             l->setDirection(dir);
@@ -85,7 +89,7 @@ private:
         }
     }
 
-public:
+  public:
     IGLights() {}
 
     IGLights(vector<Light *> lights) : lights(lights) {}
@@ -93,17 +97,22 @@ public:
     inline virtual void render() override {
         ImGui::Begin("Lights");
 
-        ImGui::TextWrapped("Settings");
+        ImGui::SeparatorText("Settings");
 
-        ImGui::InputInt("Max Lights in Scene", &max_lights, 1, 5);
+        ImGui::InputInt("##", &max_lights, 1, 5);
+        ImGui::SameLine();
+        ImGui::TextWrapped("Max Lights in Scene");
         if (max_lights < 0) {
             max_lights = 0;
         }
 
+        ImGui::SeparatorText("Light Sources");
         for (auto l : this->lights) {
             ImGui::PushID(l);
             auto type = getLightTypeName(l->getType());
             if (ImGui::CollapsingHeader(string(type + " Light").c_str())) {
+                ImGui::SeparatorText("Light Info");
+
                 auto col = l->getColor();
                 if (ImGui::ColorEdit3("Color", &col.x)) {
                     l->setColor(col);
@@ -116,6 +125,7 @@ public:
                     }
                 }
 
+                ImGui::SeparatorText("Light Parameters");
                 auto amb = l->getAmbient();
                 if (ImGui::DragFloat3("Ambient", &amb.x, 0.005f, 0.0f, 1.0f)) {
                     l->setAmbient(amb);
@@ -132,17 +142,17 @@ public:
                 }
 
                 switch (l->getType()) {
-                    case LightType::DIRECTIONAL:
-                        renderDirectional((DirectionalLight *)l);
-                        break;
-                    case LightType::POINTLIGHT:
-                        renderPoint((PointLight *)l);
-                        break;
-                    case LightType::SPOTLIGHT:
-                        renderSpot((SpotLight *)l);
-                        break;
-                    default:
-                        break;
+                case LightType::DIRECTIONAL:
+                    renderDirectional((DirectionalLight *)l);
+                    break;
+                case LightType::POINTLIGHT:
+                    renderPoint((PointLight *)l);
+                    break;
+                case LightType::SPOTLIGHT:
+                    renderSpot((SpotLight *)l);
+                    break;
+                default:
+                    break;
                 }
             }
 
