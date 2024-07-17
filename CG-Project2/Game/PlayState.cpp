@@ -18,6 +18,8 @@
 #include "../Menu/IGMode.hpp"
 #include "../Menu/IGMousePopup.hpp"
 
+#include "../Menu/Logger/Log.hpp"
+
 #include "Game.hpp"
 
 PlayState PlayState::playState;
@@ -63,6 +65,7 @@ void PlayState::init() {
 
     cube = new CubeEntity();
     cube->createVertexArray();
+    debug_log->addLog(LogType::GENERAL_EVENT, "Instanced buffers for Cube");
     cube->setPosition(vec3(0, 1, 0));
     cube->setScale(vec3(1));
     cube->attachTexture(cube_texture);
@@ -73,6 +76,7 @@ void PlayState::init() {
 
     sphere = new Sphere();
     sphere->createVertexArray();
+    debug_log->addLog(LogType::GENERAL_EVENT, "Instanced buffers for Sphere");
     sphere->setPosition(vec3(2, 0, 0));
     sphere->setScale(vec3(1));
     sphere->attachTexture(sphere_texture);
@@ -85,6 +89,7 @@ void PlayState::init() {
 
     plane = new PlaneEntity(color::RED);
     plane->createVertexArray();
+    debug_log->addLog(LogType::GENERAL_EVENT, "Instanced buffers for Plane");
 
     skyboxShader = Shader("./resources/shaders/vertexShaderSkybox.glsl", "./resources/shaders/fragmentShaderSkybox.glsl");
     skyboxShader.use();
@@ -93,6 +98,7 @@ void PlayState::init() {
 
     skybox = new Cubemap();
     skybox->createVertexArray();
+    debug_log->addLog(LogType::GENERAL_EVENT, "Instanced buffers for Skybox");
 
     // add elements to the scene
     obj_scene.addElement(cube, &lightShader);
@@ -112,6 +118,7 @@ void PlayState::init() {
     modelShader.setMat4("projection", projection);
 
     obj = new Object("./resources/models/backpack/backpack.obj", Flip::VERTICALLY);
+    debug_log->addLog(LogType::GENERAL_EVENT, "Instanced buffers for imported Object");
     obj->setPosition(vec3(0));
     obj->setScale(vec3(0.5));
     obj->setMaterial(material::NONE);

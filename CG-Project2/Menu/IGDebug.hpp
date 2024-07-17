@@ -4,17 +4,18 @@
 
 #include "Logger/Log.hpp"
 
-#include <iostream>
+#include "../Lib.hpp"
+
 #include <set>
 
-using namespace std;
+#define NUM_LOG_TYPES 4
 
 class IGDebug : private IGMenu {
   private:
     std::vector<std::pair<LogType, std::string>> logs;
 
-    LogType log_types[3] = {LogType::SELECT_WARNING, LogType::ERROR, LogType::EMPTY};
-    set<LogType> active_log_filter;
+    LogType log_types[NUM_LOG_TYPES] = {LogType::GENERAL_EVENT, LogType::SELECT_WARNING, LogType::ERROR, LogType::EMPTY};
+    std::set<LogType> active_log_filter;
 
     bool track_logs = true;
     int track_item = -1;
@@ -24,7 +25,10 @@ class IGDebug : private IGMenu {
     inline void resetTrackIndex() { this->track_item = -1; }
 
   protected:
-    IGDebug() {}
+    IGDebug() {
+        // default log filter
+        this->active_log_filter.insert(GENERAL_EVENT);
+    }
 
   public:
     IGDebug(const IGDebug &obj) = delete;
@@ -44,28 +48,45 @@ class IGDebug : private IGMenu {
 
     inline virtual void render() override {
         ImGui::Begin("Debug Logger");
-        ImGui::BeginGroup();
-        if (ImGui::Button("Reset")) {
-            this->active_log_filter.clear();
+        {
+            ImGui::SeparatorText("Log Type Filter");
+            ImGui::BeginGroup();
+            for (auto t : this->log_types) {
+                ImGui::PushID(t);
+                if (this->active_log_filter.find(t) != this->active_log_filter.end()) {
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8, 0, 0, 1));
+                } else {
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_Button));
+                }
+                if (ImGui::Button(getLogLongText(t).c_str())) {
+                    if (this->active_log_filter.find(t) != this->active_log_filter.end())
+                        this->active_log_filter.erase(t);
+                    else
+                        this->active_log_filter.insert(t);
+                }
+                ImGui::PopStyleColor(1);
+                ImGui::PopID();
+                ImGui::SameLine();
+            }
+            ImGui::EndGroup();
         }
-        for (auto t : this->log_types) {
+
+        {
+            if (ImGui::Button("Reset")) {
+                this->active_log_filter.clear();
+            }
             ImGui::SameLine();
-            ImGui::PushID(t);
-            if (this->active_log_filter.find(t) != this->active_log_filter.end()) {
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8, 0, 0, 1));
-            } else {
-                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_Button));
-            }
-            if (ImGui::Button(getLogLongText(t).c_str())) {
-                if (this->active_log_filter.find(t) != this->active_log_filter.end())
-                    this->active_log_filter.erase(t);
+            if (ImGui::Button("All")) {
+                if (this->active_log_filter.size() != NUM_LOG_TYPES)
+                    for (auto l : this->log_types) {
+                        this->active_log_filter.insert(l);
+                    }
                 else
-                    this->active_log_filter.insert(t);
+                    this->active_log_filter.clear();
             }
-            ImGui::PopStyleColor(1);
-            ImGui::PopID();
         }
-        ImGui::EndGroup();
+
+        ImGui::SeparatorText("Logs");
         {
             ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyleColorVec4(ImGuiCol_FrameBg));
             ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, ImGui::GetTextLineHeightWithSpacing() * 1),
@@ -75,7 +96,7 @@ class IGDebug : private IGMenu {
                 for (auto elem : this->logs) {
                     if (this->active_log_filter.find(elem.first) != this->active_log_filter.end()) {
                         ImGui::PushID(&elem);
-                        ImGui::TextColored(getLogColor(elem.first), "[%s]", getLogText(elem.first).c_str());
+                        ImGui::TextColored(getLogColor(elem.first), "(TIME) [%s]", getLogText(elem.first).c_str());
                         ImGui::SameLine();
                         ImGui::Text("=> %s", elem.second.c_str());
                         ImGui::PopID();
