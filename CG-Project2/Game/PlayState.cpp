@@ -11,6 +11,7 @@
 #include "../Scene/Scene.hpp"
 
 #include "../Menu/IGCamera.hpp"
+#include "../Menu/IGDebug.hpp"
 #include "../Menu/IGEntity.hpp"
 #include "../Menu/IGLights.hpp"
 #include "../Menu/IGMenu.hpp"
@@ -50,6 +51,7 @@ bool show_object_picker = false;
 Mouse mouse;
 
 ActionManager *action_manager = ActionManager::instance();
+IGDebug *debug_log = IGDebug::instance();
 
 void PlayState::init() {
     glEnable(GL_DEPTH_TEST);
@@ -318,7 +320,7 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
                 if (isRayInSphere(ray, current->getPosition(), 0.7, &dist)) {
                     if (obj_selected == nullptr || dist <= ci) {
                         obj_selected = current;
-                        warning("Working on the same shader, it affects all the shaders");
+                        debug_log->addLog(LogType::SELECT_WARNING, "Working on the same shader, it affects all the shaders");
                         shader_selected = shader;
                         ci = dist;
                     }
@@ -331,7 +333,7 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
                 if (isRayInSphere(ray, caster->getCaster()->getPosition(), 0.7, &dist)) {
                     if (obj_selected == nullptr || dist <= ci) {
                         obj_selected = caster->getCaster();
-                        warning("Working on the same shader, it affects all the shaders");
+                        debug_log->addLog(LogType::SELECT_WARNING, "Working on the same shader, it affects all the shaders");
                         shader_selected = caster->getShader();
                         ci = dist;
                     }
@@ -350,6 +352,10 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
     imGuiMouse2Popup();
 
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);
+}
+
+void scrollPosFunc(GLFWwindow *window, double xoffset, double yoffset) {
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 }
 
 void PlayState::handleEvent(GameEngine *engine) {
@@ -378,6 +384,7 @@ void PlayState::handleEvent(GameEngine *engine) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         glfwSetMouseButtonCallback(window, selectMouseFunc);
         glfwSetCursorPosCallback(window, mouseActiveMotion);
+        glfwSetScrollCallback(window, scrollPosFunc);
         break;
     case INTERACT:
         // enable movement in the scene, and active mouse movement
@@ -385,6 +392,7 @@ void PlayState::handleEvent(GameEngine *engine) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         glfwSetMouseButtonCallback(window, mouseInputFunc);
         glfwSetCursorPosCallback(window, mouseActiveMotion);
+        glfwSetScrollCallback(window, scrollPosFunc);
         break;
     case PASSIVE:
         // enable passive mouse movement
@@ -546,4 +554,6 @@ void PlayState::draw(GameEngine *engine) {
     if (show_object_picker) {
         showObjectPicker();
     }
+
+    debug_log->render();
 }
