@@ -14,6 +14,7 @@ bool Scene::removeElement(Entity *e, Shader *s) {
 }
 
 void Scene::addLight(Light *l) {
+    l->getCaster();
     this->lights.push_back(l);
 }
 

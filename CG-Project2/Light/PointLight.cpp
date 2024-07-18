@@ -35,11 +35,10 @@ void PointLight::drawCaster() {
         IGDebug::instance()->addLog(LogType::MISSING_CASTER, "No Caster Attached");
         return;
     }
-
     this->casterShader.use();
     this->casterShader.setVec3("light_color", this->getColor());
     this->casterShader.setMat4("projection", projection);
-    this->casterShader.setMat4("view", this->getCustomView());
+    this->casterShader.setMat4("view", camera.getViewMatrix());
     this->casterShader.setMat4("model", this->caster->getModelMatrix());
     this->caster->draw(this->casterShader);
 }

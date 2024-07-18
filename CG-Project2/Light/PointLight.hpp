@@ -5,14 +5,12 @@
 #include "../Entity/Sphere.hpp"
 
 class PointLight : public Light {
-private:
+  private:
     vec3 position = vec3(0);
     LightInfo info;
 
-public:
-    PointLight() { 
-        this->type = LightType::POINTLIGHT;
-    }
+  public:
+    PointLight() { this->type = LightType::POINTLIGHT; }
 
     PointLight(vec3 position, float constant, float linear, float quadratic);
 

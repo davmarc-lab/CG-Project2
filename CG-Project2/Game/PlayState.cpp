@@ -362,9 +362,7 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);
 }
 
-void scrollPosFunc(GLFWwindow *window, double xoffset, double yoffset) {
-    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
-}
+void scrollPosFunc(GLFWwindow *window, double xoffset, double yoffset) { ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset); }
 
 void PlayState::handleEvent(GameEngine *engine) {
     auto window = engine->getWindow()->getWindow();
@@ -467,6 +465,16 @@ void PlayState::update(GameEngine *engine) {
                 show_object_picker = true;
                 break;
             }
+            case Action::ADD_DIRECT_LIGHT:
+                obj_scene.addLight(new DirectionalLight());
+                break;
+            case Action::ADD_POINT_LIGHT:
+                obj_scene.addLight(new PointLight());
+                break;
+            case Action::ADD_SPOT_LIGHT: {
+                obj_scene.addLight(new SpotLight());
+                break;
+            }
             case Action::DEL_ENTITY:
                 if (obj_selected != nullptr) {
                     obj_scene.removeElement(obj_selected, shader_selected);
@@ -495,10 +503,6 @@ void PlayState::update(GameEngine *engine) {
 
     skyboxShader.use();
     skyboxShader.setMat4("view", mat4(mat3(camera.getViewMatrix())));
-
-    // send custom view matrix to lights
-    pl->setCustomView(camera.getViewMatrix());
-    ll->setCustomView(camera.getViewMatrix());
 }
 
 void showObjectPicker() {

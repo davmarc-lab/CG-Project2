@@ -5,14 +5,14 @@
 #include "../Entity/Sphere.hpp"
 
 class SpotLight : public Light {
-private:
+  private:
     vec3 position = vec3(0);
     vec3 direction = vec3(1);
     LightInfo info;
     float cutOff = 12.5f;
     float outer_cutOff = 17.5f;
 
-public:
+  public:
     SpotLight() { this->type = LightType::SPOTLIGHT; }
 
     SpotLight(vec3 position, vec3 direction, float constant, float linear, float quadratic);
@@ -20,9 +20,9 @@ public:
     inline vec3 getDirection() { return this->direction; }
 
     inline void setDirection(vec3 dir) { this->direction = dir; }
-    
+
     inline float getConstant() { return this->info.constant; }
-    
+
     inline void setConstant(const float val) { this->info.constant = val; }
 
     inline float getLinear() { return this->info.linear; }
@@ -49,7 +49,6 @@ public:
         this->caster->createVertexArray();
         this->caster->setPosition(this->position);
         this->caster->setScale(vec3(0.1));
-
     }
 
     virtual void sendDataToShader(Shader shader, int index) override;

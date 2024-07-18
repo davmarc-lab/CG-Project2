@@ -91,7 +91,7 @@ class IGDebug : private IGMenu {
             ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyleColorVec4(ImGuiCol_FrameBg));
             ImGui::SetNextWindowSizeConstraints(ImVec2(0.0f, ImGui::GetTextLineHeightWithSpacing() * 1),
                                                 ImVec2(FLT_MAX, ImGui::GetTextLineHeightWithSpacing() * 10));
-            if (ImGui::BeginChild("Log Messages", ImVec2(-FLT_MIN, ImGui::GetTextLineHeightWithSpacing() * 8), ImGuiChildFlags_Border)) {
+            if (ImGui::BeginChild("Log Messages", ImVec2(-FLT_MIN, ImGui::GetTextLineHeightWithSpacing() * 8), ImGuiChildFlags_Border | ImGuiChildFlags_ResizeY)) {
                 ImGui::PopStyleColor();
                 for (auto elem : this->logs) {
                     if (this->active_log_filter.find(elem.first) != this->active_log_filter.end()) {
