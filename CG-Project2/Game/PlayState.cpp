@@ -31,7 +31,7 @@ PlaneEntity *plane;
 Cubemap *skybox;
 Shader lightShader, planeShader, skyboxShader, modelShader;
 
-PointLight *pl = new PointLight();
+DirectionalLight *pl = new DirectionalLight();
 SpotLight *ll = new SpotLight();
 
 Object *obj;
@@ -43,7 +43,8 @@ Scene obj_scene;
 
 InputMode user_mode = InputMode::INTERACT;
 
-IGMenu *modeMenu, *cameraMenu, *lightsMenu;
+IGMenu *modeMenu, *cameraMenu;
+IGLights *lightsMenu;
 IGEntity *entityMenu = nullptr;
 IGMousePopup *mousePopup = new IGMousePopup(mouse_popup_name.c_str());
 
@@ -104,8 +105,6 @@ void PlayState::init() {
     obj_scene.addElement(cube, &lightShader);
     obj_scene.addElement(sphere, &lightShader);
 
-    pl->initCaster();
-    pl->setPosition(vec3(0, -2, 0));
     ll->initCaster();
     ll->setPosition(vec3(1));
     ll->setDirection(vec3(0, 1, 0));
@@ -338,7 +337,7 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
             for (auto caster : obj_scene.getLights()) {
                 float dist = 0.f;
 
-                if (isRayInSphere(ray, caster->getCaster()->getPosition(), 0.1f, &dist)) {
+                if (caster->getType() != LightType::DIRECTIONAL && isRayInSphere(ray, caster->getCaster()->getPosition(), 0.1f, &dist)) {
                     if (obj_selected == nullptr || dist <= ci) {
                         obj_selected = caster->getCaster();
                         debug_log->addLog(LogType::ERROR, "Working on the same shader, it affects all the shaders");
@@ -467,12 +466,15 @@ void PlayState::update(GameEngine *engine) {
             }
             case Action::ADD_DIRECT_LIGHT:
                 obj_scene.addLight(new DirectionalLight());
+                lightsMenu->refreshLights(obj_scene.getLights());
                 break;
             case Action::ADD_POINT_LIGHT:
                 obj_scene.addLight(new PointLight());
+                lightsMenu->refreshLights(obj_scene.getLights());
                 break;
             case Action::ADD_SPOT_LIGHT: {
                 obj_scene.addLight(new SpotLight());
+                lightsMenu->refreshLights(obj_scene.getLights());
                 break;
             }
             case Action::DEL_ENTITY:

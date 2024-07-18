@@ -14,12 +14,11 @@ bool Scene::removeElement(Entity *e, Shader *s) {
 }
 
 void Scene::addLight(Light *l) {
-    l->getCaster();
+    if (!l->isCasterInstaced()) l->initCaster();
     this->lights.push_back(l);
 }
 
 void Scene::draw() {
-
     int index = 0;
 
     for (auto e : this->elements) {
@@ -39,7 +38,6 @@ void Scene::draw() {
                 }
             }
         }
-
         e.first->draw(*e.second);
     }
 

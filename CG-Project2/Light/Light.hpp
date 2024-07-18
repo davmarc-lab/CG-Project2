@@ -15,12 +15,11 @@ public:
     LightVectors vectors;
     LightType type;
 
-    Entity* caster;
+    Entity* caster = nullptr;
     Shader casterShader;
     bool show_caster = true;
 
     mat4 custom_view = mat4(1.0f);
-
 
     vec3 getAmbient() { return this->vectors.ambient; }
 
@@ -51,6 +50,8 @@ public:
     inline Entity* getCaster() { return this->caster; }
 
     inline Shader* getShader() { return &this->casterShader; }
+
+    bool isCasterInstaced() { return this->caster != nullptr || this->type == LightType::DIRECTIONAL; }
 
     bool showCaster() { return this->show_caster; }
 

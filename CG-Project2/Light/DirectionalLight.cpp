@@ -1,7 +1,6 @@
 #include "DirectionalLight.hpp"
 
 DirectionalLight::DirectionalLight() {
-    this->casterShader = Shader("./resources/shaders/casterVertexShader.glsl", "./resources/shaders/casterFragmentShader.glsl");
     this->type = LightType::DIRECTIONAL;
 }
 

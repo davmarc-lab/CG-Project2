@@ -12,6 +12,7 @@ PointLight::PointLight(vec3 position, float constant, float linear, float quadra
 void PointLight::sendDataToShader(Shader shader, int index) {
     shader.use();
 
+
     shader.setInt("lights[" + to_string(index) + "].lightType", this->type);
     shader.setFloat("lights[" + to_string(index) + "].intensity", this->intensity);
     shader.setInt("max_num_lights", max_lights);

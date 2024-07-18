@@ -6,7 +6,7 @@
 
 class DirectionalLight : public Light {
 private:
-    vec3 direction = vec3(1);
+    vec3 direction = vec3(1, 0, 0);
 
 public:
     DirectionalLight();

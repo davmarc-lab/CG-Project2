@@ -94,6 +94,8 @@ class IGLights : public IGMenu {
 
     IGLights(vector<Light *> lights) : lights(lights) {}
 
+    void refreshLights(vector<Light*> lights) { this->lights = lights; }
+
     inline virtual void render() override {
         ImGui::Begin("Lights");
 
