@@ -11,6 +11,7 @@ void DirectionalLight::sendDataToShader(Shader shader, int index) {
     shader.setInt("max_num_lights", max_lights);
 
     shader.setVec3("lights[" + to_string(index) + "].color", this->color);
+    shader.setFloat("lights[" + to_string(index) + "].intensity", this->intensity);
 
     shader.setVec3("lights[" + to_string(index) + "].direction", this->direction);
 

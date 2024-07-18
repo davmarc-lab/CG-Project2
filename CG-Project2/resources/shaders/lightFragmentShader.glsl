@@ -65,13 +65,20 @@ vec3 reflectDir = vec3(0);
 float spec = 0.f;
 
 vec3 calcDirectionalLight(Light light) {
+    vec3 norm = normalize(Normal);
+
     // ambient
     vec3 ambient = light.intensity * light.color * light.ambient * material.ambient;
 
     // diffuse
+    vec3 lightDir = normalize(-light.direction);
+    float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = light.intensity * light.color * light.diffuse * diff * material.diffuse;
 
     // specular
+    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 reflectDir = reflect(-lightDir, norm);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     vec3 specular = light.intensity * light.color * light.specular * spec * material.specular;
 
     return (ambient + diffuse + specular);
