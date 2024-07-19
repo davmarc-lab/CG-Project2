@@ -42,7 +42,9 @@ inline LogType MISSING_CASTER = LogType("CASTER", "Caster", ImVec4(1, 1, 0, 1));
 inline LogType SELECT_WARNING = LogType("SELECT", "Select W", ImVec4(1, 1, 0, 1));
 inline LogType ERROR = LogType("ERROR", "Error", ImVec4(1, 0, 0, 1));
 inline LogType STATE = LogType("STATE", "Play", ImVec4(1, 0, 0, 1));
-inline std::set<LogType> log_types = {GENERAL_EVENT, MISSING_IMPLEMENTATION, MISSING_CASTER, STATE, SELECT_WARNING, ERROR, EMPTY};
+inline LogType INIT = LogType("INIT", "Init", ImVec4(1, 1, 0, 1));
+inline LogType SILENCE = LogType("SILENCE", "Silence", ImVec4(1, 1, 1, 1));
+inline std::set<LogType> log_types = {GENERAL_EVENT, MISSING_IMPLEMENTATION, MISSING_CASTER, STATE, SELECT_WARNING, ERROR, SILENCE, EMPTY};
 
 } // namespace logs
 
@@ -58,7 +60,7 @@ class Log {
     Log(LogType type = LogType(), float time = 0.f, const char *text = "") : m_type(type), m_time(time), m_text(text) {}
 
     Log(const char *log_type, const char *log_type_text, ImVec4 color, float time, const char *text)
-        : Log(LogType(log_type, log_type_text, color), time, text) {}
+        : Log(LogType(log_type, log_type_text, color), time, std::string(text).c_str()) {}
 
     inline const char *getLogType() { return this->m_type.getLogType(); }
 

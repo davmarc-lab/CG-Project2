@@ -43,7 +43,6 @@ public:
 		this->elements.clear();
         this->custom_obj.clear();
         this->lights.clear();
-		delete this;
 	}
 
 	~Scene() = default;

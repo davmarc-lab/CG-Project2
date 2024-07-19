@@ -3,6 +3,8 @@
 
 #include "../Window/Window.hpp"
 
+#include "../Menu/Logger/LogManager.hpp"
+
 Mouse input;
 
 GameEngine::GameEngine(Window *window, unsigned int width, unsigned int height) {
@@ -35,8 +37,8 @@ void GameEngine::changeState(GameState *state) {
     if (!this->states.empty()) {
         this->states.back()->clean();
     }
-
     this->states.push_back(state);
+    LogManager::instance()->addLog(logs::STATE, glfwGetTime(), "Changing State");
     this->states.back()->init();
 }
 

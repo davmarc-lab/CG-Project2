@@ -21,6 +21,7 @@
 #include "../Menu/Logger/LogManager.hpp"
 
 #include "Game.hpp"
+#include "IntroState.hpp"
 
 PlayState PlayState::playState;
 string mouse_popup_name = "Menu";
@@ -43,21 +44,25 @@ Scene obj_scene;
 
 InputMode user_mode = InputMode::INTERACT;
 
-IGMenu *modeMenu, *cameraMenu;
+IGMode *modeMenu;
+IGCamera *cameraMenu;
 IGLights *lightsMenu;
 IGEntity *entityMenu = nullptr;
 IGMousePopup *mousePopup = new IGMousePopup(mouse_popup_name.c_str());
-IGDebug* debugMenu = new IGDebug();
+IGDebug *debugMenu = new IGDebug();
 
 bool show_popup = false;
 bool show_object_picker = false;
 
 Mouse mouse;
 
+string string_buffer = "";
+
 ActionManager *action_manager = ActionManager::instance();
 LogManager *debug_log = LogManager::instance();
 
 void PlayState::init() {
+    debug_log->addLog(logs::INIT, glfwGetTime(), "Start Init PlayState");
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
@@ -67,7 +72,7 @@ void PlayState::init() {
 
     cube = new CubeEntity();
     cube->createVertexArray();
-    debug_log->addLog(logs::GENERAL_EVENT, glfwGetTime(), "Instanced buffers for Cube");
+    debug_log->addLog(logs::SILENCE, glfwGetTime(), "Instanced buffers for Cube");
     cube->setPosition(vec3(0, 1, 0));
     cube->setScale(vec3(1));
     cube->attachTexture(cube_texture);
@@ -78,7 +83,7 @@ void PlayState::init() {
 
     sphere = new Sphere();
     sphere->createVertexArray();
-    debug_log->addLog(logs::GENERAL_EVENT, glfwGetTime(), "Instanced buffers for Sphere");
+    debug_log->addLog(logs::SILENCE, glfwGetTime(), "Instanced buffers for Sphere");
     sphere->setPosition(vec3(2, 0, 0));
     sphere->setScale(vec3(1));
     sphere->attachTexture(sphere_texture);
@@ -91,7 +96,7 @@ void PlayState::init() {
 
     plane = new PlaneEntity(color::RED);
     plane->createVertexArray();
-    debug_log->addLog(logs::GENERAL_EVENT, glfwGetTime(), "Instanced buffers for Plane");
+    debug_log->addLog(logs::SILENCE, glfwGetTime(), "Instanced buffers for Plane");
 
     skyboxShader = Shader("./resources/shaders/vertexShaderSkybox.glsl", "./resources/shaders/fragmentShaderSkybox.glsl");
     skyboxShader.use();
@@ -100,7 +105,7 @@ void PlayState::init() {
 
     skybox = new Cubemap();
     skybox->createVertexArray();
-    debug_log->addLog(logs::GENERAL_EVENT, glfwGetTime(), "Instanced buffers for Skybox");
+    debug_log->addLog(logs::SILENCE, glfwGetTime(), "Instanced buffers for Skybox");
 
     // add elements to the scene
     obj_scene.addElement(cube, &lightShader);
@@ -118,20 +123,23 @@ void PlayState::init() {
     modelShader.setMat4("projection", projection);
 
     obj = new Object("./resources/models/backpack/backpack.obj", Flip::VERTICALLY);
-    debug_log->addLog(logs::GENERAL_EVENT, glfwGetTime(), "Instanced buffers for imported Object");
+    debug_log->addLog(logs::SILENCE, glfwGetTime(), "Instanced buffers for imported Object");
     obj->setPosition(vec3(0));
     obj->setScale(vec3(0.5));
     obj->setMaterial(material::NONE);
     obj_scene.addElement(obj, &lightShader);
 
     // imgui
+    debug_log->addLog(logs::INIT, glfwGetTime(), "Start Init ImGui menus");
+
     entityMenu = new IGEntity();
     modeMenu = new IGMode(&user_mode);
     cameraMenu = new IGCamera();
     lightsMenu = new IGLights(obj_scene.getLights());
-}
+    debug_log->addLog(logs::INIT, glfwGetTime(), "End Init ImGui menus");
 
-void PlayState::clean() {}
+    debug_log->addLog(logs::INIT, glfwGetTime(), "End Init PlayState");
+}
 
 void PlayState::pause() {}
 
@@ -245,9 +253,6 @@ void passiveCursorPosFunc(GLFWwindow *window, double x, double y) {
     mouse.lastY = y;
 
     camera.processMouseMovement(xoffset, yoffset);
-
-    // this should be useless, because the mouse is hidden when using passive mode
-    // ImGui_ImplGlfw_CursorPosCallback(window, x, y);
 }
 
 vec3 getRayFromMouse(int mouse_x, int mouse_y) {
@@ -379,7 +384,8 @@ void PlayState::handleEvent(GameEngine *engine) {
         user_mode = InputMode::PASSIVE;
     }
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_Q)) {
-        this->clean();
+        // This changeState kinda work for PlayState but need to test more
+        // engine->changeState(IntroState::instance());
         engine->quit();
     }
 
@@ -425,27 +431,32 @@ void PlayState::handleEvent(GameEngine *engine) {
     float cameraVelocity = camera.getCameraVelocity() * engine->getDeltaTime();
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         // lockKey(GLFW_KEY_W);
+        debug_log->addLog(logs::SILENCE, glfwGetTime(), "Moving Camera forward");
         auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraFront();
         camera.moveCamera(pos);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        debug_log->addLog(logs::SILENCE, glfwGetTime(), "Moving Camera backward");
         auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraFront();
         camera.moveCamera(pos);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        debug_log->addLog(logs::SILENCE, glfwGetTime(), "Moving Camera left");
         auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraRight();
         camera.moveCamera(pos);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        debug_log->addLog(logs::SILENCE, glfwGetTime(), "Moving Camera right");
         auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraRight();
         camera.moveCamera(pos);
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        // cube jump
+        debug_log->addLog(logs::SILENCE, glfwGetTime(), "Moving Camera upward");
         auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraUp();
         camera.moveCamera(pos);
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        debug_log->addLog(logs::SILENCE, glfwGetTime(), "Moving Camera downward");
         auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraUp();
         camera.moveCamera(pos);
     }
@@ -571,4 +582,17 @@ void PlayState::draw(GameEngine *engine) {
     }
 
     debugMenu->render();
+}
+
+void PlayState::clean() {
+    // delete obj_selected;
+    // delete shader_selected;
+    delete plane;
+    delete skybox;
+    delete entityMenu;
+    delete modeMenu;
+    delete cameraMenu;
+    delete lightsMenu;
+    delete mousePopup;
+    delete debugMenu;
 }

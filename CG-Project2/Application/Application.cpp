@@ -1,10 +1,12 @@
 #include "Application.hpp"
 
+#include "../LibCustomGui.hpp"
+
 #include "../Game/Game.hpp"
 #include "../Game/IntroState.hpp"
 #include "../Window/Window.hpp"
 
-#include "../LibCustomGui.hpp"
+#include "../Menu/Logger/LogManager.hpp"
 
 void Application::launch() {
     // instanciate window
@@ -26,7 +28,9 @@ void Application::launch() {
 
     game.init();
 
+    LogManager::instance()->addLog(logs::STATE, glfwGetTime(), "Creating IntroState");
     game.changeState(IntroState::instance());
+    LogManager::instance()->addLog(logs::STATE, glfwGetTime(), "Instanced IntroState");
     float lastFrame = 0;
 
     while (!glfwWindowShouldClose(window.getWindow()) && game.isRunning()) {

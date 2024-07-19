@@ -20,7 +20,9 @@ class IGDebug : private IGMenu {
 
     IGDebug() {
         // default log filter
+        this->active_log_filter.insert(logs::ERROR);
         this->active_log_filter.insert(logs::GENERAL_EVENT);
+        this->active_log_filter.insert(logs::STATE);
     }
 
     inline void addLog(Log log) {
