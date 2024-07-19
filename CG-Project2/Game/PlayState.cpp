@@ -43,6 +43,7 @@ Shader *shader_selected = nullptr;
 Scene obj_scene;
 
 InputMode user_mode = InputMode::INTERACT;
+InputMode old_user_mode = user_mode;
 
 IGMode *modeMenu;
 IGCamera *cameraMenu;
@@ -389,36 +390,42 @@ void PlayState::handleEvent(GameEngine *engine) {
         engine->quit();
     }
 
-    switch (user_mode) {
-    case SELECT:
-        // enable selecting object mode
-        mouse.first_mouse = true;
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        glfwSetMouseButtonCallback(window, selectMouseFunc);
-        glfwSetCursorPosCallback(window, mouseActiveMotion);
-        glfwSetScrollCallback(window, scrollPosFunc);
-        break;
-    case INTERACT:
-        // enable movement in the scene, and active mouse movement
-        mouse.first_mouse = true;
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        glfwSetMouseButtonCallback(window, mouseInputFunc);
-        glfwSetCursorPosCallback(window, mouseActiveMotion);
-        glfwSetScrollCallback(window, scrollPosFunc);
-        break;
-    case PASSIVE:
-        // enable passive mouse movement
-        mouse.first_mouse = true;
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        glfwSetCursorPosCallback(window, passiveCursorPosFunc);
-        glfwSetMouseButtonCallback(window, clearMouseActionFunc);
+    if (user_mode != old_user_mode) {
+        old_user_mode = user_mode;
+        switch (user_mode) {
+        case SELECT:
+            // enable selecting object mode
+            debug_log->addLog(logs::USER_MODE, glfwGetTime(), "User Mode -> SELECT");
+            mouse.first_mouse = true;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetMouseButtonCallback(window, selectMouseFunc);
+            glfwSetCursorPosCallback(window, mouseActiveMotion);
+            glfwSetScrollCallback(window, scrollPosFunc);
+            break;
+        case INTERACT:
+            // enable movement in the scene, and active mouse movement
+            debug_log->addLog(logs::USER_MODE, glfwGetTime(), "User Mode -> INTERACT");
+            mouse.first_mouse = true;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetMouseButtonCallback(window, mouseInputFunc);
+            glfwSetCursorPosCallback(window, mouseActiveMotion);
+            glfwSetScrollCallback(window, scrollPosFunc);
+            break;
+        case PASSIVE:
+            // enable passive mouse movement
+            debug_log->addLog(logs::USER_MODE, glfwGetTime(), "User Mode -> PASSIVE");
+            mouse.first_mouse = true;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetCursorPosCallback(window, passiveCursorPosFunc);
+            glfwSetMouseButtonCallback(window, clearMouseActionFunc);
 
-        if (glfwRawMouseMotionSupported())
-            glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+            if (glfwRawMouseMotionSupported())
+                glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
-        break;
-    default:
-        break;
+            break;
+        default:
+            break;
+        }
     }
 
     // Mouse input
@@ -467,30 +474,37 @@ void PlayState::update(GameEngine *engine) {
         for (auto act : action_manager->getActions()) {
             switch (act) {
             case Action::ADD_CUBE_ENTITY:
+                debug_log->addLog(logs::ADD_ENTITY, glfwGetTime(), "Added Cube to Scene");
                 obj_scene.addElement(new CubeEntity(), &lightShader);
                 break;
             case Action::ADD_SPHERE_ENTITY:
+                debug_log->addLog(logs::ADD_ENTITY, glfwGetTime(), "Added Sphere to Scene");
                 obj_scene.addElement(new Sphere(), &lightShader);
                 break;
             case Action::ADD_OBJECT_ENTITY: {
+                debug_log->addLog(logs::ADD_ENTITY, glfwGetTime(), "Added extern Object to Scene");
                 show_object_picker = true;
                 break;
             }
             case Action::ADD_DIRECT_LIGHT:
                 obj_scene.addLight(new DirectionalLight());
+                debug_log->addLog(logs::ADD_ENTITY, glfwGetTime(), "Added Directional Light to Scene");
                 lightsMenu->refreshLights(obj_scene.getLights());
                 break;
             case Action::ADD_POINT_LIGHT:
+                debug_log->addLog(logs::ADD_ENTITY, glfwGetTime(), "Added Point Light to Scene");
                 obj_scene.addLight(new PointLight());
                 lightsMenu->refreshLights(obj_scene.getLights());
                 break;
             case Action::ADD_SPOT_LIGHT: {
+                debug_log->addLog(logs::ADD_ENTITY, glfwGetTime(), "Added Spot Light to Scene");
                 obj_scene.addLight(new SpotLight());
                 lightsMenu->refreshLights(obj_scene.getLights());
                 break;
             }
             case Action::DEL_ENTITY:
                 if (obj_selected != nullptr) {
+                    debug_log->addLog(logs::REMOVE_ENTITY, glfwGetTime(), "Removed Entity from Scene");
                     obj_scene.removeElement(obj_selected, shader_selected);
                     obj_selected = nullptr;
                     shader_selected = nullptr;
