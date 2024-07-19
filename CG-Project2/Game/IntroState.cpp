@@ -5,6 +5,8 @@
 #include "../Menu/ButtonComponent.hpp"
 #include "PlayState.hpp"
 
+#include "../Menu/Logger/LogManager.hpp"
+
 IntroState IntroState::introState;
 
 ButtonComponent *playButton, *optionButton, *exitButton;
@@ -51,7 +53,9 @@ void IntroState::handleEvent(GameEngine *engine) {
     if (oldState == GLFW_PRESS && state == GLFW_RELEASE) {
         // do these action if the option pane is not active
         if (isMouseInButton(playButton, pos)) {
+            LogManager::instance()->addLog(logs::STATE, glfwGetTime(), "Creating PlayState");
             engine->changeState(PlayState::instance());
+            LogManager::instance()->addLog(logs::STATE, glfwGetTime(), "Instanced PlayState");
         } else if (isMouseInButton(exitButton, pos)) {
             engine->quit();
         } else if (isMouseInButton(optionButton, pos)) {

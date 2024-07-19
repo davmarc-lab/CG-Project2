@@ -27,8 +27,8 @@ class LogManager {
 
     inline void addLog(LogType log, float time, const char *text) { this->addLog(Log(log, time, text)); }
 
-    inline void addLog(int id, const char *log_type, const char *log_type_text, ImVec4 color, float time, const char *text) {
-        this->addLog(Log(id, log_type, log_type_text, color, time, text));
+    inline void addLog(const char *log_type, const char *log_type_text, ImVec4 color, float time, const char *text) {
+        this->addLog(Log(log_type, log_type_text, color, time, text));
     }
 
     inline std::vector<Log> getLogs() { return this->m_logs; }

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../../LibCustomGui.hpp"
-#include <vector>
+#include <set>
+
+static int auto_id = 0;
 
 class LogType {
   private:
@@ -11,10 +13,14 @@ class LogType {
     ImVec4 m_log_color;
 
   public:
-    LogType() : LogType(0, "EMPTY", "", ImVec4(1, 1, 1, 1)) {}
+    LogType() : LogType("EMPTY", "", ImVec4(1, 1, 1, 1)) {}
 
-    LogType(int id, const char *log_type, const char *log_type_text, ImVec4 color)
-        : id(id), m_log_type(log_type), m_log_type_text(log_type_text), m_log_color(color) {}
+    LogType(const char *log_type, const char *log_type_text, ImVec4 color)
+        : id(auto_id), m_log_type(log_type), m_log_type_text(log_type_text), m_log_color(color) {
+        auto_id++;
+    }
+
+    inline static void incrementIndex() { auto_id++; }
 
     friend bool operator<(LogType t1, LogType t2) { return t1.id < t2.id; }
 
@@ -29,14 +35,14 @@ class LogType {
 
 // namespace for all logs (no custom logs)
 namespace logs {
-inline LogType GENERAL_EVENT = LogType(1, "EVENT", "Event", ImVec4(0, 0.8, 0.1, 1));
-inline LogType MISSING_IMPLEMENTATION = LogType(2, "MISSING", "Implementation", ImVec4(1, 0.5, 0, 1));
-inline LogType MISSING_CASTER = LogType(3, "CASTER", "Caster", ImVec4(1, 1, 0, 1));
-inline LogType SELECT_WARNING = LogType(4, "SELECT", "Select W", ImVec4(1, 1, 0, 1));
-inline LogType ERROR = LogType(5, "ERROR", "Error", ImVec4(1, 0, 0, 1));
-inline LogType EMPTY = LogType(0, "", "Empty", ImVec4(1, 1, 1, 1));
-
-inline std::vector<LogType> log_types = {GENERAL_EVENT, MISSING_IMPLEMENTATION, MISSING_CASTER, SELECT_WARNING, ERROR, EMPTY};
+inline LogType EMPTY = LogType("", "Empty", ImVec4(1, 1, 1, 1));
+inline LogType GENERAL_EVENT = LogType("EVENT", "Event", ImVec4(0, 0.8, 0.1, 1));
+inline LogType MISSING_IMPLEMENTATION = LogType("MISSING", "Implementation", ImVec4(1, 0.5, 0, 1));
+inline LogType MISSING_CASTER = LogType("CASTER", "Caster", ImVec4(1, 1, 0, 1));
+inline LogType SELECT_WARNING = LogType("SELECT", "Select W", ImVec4(1, 1, 0, 1));
+inline LogType ERROR = LogType("ERROR", "Error", ImVec4(1, 0, 0, 1));
+inline LogType STATE = LogType("STATE", "Play", ImVec4(1, 0, 0, 1));
+inline std::set<LogType> log_types = {GENERAL_EVENT, MISSING_IMPLEMENTATION, MISSING_CASTER, STATE, SELECT_WARNING, ERROR, EMPTY};
 
 } // namespace logs
 
@@ -51,8 +57,8 @@ class Log {
 
     Log(LogType type = LogType(), float time = 0.f, const char *text = "") : m_type(type), m_time(time), m_text(text) {}
 
-    Log(int id, const char *log_type, const char *log_type_text, ImVec4 color, float time, const char *text)
-        : Log(LogType(id, log_type, log_type_text, color), time, text) {}
+    Log(const char *log_type, const char *log_type_text, ImVec4 color, float time, const char *text)
+        : Log(LogType(log_type, log_type_text, color), time, text) {}
 
     inline const char *getLogType() { return this->m_type.getLogType(); }
 

@@ -29,7 +29,7 @@ class IGDebug : private IGMenu {
 
     inline void addLog(LogType log, float time, const char* text) { this->addLog(Log(log, time, text)); }
 
-    inline void addLog(int id, const char *log_type, const char *log_text, ImVec4 color, float time, const char* text) { this->addLog(Log(id, log_type, log_text, color, time, text)); }
+    inline void addLog(const char *log_type, const char *log_text, ImVec4 color, float time, const char* text) { this->addLog(Log(log_type, log_text, color, time, text)); }
 
     inline virtual void render() override {
         ImGui::Begin("Debug Logger");
