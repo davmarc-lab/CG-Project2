@@ -83,7 +83,6 @@ OBJECTS := \
 	$(OBJDIR)/DirectionalLight.o \
 	$(OBJDIR)/PointLight.o \
 	$(OBJDIR)/SpotLight.o \
-	$(OBJDIR)/IGDebug.o \
 	$(OBJDIR)/Scene.o \
 	$(OBJDIR)/Shader.o \
 	$(OBJDIR)/Text.o \
@@ -208,9 +207,6 @@ $(OBJDIR)/PointLight.o: Light/PointLight.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/SpotLight.o: Light/SpotLight.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/IGDebug.o: Menu/IGDebug.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Scene.o: Scene/Scene.cpp

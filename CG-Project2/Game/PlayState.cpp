@@ -18,7 +18,7 @@
 #include "../Menu/IGMode.hpp"
 #include "../Menu/IGMousePopup.hpp"
 
-#include "../Menu/Logger/Log.hpp"
+#include "../Menu/Logger/LogManager.hpp"
 
 #include "Game.hpp"
 
@@ -47,6 +47,7 @@ IGMenu *modeMenu, *cameraMenu;
 IGLights *lightsMenu;
 IGEntity *entityMenu = nullptr;
 IGMousePopup *mousePopup = new IGMousePopup(mouse_popup_name.c_str());
+IGDebug* debugMenu = new IGDebug();
 
 bool show_popup = false;
 bool show_object_picker = false;
@@ -54,7 +55,7 @@ bool show_object_picker = false;
 Mouse mouse;
 
 ActionManager *action_manager = ActionManager::instance();
-IGDebug *debug_log = IGDebug::instance();
+LogManager *debug_log = LogManager::instance();
 
 void PlayState::init() {
     glEnable(GL_DEPTH_TEST);
@@ -66,7 +67,7 @@ void PlayState::init() {
 
     cube = new CubeEntity();
     cube->createVertexArray();
-    debug_log->addLog(LogType::GENERAL_EVENT, "Instanced buffers for Cube");
+    debug_log->addLog(logs::GENERAL_EVENT, glfwGetTime(), "Instanced buffers for Cube");
     cube->setPosition(vec3(0, 1, 0));
     cube->setScale(vec3(1));
     cube->attachTexture(cube_texture);
@@ -77,7 +78,7 @@ void PlayState::init() {
 
     sphere = new Sphere();
     sphere->createVertexArray();
-    debug_log->addLog(LogType::GENERAL_EVENT, "Instanced buffers for Sphere");
+    debug_log->addLog(logs::GENERAL_EVENT, glfwGetTime(), "Instanced buffers for Sphere");
     sphere->setPosition(vec3(2, 0, 0));
     sphere->setScale(vec3(1));
     sphere->attachTexture(sphere_texture);
@@ -90,7 +91,7 @@ void PlayState::init() {
 
     plane = new PlaneEntity(color::RED);
     plane->createVertexArray();
-    debug_log->addLog(LogType::GENERAL_EVENT, "Instanced buffers for Plane");
+    debug_log->addLog(logs::GENERAL_EVENT, glfwGetTime(), "Instanced buffers for Plane");
 
     skyboxShader = Shader("./resources/shaders/vertexShaderSkybox.glsl", "./resources/shaders/fragmentShaderSkybox.glsl");
     skyboxShader.use();
@@ -99,7 +100,7 @@ void PlayState::init() {
 
     skybox = new Cubemap();
     skybox->createVertexArray();
-    debug_log->addLog(LogType::GENERAL_EVENT, "Instanced buffers for Skybox");
+    debug_log->addLog(logs::GENERAL_EVENT, glfwGetTime(), "Instanced buffers for Skybox");
 
     // add elements to the scene
     obj_scene.addElement(cube, &lightShader);
@@ -117,7 +118,7 @@ void PlayState::init() {
     modelShader.setMat4("projection", projection);
 
     obj = new Object("./resources/models/backpack/backpack.obj", Flip::VERTICALLY);
-    debug_log->addLog(LogType::GENERAL_EVENT, "Instanced buffers for imported Object");
+    debug_log->addLog(logs::GENERAL_EVENT, glfwGetTime(), "Instanced buffers for imported Object");
     obj->setPosition(vec3(0));
     obj->setScale(vec3(0.5));
     obj->setMaterial(material::NONE);
@@ -326,21 +327,21 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
                 if (isRayInSphere(ray, current->getPosition(), 0.7, &dist)) {
                     if (obj_selected == nullptr || dist <= ci) {
                         obj_selected = current;
-                        debug_log->addLog(LogType::SELECT_WARNING, "Working on the same shader, it affects all the shaders");
+                        debug_log->addLog(logs::SELECT_WARNING, glfwGetTime(), "Working on the same shader, it affects all the shaders");
                         shader_selected = shader;
                         ci = dist;
                     }
                 }
             }
 
-            debug_log->addLog(LogType::EMPTY, "Sphere radius value (0.1f) could be incorrect");
+            debug_log->addLog(logs::ERROR, glfwGetTime(), "Sphere radius value (0.1f) could be incorrect");
             for (auto caster : obj_scene.getLights()) {
                 float dist = 0.f;
 
                 if (caster->getType() != LightType::DIRECTIONAL && isRayInSphere(ray, caster->getCaster()->getPosition(), 0.1f, &dist)) {
                     if (obj_selected == nullptr || dist <= ci) {
                         obj_selected = caster->getCaster();
-                        debug_log->addLog(LogType::ERROR, "Working on the same shader, it affects all the shaders");
+                        debug_log->addLog(logs::ERROR, glfwGetTime(), "Working on the same shader, it affects all the shaders");
                         shader_selected = caster->getShader();
                         ci = dist;
                     }
@@ -569,5 +570,5 @@ void PlayState::draw(GameEngine *engine) {
         showObjectPicker();
     }
 
-    debug_log->render();
+    debugMenu->render();
 }

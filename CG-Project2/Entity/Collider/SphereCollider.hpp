@@ -2,7 +2,7 @@
 
 #include "Collider.hpp"
 
-#include "../../Menu/IGDebug.hpp"
+#include "../../Menu/Logger/LogManager.hpp"
 
 class SphereCollider : public Collider {
   private:
@@ -12,7 +12,7 @@ class SphereCollider : public Collider {
     SphereCollider(Transform *transform) : transform(transform) {}
 
     virtual void createCollider(const vector<vec3> coords) {
-        IGDebug::instance()->addLog(LogType::MISSING_IMPLEMENTATION, "No Implemetation for Sphere Collider");
+        LogManager::instance()->addLog(logs::MISSING_IMPLEMENTATION, glfwGetTime(), "No Implemetation for Sphere Collider");
     }
 
     virtual bool testCollision(Transform *transform, Collider *collider, Transform *colliderTransform) {

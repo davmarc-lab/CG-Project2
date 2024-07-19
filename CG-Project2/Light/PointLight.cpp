@@ -1,6 +1,6 @@
 #include "PointLight.hpp"
 
-#include "../Menu/IGDebug.hpp"
+#include "../Menu/Logger/LogManager.hpp"
 
 PointLight::PointLight(vec3 position, float constant, float linear, float quadratic) : PointLight() {
     this->position = position; this->caster->setPosition(position);
@@ -33,7 +33,7 @@ void PointLight::sendDataToShader(Shader shader, int index) {
 
 void PointLight::drawCaster() {
     if (this->caster == nullptr) {
-        IGDebug::instance()->addLog(LogType::MISSING_CASTER, "No Caster Attached");
+        LogManager::instance()->addLog(logs::MISSING_CASTER, glfwGetTime(), "No Caster Attached");
         return;
     }
     this->casterShader.use();

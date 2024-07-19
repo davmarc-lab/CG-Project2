@@ -38,7 +38,7 @@ void SpotLight::sendDataToShader(Shader shader, int index) {
 
 void SpotLight::drawCaster() {
     if (this->caster == nullptr) {
-        IGDebug::instance()->addLog(LogType::MISSING_CASTER, "No Caster Attached");
+        LogManager::instance()->addLog(logs::MISSING_CASTER, glfwGetTime(), "No Caster Attached");
         return;
     }
 

@@ -2,7 +2,7 @@
 
 #include "Light.hpp"
 
-#include "../Menu/IGDebug.hpp"
+#include "../Menu/Logger/LogManager.hpp"
 
 class DirectionalLight : public Light {
 private:
@@ -16,7 +16,7 @@ public:
     inline void setDirection(vec3 dir) { this->direction = dir; }
 
     inline virtual void initCaster() override {
-        IGDebug::instance()->addLog(LogType::MISSING_CASTER, "No Caster Needed for Directional Light");
+        LogManager::instance()->addLog(logs::MISSING_CASTER, glfwGetTime(), "No Caster Needed for Directional Light");
     }
 
     virtual void sendDataToShader(Shader shader, int index) override;
