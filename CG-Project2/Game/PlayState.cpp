@@ -127,7 +127,6 @@ void PlayState::init() {
     debug_log->addLog(logs::SILENCE, glfwGetTime(), "Instanced buffers for imported Object");
     obj->setPosition(vec3(0));
     obj->setScale(vec3(0.5));
-    obj->setMaterial(material::NONE);
     obj_scene.addElement(obj, &lightShader);
 
     // imgui
@@ -333,7 +332,6 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
                 if (isRayInSphere(ray, current->getPosition(), 0.7, &dist)) {
                     if (obj_selected == nullptr || dist <= ci) {
                         obj_selected = current;
-                        debug_log->addLog(logs::SELECT_WARNING, glfwGetTime(), "Working on the same shader, it affects all the shaders");
                         shader_selected = shader;
                         ci = dist;
                     }
@@ -347,7 +345,6 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
                 if (caster->getType() != LightType::DIRECTIONAL && isRayInSphere(ray, caster->getCaster()->getPosition(), 0.1f, &dist)) {
                     if (obj_selected == nullptr || dist <= ci) {
                         obj_selected = caster->getCaster();
-                        debug_log->addLog(logs::ERROR, glfwGetTime(), "Working on the same shader, it affects all the shaders");
                         shader_selected = caster->getShader();
                         ci = dist;
                     }
@@ -357,8 +354,10 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
             // updating the observer in IGEntity menu
             if (obj_selected != nullptr) {
                 entityMenu->changeObserver(obj_selected, shader_selected);
+                debug_log->addLog(logs::SELECT_WARNING, glfwGetTime(), "Working on the same shader, it affects all the shaders");
             } else {
                 entityMenu->resetObserver();
+                debug_log->addLog(logs::SELECT_WARNING, glfwGetTime(), "No Entity Selected");
             }
         }
     }
@@ -387,6 +386,8 @@ void PlayState::handleEvent(GameEngine *engine) {
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_Q)) {
         // This changeState kinda work for PlayState but need to test more
         // engine->changeState(IntroState::instance());
+        debug_log->addLog(logs::GENERAL_EVENT, glfwGetTime(), "Game Closing");
+        // Print all logs in a txt file
         engine->quit();
     }
 
@@ -438,32 +439,26 @@ void PlayState::handleEvent(GameEngine *engine) {
     float cameraVelocity = camera.getCameraVelocity() * engine->getDeltaTime();
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         // lockKey(GLFW_KEY_W);
-        debug_log->addLog(logs::SILENCE, glfwGetTime(), "Moving Camera forward");
         auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraFront();
         camera.moveCamera(pos);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        debug_log->addLog(logs::SILENCE, glfwGetTime(), "Moving Camera backward");
         auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraFront();
         camera.moveCamera(pos);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        debug_log->addLog(logs::SILENCE, glfwGetTime(), "Moving Camera left");
         auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraRight();
         camera.moveCamera(pos);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        debug_log->addLog(logs::SILENCE, glfwGetTime(), "Moving Camera right");
         auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraRight();
         camera.moveCamera(pos);
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        debug_log->addLog(logs::SILENCE, glfwGetTime(), "Moving Camera upward");
         auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraUp();
         camera.moveCamera(pos);
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-        debug_log->addLog(logs::SILENCE, glfwGetTime(), "Moving Camera downward");
         auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraUp();
         camera.moveCamera(pos);
     }

@@ -2,6 +2,8 @@
 
 #include "../Lib.hpp"
 
+#include "../Menu/Logger/LogManager.hpp"
+
 #include <iostream>
 
 using namespace std;
@@ -10,7 +12,7 @@ using namespace std;
  * This class creates a shader by reading the vertex and fragment shader files given.
  */
 class Shader {
-private:
+  private:
     // Shader id
     GLuint id;
 
@@ -22,23 +24,25 @@ private:
         if (type != "PROGRAM") {
             glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
             if (!success) {
+                LogManager::instance()->addLog(logs::ERROR, glfwGetTime(), "Shader Compilation Failed");
                 glGetShaderInfoLog(shader, 1024, NULL, infoLog);
                 cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << endl
-                    << infoLog << endl
-                    << "-- -------------------------------------------------- --" << endl;
+                     << infoLog << endl
+                     << "-- -------------------------------------------------- --" << endl;
             }
         } else {
             glGetProgramiv(shader, GL_LINK_STATUS, &success);
             if (!success) {
+                LogManager::instance()->addLog(logs::ERROR, glfwGetTime(), "Shader Program Linking Error");
                 glGetShaderInfoLog(shader, 1024, NULL, infoLog);
                 cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << endl
-                    << infoLog << endl
-                    << "-- --------------------------------------------------- --" << endl;
+                     << infoLog << endl
+                     << "-- --------------------------------------------------- --" << endl;
             }
         }
     }
 
-public:
+  public:
     // This constructor creates a shader with the vertex and fragment shader file path.
     Shader(const char *vertexPath, const char *fragmentPath);
 
@@ -68,9 +72,7 @@ public:
     void setMat3(const string &name, const mat3 &mat);
     void setMat4(const string &name, const mat4 &mat);
 
-    inline void clear() {
-        glDeleteShader(this->id);
-    }
+    inline void clear() { glDeleteShader(this->id); }
 
     ~Shader() = default;
 };

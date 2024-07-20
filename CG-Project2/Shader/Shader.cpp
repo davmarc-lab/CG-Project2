@@ -4,6 +4,8 @@
 #include <sstream>
 
 Shader::Shader(const char *vertexPath, const char *fragmentPath) {
+    LogManager::instance()->addLog(logs::SHADER, glfwGetTime(), "Shader Start Creating");
+
     string vertexCode;
     string fragmentCode;
     ifstream vShaderFile;
@@ -29,6 +31,7 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
     } catch (ifstream::failure &e) {
+        LogManager::instance()->addLog(logs::ERROR, glfwGetTime(), "Shader File not Read correctly");
         cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << endl << e.what() << endl;
     }
 
@@ -59,6 +62,7 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 
     glDeleteShader(vertex);
     glDeleteShader(fragment);
+    LogManager::instance()->addLog(logs::SHADER, glfwGetTime(), "Shader Created");
 }
 
 void Shader::use() { glUseProgram(this->getId()); }
