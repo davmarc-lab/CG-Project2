@@ -65,9 +65,7 @@ class IGEntity : public IGMenu {
         this->shader_observer = s;
         this->selected_model = e->getLightComputation();
         for (int i = 0; i < material::materials.size(); i++) {
-            cout << (material::materials[i] == e->getMaterial()) << endl;
-
-            if (strcmp(e->getMaterial().getName(), material::materials[i].getName()) == 0) {
+            if (material::materials[i] == e->getMaterial()) {
                 this->selected_material = i;
                 break;
             }

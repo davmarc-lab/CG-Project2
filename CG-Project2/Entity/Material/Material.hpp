@@ -19,7 +19,7 @@ class Material {
 
     Material(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float shininess, const char* name);
 
-    inline friend bool operator==(Material &m1, Material &m2) {
+    inline friend bool operator==(Material m1, Material m2) {
         return m1.shininess == m2.shininess && m1.vectors.ambient == m2.vectors.ambient && m1.vectors.diffuse == m2.vectors.diffuse &&
                m1.vectors.specular == m2.vectors.specular;
     }
@@ -53,4 +53,3 @@ const Material NONE(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 32.0f, "N
 inline std::vector<Material> materials = {NONE, EMERALD, BRASS, SLATE, RED_PLASTIC, YELLOW_PLASTIC};
 } // namespace material
 
-inline bool operator==(const Material &m1, const Material &m2) { return false; }
