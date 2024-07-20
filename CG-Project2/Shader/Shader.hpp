@@ -24,7 +24,7 @@ class Shader {
         if (type != "PROGRAM") {
             glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
             if (!success) {
-                LogManager::instance()->addLog(logs::ERROR, glfwGetTime(), "Shader Compilation Failed");
+                LogManager::instance()->addLog(logs::ERROR, "Shader Compilation Failed");
                 glGetShaderInfoLog(shader, 1024, NULL, infoLog);
                 cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << endl
                      << infoLog << endl
@@ -33,7 +33,7 @@ class Shader {
         } else {
             glGetProgramiv(shader, GL_LINK_STATUS, &success);
             if (!success) {
-                LogManager::instance()->addLog(logs::ERROR, glfwGetTime(), "Shader Program Linking Error");
+                LogManager::instance()->addLog(logs::ERROR, "Shader Program Linking Error");
                 glGetShaderInfoLog(shader, 1024, NULL, infoLog);
                 cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << endl
                      << infoLog << endl

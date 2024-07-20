@@ -16,7 +16,7 @@ public:
     inline void setDirection(vec3 dir) { this->direction = dir; }
 
     inline virtual void initCaster() override {
-        LogManager::instance()->addLog(logs::MISSING_CASTER, glfwGetTime(), "No Caster Needed for Directional Light");
+        LogManager::instance()->addLog(logs::MISSING_CASTER, "No Caster Needed for Directional Light");
     }
 
     virtual void sendDataToShader(Shader shader, int index) override;

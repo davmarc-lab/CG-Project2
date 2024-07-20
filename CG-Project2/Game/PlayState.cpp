@@ -22,6 +22,7 @@
 
 #include "Game.hpp"
 #include "IntroState.hpp"
+#include <iomanip>
 
 PlayState PlayState::playState;
 string mouse_popup_name = "Menu";
@@ -63,7 +64,7 @@ ActionManager *action_manager = ActionManager::instance();
 LogManager *debug_log = LogManager::instance();
 
 void PlayState::init() {
-    debug_log->addLog(logs::INIT, glfwGetTime(), "Start Init PlayState");
+    debug_log->addLog(logs::INIT, "Start Init PlayState");
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
@@ -73,7 +74,7 @@ void PlayState::init() {
 
     cube = new CubeEntity();
     cube->createVertexArray();
-    debug_log->addLog(logs::SILENCE, glfwGetTime(), "Instanced buffers for Cube");
+    debug_log->addLog(logs::SILENCE, "Instanced buffers for Cube");
     cube->setPosition(vec3(0, 1, 0));
     cube->setScale(vec3(1));
     cube->attachTexture(cube_texture);
@@ -84,7 +85,7 @@ void PlayState::init() {
 
     sphere = new Sphere();
     sphere->createVertexArray();
-    debug_log->addLog(logs::SILENCE, glfwGetTime(), "Instanced buffers for Sphere");
+    debug_log->addLog(logs::SILENCE, "Instanced buffers for Sphere");
     sphere->setPosition(vec3(2, 0, 0));
     sphere->setScale(vec3(1));
     sphere->attachTexture(sphere_texture);
@@ -97,7 +98,7 @@ void PlayState::init() {
 
     plane = new PlaneEntity(color::RED);
     plane->createVertexArray();
-    debug_log->addLog(logs::SILENCE, glfwGetTime(), "Instanced buffers for Plane");
+    debug_log->addLog(logs::SILENCE, "Instanced buffers for Plane");
 
     skyboxShader = Shader("./resources/shaders/vertexShaderSkybox.glsl", "./resources/shaders/fragmentShaderSkybox.glsl");
     skyboxShader.use();
@@ -106,7 +107,7 @@ void PlayState::init() {
 
     skybox = new Cubemap();
     skybox->createVertexArray();
-    debug_log->addLog(logs::SILENCE, glfwGetTime(), "Instanced buffers for Skybox");
+    debug_log->addLog(logs::SILENCE, "Instanced buffers for Skybox");
 
     // add elements to the scene
     obj_scene.addElement(cube, &lightShader);
@@ -124,21 +125,21 @@ void PlayState::init() {
     modelShader.setMat4("projection", projection);
 
     obj = new Object("./resources/models/backpack/backpack.obj", Flip::VERTICALLY);
-    debug_log->addLog(logs::SILENCE, glfwGetTime(), "Instanced buffers for imported Object");
+    debug_log->addLog(logs::SILENCE, "Instanced buffers for imported Object");
     obj->setPosition(vec3(0));
     obj->setScale(vec3(0.5));
     obj_scene.addElement(obj, &lightShader);
 
     // imgui
-    debug_log->addLog(logs::INIT, glfwGetTime(), "Start Init ImGui menus");
+    debug_log->addLog(logs::INIT, "Start Init ImGui menus");
 
     entityMenu = new IGEntity();
     modeMenu = new IGMode(&user_mode);
     cameraMenu = new IGCamera();
     lightsMenu = new IGLights(obj_scene.getLights());
-    debug_log->addLog(logs::INIT, glfwGetTime(), "End Init ImGui menus");
+    debug_log->addLog(logs::INIT, "End Init ImGui menus");
 
-    debug_log->addLog(logs::INIT, glfwGetTime(), "End Init PlayState");
+    debug_log->addLog(logs::INIT, "End Init PlayState");
 }
 
 void PlayState::pause() {}
@@ -338,7 +339,7 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
                 }
             }
 
-            debug_log->addLog(logs::ERROR, glfwGetTime(), "Sphere radius value (0.1f) could be incorrect");
+            debug_log->addLog(logs::ERROR, "Sphere radius value (0.1f) could be incorrect");
             for (auto caster : obj_scene.getLights()) {
                 float dist = 0.f;
 
@@ -354,10 +355,10 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
             // updating the observer in IGEntity menu
             if (obj_selected != nullptr) {
                 entityMenu->changeObserver(obj_selected, shader_selected);
-                debug_log->addLog(logs::SELECT_WARNING, glfwGetTime(), "Working on the same shader, it affects all the shaders");
+                debug_log->addLog(logs::SELECT_WARNING,  "Working on the same shader, it affects all the shaders");
             } else {
                 entityMenu->resetObserver();
-                debug_log->addLog(logs::SELECT_WARNING, glfwGetTime(), "No Entity Selected");
+                debug_log->addLog(logs::SELECT_WARNING,  "No Entity Selected");
             }
         }
     }
@@ -386,7 +387,7 @@ void PlayState::handleEvent(GameEngine *engine) {
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_Q)) {
         // This changeState kinda work for PlayState but need to test more
         // engine->changeState(IntroState::instance());
-        debug_log->addLog(logs::GENERAL_EVENT, glfwGetTime(), "Game Closing");
+        debug_log->addLog(logs::GENERAL_EVENT, "Game Closing");
         // Print all logs in a txt file
         engine->quit();
     }
@@ -396,7 +397,7 @@ void PlayState::handleEvent(GameEngine *engine) {
         switch (user_mode) {
         case SELECT:
             // enable selecting object mode
-            debug_log->addLog(logs::USER_MODE, glfwGetTime(), "User Mode -> SELECT");
+            debug_log->addLog(logs::USER_MODE, "User Mode -> SELECT");
             mouse.first_mouse = true;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             glfwSetMouseButtonCallback(window, selectMouseFunc);
@@ -405,7 +406,7 @@ void PlayState::handleEvent(GameEngine *engine) {
             break;
         case INTERACT:
             // enable movement in the scene, and active mouse movement
-            debug_log->addLog(logs::USER_MODE, glfwGetTime(), "User Mode -> INTERACT");
+            debug_log->addLog(logs::USER_MODE, "User Mode -> INTERACT");
             mouse.first_mouse = true;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             glfwSetMouseButtonCallback(window, mouseInputFunc);
@@ -414,7 +415,7 @@ void PlayState::handleEvent(GameEngine *engine) {
             break;
         case PASSIVE:
             // enable passive mouse movement
-            debug_log->addLog(logs::USER_MODE, glfwGetTime(), "User Mode -> PASSIVE");
+            debug_log->addLog(logs::USER_MODE, "User Mode -> PASSIVE");
             mouse.first_mouse = true;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             glfwSetCursorPosCallback(window, passiveCursorPosFunc);
@@ -469,37 +470,37 @@ void PlayState::update(GameEngine *engine) {
         for (auto act : action_manager->getActions()) {
             switch (act) {
             case Action::ADD_CUBE_ENTITY:
-                debug_log->addLog(logs::ADD_ENTITY, glfwGetTime(), "Added Cube to Scene");
+                debug_log->addLog(logs::ADD_ENTITY, "Added Cube to Scene");
                 obj_scene.addElement(new CubeEntity(), &lightShader);
                 break;
             case Action::ADD_SPHERE_ENTITY:
-                debug_log->addLog(logs::ADD_ENTITY, glfwGetTime(), "Added Sphere to Scene");
+                debug_log->addLog(logs::ADD_ENTITY, "Added Sphere to Scene");
                 obj_scene.addElement(new Sphere(), &lightShader);
                 break;
             case Action::ADD_OBJECT_ENTITY: {
-                debug_log->addLog(logs::ADD_ENTITY, glfwGetTime(), "Added extern Object to Scene");
+                debug_log->addLog(logs::ADD_ENTITY, "Added extern Object to Scene");
                 show_object_picker = true;
                 break;
             }
             case Action::ADD_DIRECT_LIGHT:
                 obj_scene.addLight(new DirectionalLight());
-                debug_log->addLog(logs::ADD_ENTITY, glfwGetTime(), "Added Directional Light to Scene");
+                debug_log->addLog(logs::ADD_ENTITY, "Added Directional Light to Scene");
                 lightsMenu->refreshLights(obj_scene.getLights());
                 break;
             case Action::ADD_POINT_LIGHT:
-                debug_log->addLog(logs::ADD_ENTITY, glfwGetTime(), "Added Point Light to Scene");
+                debug_log->addLog(logs::ADD_ENTITY, "Added Point Light to Scene");
                 obj_scene.addLight(new PointLight());
                 lightsMenu->refreshLights(obj_scene.getLights());
                 break;
             case Action::ADD_SPOT_LIGHT: {
-                debug_log->addLog(logs::ADD_ENTITY, glfwGetTime(), "Added Spot Light to Scene");
+                debug_log->addLog(logs::ADD_ENTITY, "Added Spot Light to Scene");
                 obj_scene.addLight(new SpotLight());
                 lightsMenu->refreshLights(obj_scene.getLights());
                 break;
             }
             case Action::DEL_ENTITY:
                 if (obj_selected != nullptr) {
-                    debug_log->addLog(logs::REMOVE_ENTITY, glfwGetTime(), "Removed Entity from Scene");
+                    debug_log->addLog(logs::REMOVE_ENTITY, "Removed Entity from Scene");
                     obj_scene.removeElement(obj_selected, shader_selected);
                     obj_selected = nullptr;
                     shader_selected = nullptr;

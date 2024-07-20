@@ -28,9 +28,9 @@ void Application::launch() {
 
     game.init();
 
-    LogManager::instance()->addLog(logs::STATE, glfwGetTime(), "Creating IntroState");
+    LogManager::instance()->addLog(logs::STATE, "Creating IntroState");
     game.changeState(IntroState::instance());
-    LogManager::instance()->addLog(logs::STATE, glfwGetTime(), "Instanced IntroState");
+    LogManager::instance()->addLog(logs::STATE, "Instanced IntroState");
     float lastFrame = 0;
 
     while (!glfwWindowShouldClose(window.getWindow()) && game.isRunning()) {

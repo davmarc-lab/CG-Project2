@@ -33,7 +33,7 @@ void PointLight::sendDataToShader(Shader shader, int index) {
 
 void PointLight::drawCaster() {
     if (this->caster == nullptr) {
-        LogManager::instance()->addLog(logs::MISSING_CASTER, glfwGetTime(), "No Caster Attached");
+        LogManager::instance()->addLog(logs::MISSING_CASTER, "No Caster Attached");
         return;
     }
     this->casterShader.use();

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../../LibCustomGui.hpp"
+#include <chrono>
+#include <ctime>
 #include <set>
 
 static int auto_id = 0;
@@ -48,23 +50,29 @@ inline LogType ERROR = LogType("ERROR", "Error", ImVec4(1, 0, 0, 1));
 inline LogType STATE = LogType("STATE", "Play", ImVec4(1, 0.5, 0, 1));
 inline LogType INIT = LogType("INIT", "Init", ImVec4(1, 1, 0, 1));
 inline LogType SILENCE = LogType("SILENCE", "Silence", ImVec4(1, 1, 1, 1));
-inline std::set<LogType> log_types = {GENERAL_EVENT, USER_MODE, MISSING_IMPLEMENTATION, MISSING_CASTER, STATE, SHADER, ADD_ENTITY, REMOVE_ENTITY, SELECT_WARNING, ERROR, SILENCE, EMPTY};
+inline std::set<LogType> log_types = {GENERAL_EVENT, USER_MODE,     MISSING_IMPLEMENTATION, MISSING_CASTER, STATE,   SHADER,
+                                      ADD_ENTITY,    REMOVE_ENTITY, SELECT_WARNING,         ERROR,          SILENCE, EMPTY};
 
 } // namespace logs
 
 class Log {
   private:
     LogType m_type;
-    float m_time;
+    std::time_t m_clock;
+    std::string m_time;
     const char *m_text;
 
   public:
     Log() = delete;
 
-    Log(LogType type = LogType(), float time = 0.f, const char *text = "") : m_type(type), m_time(time), m_text(text) {}
+    Log(LogType type = LogType(), const char *text = "") : m_type(type), m_text(text) {
+        // current time
+        this->m_clock = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        this->m_time = std::string(std::ctime(&this->m_clock), 11, 8);
+    }
 
-    Log(const char *log_type, const char *log_type_text, ImVec4 color, float time, const char *text)
-        : Log(LogType(log_type, log_type_text, color), time, std::string(text).c_str()) {}
+    Log(const char *log_type, const char *log_type_text, ImVec4 color, const char *text)
+        : Log(LogType(log_type, log_type_text, color), std::string(text).c_str()) {}
 
     inline const char *getLogType() { return this->m_type.getLogType(); }
 
@@ -74,7 +82,7 @@ class Log {
 
     inline ImVec4 getLogTypeColor() { return this->m_type.getColor(); }
 
-    inline float getLogTime() { return this->m_time; }
+    inline const char *getLogTime() { return this->m_time.c_str(); }
 
     inline const char *getLogText() { return this->m_text; }
 

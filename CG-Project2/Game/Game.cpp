@@ -38,7 +38,7 @@ void GameEngine::changeState(GameState *state) {
         this->states.back()->clean();
     }
     this->states.push_back(state);
-    LogManager::instance()->addLog(logs::STATE, glfwGetTime(), "Changing State");
+    LogManager::instance()->addLog(logs::STATE, "Changing State");
     this->states.back()->init();
 }
 

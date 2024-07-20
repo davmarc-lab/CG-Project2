@@ -53,9 +53,9 @@ void IntroState::handleEvent(GameEngine *engine) {
     if (oldState == GLFW_PRESS && state == GLFW_RELEASE) {
         // do these action if the option pane is not active
         if (isMouseInButton(playButton, pos)) {
-            LogManager::instance()->addLog(logs::STATE, glfwGetTime(), "Creating PlayState");
+            LogManager::instance()->addLog(logs::STATE, "Creating PlayState");
             engine->changeState(PlayState::instance());
-            LogManager::instance()->addLog(logs::STATE, glfwGetTime(), "Instanced PlayState");
+            LogManager::instance()->addLog(logs::STATE, "Instanced PlayState");
         } else if (isMouseInButton(exitButton, pos)) {
             engine->quit();
         } else if (isMouseInButton(optionButton, pos)) {
