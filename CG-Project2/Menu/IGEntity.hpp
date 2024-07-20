@@ -4,6 +4,7 @@
 
 #include "IGMenu.hpp"
 
+#include <charconv>
 #include <vector>
 #ifdef _WIN32
 #include <sstream>
@@ -12,12 +13,13 @@
 
 class IGEntity : public IGMenu {
 
-private:
+  private:
     Entity *obj_observer = nullptr;
     Shader *shader_observer = nullptr;
 
-    const char* light_models[3] = { "Phong", "Blinn-Phong", "None" };
+    const char *light_models[3] = {"Phong", "Blinn-Phong", "None"};
     int selected_model = 0;
+    int selected_material = 0;
 
     enum AXIS { X, Y, Z, NONE };
 
@@ -25,21 +27,21 @@ private:
         float val = 0.f;
 
         switch (axis) {
-            case AXIS::X: {
-                val = vec.x;
-                break;
-            }
-            case AXIS::Y: {
-                val = vec.y;
-                break;
-            }
-            case AXIS::Z: {
-                val = vec.z;
-                break;
-            }
-            default: {
-                return vec3(vec);
-            }
+        case AXIS::X: {
+            val = vec.x;
+            break;
+        }
+        case AXIS::Y: {
+            val = vec.y;
+            break;
+        }
+        case AXIS::Z: {
+            val = vec.z;
+            break;
+        }
+        default: {
+            return vec3(vec);
+        }
         }
 
         return vec = vec3(val);
@@ -53,7 +55,7 @@ private:
         return AXIS::NONE;
     }
 
-public:
+  public:
     IGEntity() {}
 
     IGEntity(Entity *entity, Shader *shader) : obj_observer(entity), shader_observer(shader) {}
@@ -62,6 +64,14 @@ public:
         this->obj_observer = e;
         this->shader_observer = s;
         this->selected_model = e->getLightComputation();
+        for (int i = 0; i < material::materials.size(); i++) {
+            cout << (material::materials[i] == e->getMaterial()) << endl;
+
+            if (strcmp(e->getMaterial().getName(), material::materials[i].getName()) == 0) {
+                this->selected_material = i;
+                break;
+            }
+        }
     }
 
     inline void resetObserver() {
@@ -188,6 +198,24 @@ public:
                     // close
                     ImGuiFileDialog::Instance()->Close();
                 }
+            }
+
+            if (ImGui::CollapsingHeader("Material")) {
+                auto mat = this->obj_observer->getMaterial();
+                if (ImGui::BeginCombo("Material Selected", material::materials[this->selected_material].getName())) {
+                    for (int i = 0; i < material::materials.size(); i++) {
+                        if (ImGui::Selectable(material::materials[i].getName(), (this->selected_material == i))) {
+                            this->selected_material = i;
+                            this->obj_observer->setMaterial(material::materials[i]);
+                        }
+
+                        if (this->selected_material == i) {
+                            ImGui::SetItemDefaultFocus();
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
+                
             }
 
             if (ImGui::CollapsingHeader("Light Complexity")) {
