@@ -13,6 +13,8 @@ enum LightType
 enum LightComp {
     PHONG,
     BLINN,
+    INT_PHONG,
+    INT_BLINN,
     NONE
 };
 

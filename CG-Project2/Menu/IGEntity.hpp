@@ -4,7 +4,6 @@
 
 #include "IGMenu.hpp"
 
-#include <charconv>
 #include <vector>
 #ifdef _WIN32
 #include <sstream>
@@ -17,7 +16,7 @@ class IGEntity : public IGMenu {
     Entity *obj_observer = nullptr;
     Shader *shader_observer = nullptr;
 
-    const char *light_models[3] = {"Phong", "Blinn-Phong", "None"};
+    const char *light_models[5] = {"Phong", "Blinn-Phong", "Int Phong", "Int Blinn-Phong", "None"};
     int selected_model = 0;
     int selected_material = 0;
 

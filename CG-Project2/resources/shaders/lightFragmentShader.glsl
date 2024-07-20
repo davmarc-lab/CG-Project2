@@ -57,6 +57,8 @@ uniform vec3 viewPos;
 uniform Material material;
 uniform Light lights[MAX_LIGHTS];
 
+in vec3 res_int_shading;
+
 vec3 norm = vec3(0);
 vec3 lightDir = vec3(0);
 float diff = 0.f;
@@ -128,7 +130,8 @@ void main() {
     norm = normalize(Normal);
     viewDir = normalize(viewPos - FragPos);
 
-    if (light_comp != 2) {
+    if (light_comp == 0 || light_comp == 1) {
+        // phong shading
         if (max_num_lights >= 1) {
             // calc multiple lights
             for (int i = 0; i < num_lights && i < max_num_lights; i++) {
@@ -150,6 +153,9 @@ void main() {
                 }
             }
         }
+    } else if (light_comp == 2 || light_comp == 3) {
+        // interpolative shading
+        result = res_int_shading;
     } else {
         result = texture(ourTexture, TexCoord).rgb;
     }
