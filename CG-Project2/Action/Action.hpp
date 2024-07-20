@@ -7,5 +7,6 @@ enum Action {
     ADD_DIRECT_LIGHT,
     ADD_POINT_LIGHT,
     ADD_SPOT_LIGHT,
-    DEL_ENTITY
+    DEL_ENTITY,
+    REFRESH_PROJ
 };

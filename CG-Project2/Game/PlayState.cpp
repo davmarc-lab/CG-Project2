@@ -506,6 +506,12 @@ void PlayState::update(GameEngine *engine) {
                     entityMenu->resetObserver();
                 }
                 break;
+            case Action::REFRESH_PROJ:
+                planeShader.use();
+                planeShader.setMat4("projection", projection);
+
+                skyboxShader.use();
+                skyboxShader.setMat4("projection", projection);
             default:
                 break;
             }

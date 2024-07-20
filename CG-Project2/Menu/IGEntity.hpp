@@ -213,20 +213,18 @@ class IGEntity : public IGMenu {
                     }
                     ImGui::EndCombo();
                 }
-                
             }
 
             if (ImGui::CollapsingHeader("Light Complexity")) {
                 if (ImGui::BeginCombo("Light Model", this->light_models[this->selected_model])) {
                     for (int n = 0; n < IM_ARRAYSIZE(this->light_models); n++) {
-                        const bool is_selected = (this->selected_model == n);
-                        if (ImGui::Selectable(this->light_models[n], is_selected)) {
+                        if (ImGui::Selectable(this->light_models[n], this->selected_model == n)) {
                             this->selected_model = n;
                             this->obj_observer->setLightComputation(this->selected_model);
                         }
 
                         // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-                        if (is_selected)
+                        if (this->selected_model == n)
                             ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();

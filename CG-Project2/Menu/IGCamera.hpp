@@ -2,6 +2,8 @@
 
 #include "IGMenu.hpp"
 
+#include "../Action/ActionManager.hpp"
+
 #include "../Lib.hpp"
 
 class IGCamera : public IGMenu {
@@ -16,10 +18,12 @@ public:
         if (ImGui::DragFloat("Fov##1", &zoom, 0.5f, 20.f, 120.f)) {
             camera.setCameraZoom(zoom);
             updatePerspective(zoom);
+            ActionManager::instance()->addAction(REFRESH_PROJ);
         }
         if (ImGui::Button("Reset##1")) {
             camera.setCameraZoom(cmr::ZOOM);
             updatePerspective(cmr::ZOOM);
+            ActionManager::instance()->addAction(REFRESH_PROJ);
         }
 
         // Camera position
