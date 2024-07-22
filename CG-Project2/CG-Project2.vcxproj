@@ -102,9 +102,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)CG-Project2\dependencies\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Action\ActionManager.cpp" />
     <ClCompile Include="Application\Application.cpp" />
     <ClCompile Include="Camera\Camera.cpp" />
     <ClCompile Include="dependencies\include\imgui-file-dialog\ImGuiFileDialog.cpp" />
@@ -146,6 +148,8 @@
     <ClCompile Include="Entity\Cube.cpp" />
     <ClCompile Include="Entity\Cubemap.cpp" />
     <ClCompile Include="Entity\Material\Material.cpp" />
+    <ClCompile Include="Entity\Mesh.cpp" />
+    <ClCompile Include="Entity\Object.cpp" />
     <ClCompile Include="Entity\Plane.cpp" />
     <ClCompile Include="Entity\Sphere.cpp" />
     <ClCompile Include="Entity\Textures\Texture.cpp" />
@@ -164,6 +168,8 @@
     <ClCompile Include="Window\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Action\Action.hpp" />
+    <ClInclude Include="Action\ActionManager.hpp" />
     <ClInclude Include="Application\Application.hpp" />
     <ClInclude Include="Camera\Camera.hpp" />
     <ClInclude Include="Color\Color.hpp" />
@@ -191,6 +197,8 @@
     <ClInclude Include="Entity\Cubemap.hpp" />
     <ClInclude Include="Entity\Entity.hpp" />
     <ClInclude Include="Entity\Material\Material.hpp" />
+    <ClInclude Include="Entity\Mesh.hpp" />
+    <ClInclude Include="Entity\Object.hpp" />
     <ClInclude Include="Entity\Plane.hpp" />
     <ClInclude Include="Entity\Sphere.hpp" />
     <ClInclude Include="Entity\Textures\Texture.hpp" />
@@ -210,10 +218,14 @@
     <ClInclude Include="Menu\ButtonComponent.hpp" />
     <ClInclude Include="Menu\Component.hpp" />
     <ClInclude Include="Menu\IGCamera.hpp" />
+    <ClInclude Include="Menu\IGDebug.hpp" />
     <ClInclude Include="Menu\IGEntity.hpp" />
     <ClInclude Include="Menu\IGLights.hpp" />
     <ClInclude Include="Menu\IGMenu.hpp" />
     <ClInclude Include="Menu\IGMode.hpp" />
+    <ClInclude Include="Menu\IGMousePopup.hpp" />
+    <ClInclude Include="Menu\Logger\Log.hpp" />
+    <ClInclude Include="Menu\Logger\LogManager.hpp" />
     <ClInclude Include="Menu\OptionPane.hpp" />
     <ClInclude Include="Menu\RectComponent.hpp" />
     <ClInclude Include="Scene\Scene.hpp" />

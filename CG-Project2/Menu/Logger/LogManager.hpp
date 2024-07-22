@@ -4,8 +4,7 @@
 
 #include <deque>
 
-
-#define MAX_BUF_DIM 255
+#define MAX_BUF_DIM 50
 
 class LogManager {
   private:

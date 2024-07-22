@@ -102,6 +102,15 @@
     <ClCompile Include="Light\SpotLight.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Action\ActionManager.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity\Mesh.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity\Object.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\include\glad\glad.h">
@@ -273,6 +282,30 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Light\SpotLight.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Action\Action.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Action\ActionManager.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu\Logger\Log.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu\Logger\LogManager.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu\IGDebug.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu\IGMousePopup.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\Mesh.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\Object.hpp">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
