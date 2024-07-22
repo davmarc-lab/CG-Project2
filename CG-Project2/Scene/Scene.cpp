@@ -1,4 +1,5 @@
 #include "Scene.hpp"
+#include <algorithm>
 
 void Scene::addElement(Entity *e, Shader *s) {
     if (!e->isInstanced()) {
@@ -9,12 +10,17 @@ void Scene::addElement(Entity *e, Shader *s) {
 
 void Scene::addCustomObj(Object *o, Shader *s) { this->custom_obj.push_back(std::make_pair(o, s)); }
 
-bool Scene::removeElement(Entity *e, Shader *s) {
+bool Scene::removeElement(Entity *e, Shader *s, bool is_light_selected = false, Light *light_selcted = nullptr) {
+    // if is selected a light, delete from light scene
+    if (is_light_selected) {
+        return this->lights.erase(std::find(this->lights.begin(), this->lights.end(), light_selcted)) != this->lights.end();
+    }
     return this->elements.erase(std::remove(this->elements.begin(), this->elements.end(), pair(e, s)), this->elements.end()) != this->elements.end();
 }
 
 void Scene::addLight(Light *l) {
-    if (!l->isCasterInstaced()) l->initCaster();
+    if (!l->isCasterInstaced())
+        l->initCaster();
     this->lights.push_back(l);
 }
 

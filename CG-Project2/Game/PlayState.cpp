@@ -56,6 +56,9 @@ IGDebug *debugMenu = new IGDebug();
 bool show_popup = false;
 bool show_object_picker = false;
 
+bool is_light_selected;
+Light* light_selected = nullptr;
+
 Mouse mouse;
 
 string string_buffer = "";
@@ -323,31 +326,34 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
             obj_selected = nullptr;
             shader_selected = nullptr;
 
+            // distance between ray and object
+            float dist = 0.f;
+
             // check all the element of the scene for intersection with ray
             for (auto elem : obj_scene.getElements()) {
                 auto current = elem.first;
                 auto shader = elem.second;
-                // distance between ray and object
-                float dist = 0.f;
 
                 if (isRayInSphere(ray, current->getPosition(), 0.7, &dist)) {
                     if (obj_selected == nullptr || dist <= ci) {
                         obj_selected = current;
                         shader_selected = shader;
                         ci = dist;
+                        is_light_selected = false;
+                        light_selected = nullptr;
                     }
                 }
             }
 
             debug_log->addLog(logs::ERROR, "Sphere radius value (0.1f) could be incorrect");
             for (auto caster : obj_scene.getLights()) {
-                float dist = 0.f;
-
                 if (caster->getType() != LightType::DIRECTIONAL && isRayInSphere(ray, caster->getCaster()->getPosition(), 0.1f, &dist)) {
                     if (obj_selected == nullptr || dist <= ci) {
                         obj_selected = caster->getCaster();
                         shader_selected = caster->getShader();
                         ci = dist;
+                        is_light_selected = true;
+                        light_selected = caster;
                     }
                 }
             }
@@ -463,6 +469,9 @@ void PlayState::handleEvent(GameEngine *engine) {
         auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraUp();
         camera.moveCamera(pos);
     }
+    if (glfwGetKey(window, GLFW_KEY_DELETE) == GLFW_PRESS) {
+        am->addAction(Action::DEL_ENTITY);
+    }
 }
 
 void PlayState::update(GameEngine *engine) {
@@ -501,10 +510,12 @@ void PlayState::update(GameEngine *engine) {
             case Action::DEL_ENTITY:
                 if (obj_selected != nullptr) {
                     debug_log->addLog(logs::REMOVE_ENTITY, "Removed Entity from Scene");
-                    obj_scene.removeElement(obj_selected, shader_selected);
+                    obj_scene.removeElement(obj_selected, shader_selected, is_light_selected, light_selected);
                     obj_selected = nullptr;
                     shader_selected = nullptr;
+                    light_selected = nullptr;
                     entityMenu->resetObserver();
+                    lightsMenu->refreshLights(obj_scene.getLights());
                 }
                 break;
             case Action::REFRESH_PROJ:

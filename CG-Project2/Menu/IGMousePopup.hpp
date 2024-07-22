@@ -10,7 +10,7 @@ class IGMousePopup : public IGMenu {
   private:
     const char *string_id;
 
-    const char *actions[2] = {"Add", "Remove"};
+    const char *actions[1] = {"Add"};
     const char *add_actions[4] = {"Cube", "Sphere", "Object", "Light"};
     const char *light_types[3] = {"Directional", "Point", "Spot"};
 
@@ -67,16 +67,6 @@ class IGMousePopup : public IGMenu {
                             }
                         }
                         ImGui::EndMenu();
-                    }
-                } else {
-                    if (ImGui::MenuItem(actions[i])) {
-                        switch (i) {
-                        case 1:
-                            am->addAction(Action::DEL_ENTITY);
-                            break;
-                        default:
-                            break;
-                        }
                     }
                 }
             }
