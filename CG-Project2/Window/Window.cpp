@@ -50,7 +50,7 @@ int Window::initializeWindow() {
         return -2;
     }
 
-    glfwSetWindowPos(this->window, WIDTH / 4 + 50, HEIGHT / 2 - 330);
+    glfwSetWindowPos(this->window, WIDTH / 4 + 230, HEIGHT / 2 - 330);
 
     // enable colors opacity
     glEnable(GL_BLEND);

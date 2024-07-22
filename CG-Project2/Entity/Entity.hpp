@@ -21,7 +21,7 @@ public:
 
     Material material = material::NONE;
 
-    int comp = LightComp::PHONG;
+    int light_comp = LightComp::PHONG;
 
     Physic physics;
     bool m_static = false;
@@ -158,11 +158,11 @@ public:
 
     inline void setMaterial(Material material) { this->material = material; }
 
-    inline bool isAffectedByLight() { return this->comp != LightComp::NONE; }
+    inline bool isAffectedByLight() { return this->light_comp != LightComp::NONE; }
 
-    inline void setLightComputation(int val) { this->comp = val; }
+    inline void setLightComputation(int val) { this->light_comp = val; }
 
-    inline int getLightComputation() { return this->comp; }
+    inline int getLightComputation() { return this->light_comp; }
 
     inline bool isInstanced() { return this->m_isInstaced; }
 

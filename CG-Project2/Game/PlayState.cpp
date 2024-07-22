@@ -57,7 +57,7 @@ bool show_popup = false;
 bool show_object_picker = false;
 
 bool is_light_selected;
-Light* light_selected = nullptr;
+Light *light_selected = nullptr;
 
 Mouse mouse;
 
@@ -120,7 +120,7 @@ void PlayState::init() {
     ll->setPosition(vec3(1));
     ll->setDirection(vec3(0, 1, 0));
 
-    obj_scene.addLight(pl);
+    // obj_scene.addLight(pl);
     obj_scene.addLight(ll);
 
     modelShader = Shader("./resources/shaders/lightVertexShader.glsl", "./resources/shaders/lightFragmentShader.glsl");
@@ -361,10 +361,10 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
             // updating the observer in IGEntity menu
             if (obj_selected != nullptr) {
                 entityMenu->changeObserver(obj_selected, shader_selected);
-                debug_log->addLog(logs::SELECT_WARNING,  "Working on the same shader, it affects all the shaders");
+                debug_log->addLog(logs::SELECT_WARNING, "Working on the same shader, it affects all the shaders");
             } else {
                 entityMenu->resetObserver();
-                debug_log->addLog(logs::SELECT_WARNING,  "No Entity Selected");
+                debug_log->addLog(logs::SELECT_WARNING, "No Entity Selected");
             }
         }
     }
@@ -517,6 +517,10 @@ void PlayState::update(GameEngine *engine) {
                     entityMenu->resetObserver();
                     lightsMenu->refreshLights(obj_scene.getLights());
                 }
+                break;
+            case Action::DEL_CUSTOM_LIGHT:
+                cout << obj_scene.removeElement(nullptr, nullptr, true, lightsMenu->getLightToDelete()) << endl;
+                lightsMenu->refreshLights(obj_scene.getLights());
                 break;
             case Action::REFRESH_PROJ:
                 planeShader.use();

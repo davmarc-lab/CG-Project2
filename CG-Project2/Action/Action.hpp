@@ -8,5 +8,6 @@ enum Action {
     ADD_POINT_LIGHT,
     ADD_SPOT_LIGHT,
     DEL_ENTITY,
+    DEL_CUSTOM_LIGHT,
     REFRESH_PROJ
 };

@@ -6,7 +6,6 @@
 #include "../dependencies/include/texture/stb_image.hpp"
 #endif
 
-
 float skyboxVertices[] = {
     // positions
     -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f,

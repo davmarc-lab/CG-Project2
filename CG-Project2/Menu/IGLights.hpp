@@ -7,11 +7,15 @@
 #include "../Light/PointLight.hpp"
 #include "../Light/SpotLight.hpp"
 
+#include "../Action/ActionManager.hpp"
+
 extern int max_lights;
 
 class IGLights : public IGMenu {
   private:
     vector<Light *> lights;
+
+    Light* del_light = nullptr;
 
     inline void renderDirectional(DirectionalLight *l) {
         ImGui::SeparatorText("Directional Light##1");
@@ -94,7 +98,9 @@ class IGLights : public IGMenu {
 
     IGLights(vector<Light *> lights) : lights(lights) {}
 
-    void refreshLights(vector<Light*> lights) { this->lights = lights; }
+    inline void refreshLights(vector<Light*> lights) { this->lights = lights; }
+
+    inline Light* getLightToDelete() { return this->del_light; }
 
     inline virtual void render() override {
         ImGui::Begin("Lights");
@@ -157,6 +163,13 @@ class IGLights : public IGMenu {
                     break;
                 }
             }
+
+            if (ImGui::Button("Delete")) {
+                this->del_light = l;
+                ActionManager::instance()->addAction(Action::DEL_CUSTOM_LIGHT);
+            }
+
+            ImGui::Separator();
 
             ImGui::PopID();
         }
