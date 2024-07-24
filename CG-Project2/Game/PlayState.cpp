@@ -17,12 +17,12 @@
 #include "../Menu/IGMenu.hpp"
 #include "../Menu/IGMode.hpp"
 #include "../Menu/IGMousePopup.hpp"
+#include "../Menu/IGViewport.hpp"
 
 #include "../Menu/Logger/LogManager.hpp"
 
 #include "Game.hpp"
 #include "IntroState.hpp"
-#include <iomanip>
 
 PlayState PlayState::playState;
 string mouse_popup_name = "Menu";
@@ -52,6 +52,7 @@ IGLights *lightsMenu;
 IGEntity *entityMenu = nullptr;
 IGMousePopup *mousePopup = new IGMousePopup(mouse_popup_name.c_str());
 IGDebug *debugMenu = new IGDebug();
+IGViewport* viep = new IGViewport();
 
 bool show_popup = false;
 bool show_object_picker = false;
@@ -143,6 +144,7 @@ void PlayState::init() {
     debug_log->addLog(logs::INIT, "End Init ImGui menus");
 
     debug_log->addLog(logs::INIT, "End Init PlayState");
+    viep->init();
 }
 
 void PlayState::pause() {}
@@ -597,10 +599,13 @@ void showObjectPicker() {
 }
 
 void PlayState::draw(GameEngine *engine) {
+    viep->bind();
     skybox->draw(skyboxShader);
     plane->draw(planeShader);
 
     obj_scene.draw();
+    viep->unbind();
+    viep->render();
 
     entityMenu->render();
     modeMenu->render();
