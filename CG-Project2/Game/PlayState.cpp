@@ -18,6 +18,7 @@
 #include "../Menu/IGMode.hpp"
 #include "../Menu/IGMousePopup.hpp"
 #include "../Menu/IGViewport.hpp"
+#include "../Menu/IGTimeline.hpp"
 
 #include "../Menu/Logger/LogManager.hpp"
 
@@ -53,6 +54,7 @@ IGEntity *entityMenu = nullptr;
 IGMousePopup *mousePopup = new IGMousePopup(mouse_popup_name.c_str());
 IGDebug *debugMenu = new IGDebug();
 IGViewport *viep = new IGViewport();
+IGTimeline* timeline = new IGTimeline();
 
 bool show_popup = false;
 bool show_object_picker = false;
@@ -636,7 +638,9 @@ void PlayState::draw(GameEngine *engine) {
         showObjectPicker();
     }
 
-    debugMenu->render();
+    timeline->render();
+
+    // debugMenu->render();
 }
 
 void PlayState::clean() {

@@ -70,7 +70,7 @@ class IGViewport : public IGMenu {
 
     inline void unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-    inline virtual void render() {
+    inline virtual void render() override {
         glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
         ImGui::Begin("Viewport");
         ImGui::BeginChild("Render");
