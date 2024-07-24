@@ -52,10 +52,11 @@ IGLights *lightsMenu;
 IGEntity *entityMenu = nullptr;
 IGMousePopup *mousePopup = new IGMousePopup(mouse_popup_name.c_str());
 IGDebug *debugMenu = new IGDebug();
-IGViewport* viep = new IGViewport();
+IGViewport *viep = new IGViewport();
 
 bool show_popup = false;
 bool show_object_picker = false;
+bool simulation_running = false;
 
 bool is_light_selected;
 Light *light_selected = nullptr;
@@ -66,6 +67,11 @@ string string_buffer = "";
 
 ActionManager *action_manager = ActionManager::instance();
 LogManager *debug_log = LogManager::instance();
+
+void viewportFramebufferCallback(GLFWwindow *window, int width, int height) {
+    glViewport(0, 0, width, height);
+    viep->rescaleRenderBuffer(width, height);
+}
 
 void PlayState::init() {
     debug_log->addLog(logs::INIT, "Start Init PlayState");
@@ -477,6 +483,7 @@ void PlayState::handleEvent(GameEngine *engine) {
 }
 
 void PlayState::update(GameEngine *engine) {
+    glfwSetFramebufferSizeCallback(engine->getWindow()->getWindow(), viewportFramebufferCallback);
     if (action_manager->isActionPresent()) {
         for (auto act : action_manager->getActions()) {
             switch (act) {
@@ -530,6 +537,14 @@ void PlayState::update(GameEngine *engine) {
 
                 skyboxShader.use();
                 skyboxShader.setMat4("projection", projection);
+            case Action::START_SIM: {
+                simulation_running = true;
+                break;
+            }
+            case Action::STOP_SIM: {
+                simulation_running = false;
+                break;
+            }
             default:
                 break;
             }
@@ -599,13 +614,17 @@ void showObjectPicker() {
 }
 
 void PlayState::draw(GameEngine *engine) {
-    viep->bind();
+    if (simulation_running) {
+        viep->bind();
+    }
     skybox->draw(skyboxShader);
     plane->draw(planeShader);
 
     obj_scene.draw();
-    viep->unbind();
-    viep->render();
+    if (simulation_running) {
+        viep->unbind();
+        viep->render();
+    }
 
     entityMenu->render();
     modeMenu->render();

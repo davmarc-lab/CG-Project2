@@ -1,18 +1,17 @@
 #pragma once
 
-#include <string.h>
 #include "../Lib.hpp"
+#include <string.h>
 
-class Window
-{
-private:
+class Window {
+  private:
     GLFWwindow *window;
     int width;
     int height;
     const char *windowName;
     vec2 resolution;
 
-public:
+  public:
     Window(const char *windowName, int w, int h);
 
     int initializeWindow();
@@ -26,6 +25,8 @@ public:
     inline GLFWwindow *getWindow() { return this->window; };
 
     inline vec2 getResolution() { return this->resolution; }
+
+    inline void resetResizeFunc();
 
     inline void enableGL(GLenum var) { glEnable(var); }
 

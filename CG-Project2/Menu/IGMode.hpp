@@ -1,6 +1,9 @@
 #pragma once
 
+
 #include "IGMenu.hpp"
+
+#include "../Action/ActionManager.hpp"
 
 #include "../Lib.hpp"
 
@@ -20,6 +23,14 @@ public:
             \nPress `p` for Passive mode \
             \nPress `q` to Quit");
 		ImGui::Text("%s", text.c_str());
+        ImGui::Separator();
+        if (ImGui::Button("Play")) {
+            ActionManager::instance()->addAction(Action::START_SIM);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Stop")) {
+            ActionManager::instance()->addAction(Action::STOP_SIM);
+        }
 		ImGui::End();
 	}
 

@@ -24,6 +24,8 @@ Window::Window(const char *name, int w, int h) {
 */
 void framebuffer_size_callback(GLFWwindow *window, int w, int h) { glViewport(0, 0, w, h); }
 
+void Window::resetResizeFunc() { glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback); }
+
 int Window::initializeWindow() {
     // initialize GLFW contents
     glfwInit();
@@ -68,4 +70,3 @@ void Window::terminateWindow() {
     // terminate GLFW window
     glfwTerminate();
 }
-

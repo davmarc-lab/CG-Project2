@@ -9,5 +9,7 @@ enum Action {
     ADD_SPOT_LIGHT,
     DEL_ENTITY,
     DEL_CUSTOM_LIGHT,
-    REFRESH_PROJ
+    REFRESH_PROJ,
+    START_SIM,
+    STOP_SIM,
 };
