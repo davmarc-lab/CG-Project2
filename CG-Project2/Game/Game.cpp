@@ -23,8 +23,8 @@ void mouseMovementCallback(GLFWwindow *window, double xposIn, double yposIn) {
         input.lastY = ypos;
     }
 
-    float xoffset = xpos - input.lastX;
-    float yoffset = ypos - input.lastY;
+    // float xoffset = xpos - input.lastX;
+    // float yoffset = ypos - input.lastY;
 
     input.lastX = xpos;
     input.lastY = ypos;

@@ -11,18 +11,19 @@ IntroState IntroState::introState;
 
 ButtonComponent *playButton, *optionButton, *exitButton;
 GLenum oldState = GL_FALSE;
+GLFWwindow* window_context;
 
 void IntroState::init() {
     playButton = new ButtonComponent(vec3(WIDTH / 2, HEIGHT / 2, 0), color::WHITE, "Play", 40, color::BLACK);
-
     optionButton = new ButtonComponent(vec3(WIDTH / 2, HEIGHT / 2 - 100, 0), color::WHITE, "Option", 40, color::BLACK);
-
     exitButton = new ButtonComponent(vec3(WIDTH / 2, HEIGHT / 2 - 200, 0), color::WHITE, "Exit", 40, color::BLACK);
 
     playButton->setScale(vec3(100, 30, 0));
     playButton->createVertexArray();
+
     optionButton->setScale(vec3(100, 30, 0));
     optionButton->createVertexArray();
+
     exitButton->setScale(vec3(100, 30, 0));
     exitButton->createVertexArray();
 }
@@ -38,17 +39,18 @@ bool isMouseInButton(ButtonComponent* button, vec2 pos) {
 }
 
 void IntroState::handleEvent(GameEngine *engine) {
-    auto window = engine->getWindow()->getWindow();
+    window_context = engine->getWindow()->getGLFWContext();
     double x, y;
-    glfwGetCursorPos(window, &x, &y);
+    glfwGetCursorPos(window_context, &x, &y);
     y = HEIGHT - y;
     vec2 pos = vec2(x, y);
 
     // mouse left click actions
-    int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+    int state = glfwGetMouseButton(window_context, GLFW_MOUSE_BUTTON_LEFT);
     if (state == GLFW_PRESS) {
         oldState = state;
     }
+
     // do these actions if the option pane is active
     if (oldState == GLFW_PRESS && state == GLFW_RELEASE) {
         // do these action if the option pane is not active

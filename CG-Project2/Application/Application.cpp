@@ -22,7 +22,7 @@ void Application::launch() {
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(window.getWindow(),
+    ImGui_ImplGlfw_InitForOpenGL(window.getGLFWContext(),
                                  true); // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
     ImGui_ImplOpenGL3_Init();
 
@@ -31,9 +31,14 @@ void Application::launch() {
     LogManager::instance()->addLog(logs::STATE, "Creating IntroState");
     game.changeState(IntroState::instance());
     LogManager::instance()->addLog(logs::STATE, "Instanced IntroState");
-    float lastFrame = 0;
 
-    while (!glfwWindowShouldClose(window.getWindow()) && game.isRunning()) {
+    float lastFrame = 0;
+    float current_frame = 0;
+
+    // backup window for imgui
+    GLFWwindow* backup_current_context;
+
+    while (!glfwWindowShouldClose(window.getGLFWContext()) && game.isRunning()) {
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -42,9 +47,9 @@ void Application::launch() {
         ImGui::NewFrame();
 
         glfwPollEvents();
-        float currentFrame = glfwGetTime();
-        game.setDeltaTime(currentFrame - lastFrame);
-        lastFrame = currentFrame;
+        current_frame = glfwGetTime();
+        game.setDeltaTime(current_frame - lastFrame);
+        lastFrame = current_frame;
 
         // handle input
         game.processInput();
@@ -59,13 +64,13 @@ void Application::launch() {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-            GLFWwindow *backup_current_context = glfwGetCurrentContext();
+            backup_current_context = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
         }
 
-        glfwSwapBuffers(window.getWindow());
+        glfwSwapBuffers(window.getGLFWContext());
     }
 
     ImGui_ImplOpenGL3_Shutdown();

@@ -4,7 +4,7 @@
 
 class IntroState : public GameState {
 
-public:
+  public:
     void init() override;
     void clean() override;
 
@@ -15,12 +15,11 @@ public:
     void update(GameEngine *engine) override;
     void draw(GameEngine *engine) override;
 
-    inline static IntroState* instance() {
-        return &introState;
-    }
+    inline static IntroState *instance() { return &introState; }
 
-protected:
+  protected:
     IntroState() {}
-private:
+
+  private:
     static IntroState introState;
 };

@@ -4,7 +4,7 @@
 
 class OptionState : public GameState {
 
-public:
+  public:
     void init() override;
     void clean() override;
 
@@ -15,12 +15,11 @@ public:
     void update(GameEngine *engine) override;
     void draw(GameEngine *engine) override;
 
-    inline static OptionState* instance() {
-        return &optionState;
-    }
+    inline static OptionState *instance() { return &optionState; }
 
-protected:
+  protected:
     OptionState() {}
-private:
+
+  private:
     static OptionState optionState;
 };

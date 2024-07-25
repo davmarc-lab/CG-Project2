@@ -13,13 +13,18 @@ class Transform {
 
     bool is_changed = false;
 
+    mat4 m_base = mat4(1);
+    mat4 m_trans = mat4(1);
+    mat4 m_sca = mat4(1);
+    quat m_q = quat(vec3(0));
+    mat4 m_rot = mat4(1);
+
     inline void updateModelMatrix() {
-        mat4 model = mat4(1);
-        mat4 trans = translate(model, this->getPosition());
-        mat4 sca = scale(model, this->getScale());
-        quat q = quat(this->getRotation());
-        mat4 rot = toMat4(q);
-        this->modelMatrix = trans * sca * rot;
+        this->m_trans = translate(this->m_base, this->getPosition());
+        this->m_sca = scale(this->m_base, this->getScale());
+        this->m_q = quat(this->getRotation());
+        this->m_rot = toMat4(this->m_q);
+        this->modelMatrix = this->m_trans * this->m_sca * this->m_rot;
     }
 
   public:
@@ -54,7 +59,6 @@ class Transform {
         if (this->is_changed) {
             this->updateModelMatrix();
         }
-
         return this->modelMatrix;
     }
 

@@ -51,28 +51,22 @@ void Mesh::createVertexArray() {
 }
 
 void Mesh::draw(Shader shader) {
-    unsigned int ndiffuse = 1;
-    unsigned int nspecular = 1;
-    unsigned int nnormal = 1;
-    unsigned int nheight = 1;
-
     shader.use();
 
     for (int i = 0; i < this->texture.size(); i++) {
         glActiveTexture(GL_TEXTURE0 + i); // activate the proper texture unit
 
-        string number;
-        string name = this->texture[i].type;
-        if (name == "texture_diffuse")
-            number = std::to_string(ndiffuse++);
-        else if (name == "texture_specular")
-            number = std::to_string(nspecular++); // transfer unsigned int to string
-        else if (name == "texture_normal")
-            number = std::to_string(nnormal++); // transfer unsigned int to string
-        else if (name == "texture_height")
-            number = std::to_string(nheight++); // transfer unsigned int to string
+        this->m_name = this->texture[i].type;
+        if (this->m_name == "texture_diffuse")
+            m_number = std::to_string(this->m_ndiffuse++);
+        else if (this->m_name == "texture_specular")
+            m_number = std::to_string(this->m_nspecular++); // transfer unsigned int to string
+        else if (this->m_name == "texture_normal")
+            m_number = std::to_string(this->m_nnormal++); // transfer unsigned int to string
+        else if (this->m_name == "texture_height")
+            m_number = std::to_string(this->m_nheight++); // transfer unsigned int to string
 
-        shader.setInt((name + number).c_str(), i);
+        shader.setInt((this->m_name + m_number).c_str(), i);
         glBindTexture(GL_TEXTURE_2D, this->texture[i].id);
     }
 

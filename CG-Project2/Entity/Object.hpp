@@ -10,11 +10,10 @@
 
 #include <vector>
 
-
 enum Flip { VERTICALLY, KEEP };
 
 class Object : public Entity {
-private:
+  private:
     vector<InfoTexture> textures_loaded;
     vector<Mesh> meshes;
     string directory;
@@ -26,10 +25,9 @@ private:
 
     Mesh processMesh(aiMesh *mesh, const aiScene *scene);
 
-    vector<InfoTexture> loadMaterialTextures(aiMaterial *mat, aiTextureType type,
-                                             string typeName);
+    vector<InfoTexture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName);
 
-public:
+  public:
     Object(const char *path, Flip flip = Flip::KEEP, bool gamma = false);
 
     Object() {}

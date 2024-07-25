@@ -17,8 +17,8 @@
 #include "../Menu/IGMenu.hpp"
 #include "../Menu/IGMode.hpp"
 #include "../Menu/IGMousePopup.hpp"
-#include "../Menu/IGViewport.hpp"
 #include "../Menu/IGTimeline.hpp"
+#include "../Menu/IGViewport.hpp"
 
 #include "../Menu/Logger/LogManager.hpp"
 
@@ -54,7 +54,7 @@ IGEntity *entityMenu = nullptr;
 IGMousePopup *mousePopup = new IGMousePopup(mouse_popup_name.c_str());
 IGDebug *debugMenu = new IGDebug();
 IGViewport *viep = new IGViewport();
-IGTimeline* timeline = new IGTimeline();
+IGTimeline *timeline = new IGTimeline();
 
 bool show_popup = false;
 bool show_object_picker = false;
@@ -387,7 +387,7 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
 void scrollPosFunc(GLFWwindow *window, double xoffset, double yoffset) { ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset); }
 
 void PlayState::handleEvent(GameEngine *engine) {
-    auto window = engine->getWindow()->getWindow();
+    auto window = engine->getWindow()->getGLFWContext();
     const float dt = engine->getDeltaTime();
 
     // Change mode
@@ -485,7 +485,7 @@ void PlayState::handleEvent(GameEngine *engine) {
 }
 
 void PlayState::update(GameEngine *engine) {
-    glfwSetFramebufferSizeCallback(engine->getWindow()->getWindow(), viewportFramebufferCallback);
+    glfwSetFramebufferSizeCallback(engine->getWindow()->getGLFWContext(), viewportFramebufferCallback);
     if (action_manager->isActionPresent()) {
         for (auto act : action_manager->getActions()) {
             switch (act) {

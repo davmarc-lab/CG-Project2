@@ -1,18 +1,16 @@
 #pragma once
 
-#include "Entity.hpp"
 #include "../Color/Color.hpp"
+#include "Entity.hpp"
 
 class PlaneEntity : public Entity {
-private:
+  private:
     Color color;
 
     void buildPlane();
 
-public:
-
-    PlaneEntity() : PlaneEntity(color::BLACK) {
-    }
+  public:
+    PlaneEntity() : PlaneEntity(color::BLACK) {}
 
     PlaneEntity(Color color) {
         this->color = color;

@@ -24,7 +24,7 @@ struct InfoTexture {
 };
 
 class Mesh {
-private:
+  private:
     GLuint vao;
     GLuint vbo;
     GLuint ebo;
@@ -32,9 +32,17 @@ private:
     vector<unsigned int> index;
     vector<InfoTexture> texture;
 
+    unsigned int m_ndiffuse = 1;
+    unsigned int m_nspecular = 1;
+    unsigned int m_nnormal = 1;
+    unsigned int m_nheight = 1;
+
+    string m_number;
+    string m_name;
+
     void createVertexArray();
 
-public:
+  public:
     Mesh() {}
 
     Mesh(vector<InfoVertex> vertex, vector<unsigned int> index, vector<InfoTexture> texture);

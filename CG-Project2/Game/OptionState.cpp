@@ -16,8 +16,9 @@ vector<pair<LightModel, string>> lightModels = {
 };
 unsigned int modelSelector = 2;
 
-void OptionState::init() {
+GLFWwindow *window_context;
 
+void OptionState::init() {
     backButton = new ButtonComponent(vec3(55, HEIGHT - 35, 0), color::WHITE, "Back", 40, color::BLACK);
     switchLight = new ButtonComponent(vec3(WIDTH / 2, HEIGHT / 2 + 200, 0), color::WHITE, lightModels[modelSelector].second, 30, color::BLACK);
 
@@ -34,14 +35,14 @@ void OptionState::pause() { cout << "-- WARNING -- Cannot pause an intro" << end
 void OptionState::resume() { cout << "-- WARNING -- Cannot resume an intro" << endl; }
 
 void OptionState::handleEvent(GameEngine *engine) {
-    auto window = engine->getWindow()->getWindow();
+    window_context = engine->getWindow()->getGLFWContext();
     double x, y;
-    glfwGetCursorPos(window, &x, &y);
+    glfwGetCursorPos(window_context, &x, &y);
     y = HEIGHT - y;
     vec2 pos = vec2(x, y);
 
     // mouse left click actions
-    int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+    int state = glfwGetMouseButton(window_context, GLFW_MOUSE_BUTTON_LEFT);
 
     if (state == GLFW_PRESS) {
         if (backButton->isMouseColliding(pos)) {

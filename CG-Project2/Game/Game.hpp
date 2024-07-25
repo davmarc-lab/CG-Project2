@@ -8,7 +8,7 @@ class GameState;
 
 class GameEngine {
 
-public:
+  public:
     GameEngine(Window *window, unsigned int width, unsigned int height);
 
     void init();
@@ -33,7 +33,7 @@ public:
 
     ~GameEngine() = default;
 
-private:
+  private:
     vector<GameState *> states;
     bool running = false;
 

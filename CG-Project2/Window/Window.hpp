@@ -22,7 +22,7 @@ class Window {
 
     inline char *getWindowName() { return (char *)this->windowName; };
 
-    inline GLFWwindow *getWindow() { return this->window; };
+    inline GLFWwindow *getGLFWContext() { return this->window; };
 
     inline vec2 getResolution() { return this->resolution; }
 

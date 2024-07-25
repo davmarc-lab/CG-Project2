@@ -19,3 +19,7 @@
  - [ ] Implement a ResourceManager
  - [ ] Implement a better method to manage Debug Logs, also find a way to implement time stamps
  - [ ] Create a timeline using buttons with value the number of the frame and next to it the value in second
+
+## Finals
+
+ - [ ] In draw methods use a boolean flag to check if the texture is set or not.

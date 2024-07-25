@@ -8,14 +8,14 @@
 using namespace glm;
 
 namespace cmr {
-    const float YAW = -90.0f;
-    const float PITCH = 0.0f;
-    const float SPEED = 1.0f;
-    const float SENSITIVITY = 0.02f;
-    const float ZOOM = 45.0f;
-    const vec3 POSITION = vec3(0, 0, 3);
-    const float TB_SPEED = 20.0f;
-}
+const float YAW = -90.0f;
+const float PITCH = 0.0f;
+const float SPEED = 1.0f;
+const float SENSITIVITY = 0.02f;
+const float ZOOM = 45.0f;
+const vec3 POSITION = vec3(0, 0, 3);
+const float TB_SPEED = 20.0f;
+} // namespace cmr
 
 struct CameraVectors {
     vec3 cameraPos = cmr::POSITION;
@@ -34,29 +34,27 @@ struct CameraInfo {
 };
 
 struct CameraRotation {
-    float pitch = cmr::PITCH;    // rotation around x axis
-    float yaw = cmr::YAW;      // rotation around y axis
+    float pitch = cmr::PITCH; // rotation around x axis
+    float yaw = cmr::YAW;     // rotation around y axis
 };
 
 class Camera {
-private:
+  private:
     vec3 worldUp = vec3(0, 1, 0);
     CameraVectors vectors;
     CameraInfo info;
     CameraRotation rotation;
 
     void updateCameraVectors() {
-        vec3 front;
-        front.x = cos(radians(this->rotation.yaw)) * cos(radians(this->rotation.pitch));
-        front.y = -sin(radians(this->rotation.pitch));
-        front.z = sin(radians(this->rotation.yaw)) * cos(radians(this->rotation.pitch));
-
-        this->vectors.cameraFront = normalize(front);
+        this->vectors.cameraFront =
+            normalize(vec3(cos(radians(this->rotation.yaw)) * cos(radians(this->rotation.pitch)),
+                           -sin(radians(this->rotation.pitch)),
+                           sin(radians(this->rotation.yaw)) * cos(radians(this->rotation.pitch))));
         this->vectors.cameraRight = normalize(cross(this->vectors.cameraFront, this->worldUp));
         this->vectors.cameraUp = normalize(cross(this->vectors.cameraRight, this->vectors.cameraFront));
     }
 
-public:
+  public:
     Camera() { this->updateCameraVectors(); }
 
     inline mat4 getViewMatrix() {
