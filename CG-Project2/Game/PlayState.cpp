@@ -14,10 +14,8 @@
 #include "../Menu/IGDebug.hpp"
 #include "../Menu/IGEntity.hpp"
 #include "../Menu/IGLights.hpp"
-#include "../Menu/IGMenu.hpp"
 #include "../Menu/IGMode.hpp"
 #include "../Menu/IGMousePopup.hpp"
-#include "../Menu/IGTimeline.hpp"
 #include "../Menu/IGViewport.hpp"
 
 #include "../Menu/Logger/LogManager.hpp"
@@ -33,11 +31,10 @@ Sphere *sphere;
 PlaneEntity *plane;
 Cubemap *skybox;
 Shader lightShader, planeShader, skyboxShader, modelShader;
+Object *obj;
 
 DirectionalLight *pl = new DirectionalLight();
 SpotLight *ll = new SpotLight();
-
-Object *obj;
 
 Entity *obj_selected = nullptr;
 Shader *shader_selected = nullptr;
@@ -54,7 +51,6 @@ IGEntity *entityMenu = nullptr;
 IGMousePopup *mousePopup = new IGMousePopup(mouse_popup_name.c_str());
 IGDebug *debugMenu = new IGDebug();
 IGViewport *viep = new IGViewport();
-IGTimeline *timeline = new IGTimeline();
 
 bool show_popup = false;
 bool show_object_picker = false;
@@ -69,6 +65,8 @@ string string_buffer = "";
 
 ActionManager *action_manager = ActionManager::instance();
 LogManager *debug_log = LogManager::instance();
+
+GLFWwindow* current_context;
 
 void viewportFramebufferCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -387,20 +385,20 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
 void scrollPosFunc(GLFWwindow *window, double xoffset, double yoffset) { ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset); }
 
 void PlayState::handleEvent(GameEngine *engine) {
-    auto window = engine->getWindow()->getGLFWContext();
+    current_context = engine->getWindow()->getGLFWContext();
     const float dt = engine->getDeltaTime();
 
     // Change mode
-    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_G)) {
+    if (glfwGetKey(current_context, GLFW_KEY_G) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_G)) {
         user_mode = InputMode::INTERACT;
     }
-    if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_V)) {
+    if (glfwGetKey(current_context, GLFW_KEY_V) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_V)) {
         user_mode = InputMode::SELECT;
     }
-    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_P)) {
+    if (glfwGetKey(current_context, GLFW_KEY_P) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_P)) {
         user_mode = InputMode::PASSIVE;
     }
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_Q)) {
+    if (glfwGetKey(current_context, GLFW_KEY_Q) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_Q)) {
         // This changeState kinda work for PlayState but need to test more
         // engine->changeState(IntroState::instance());
         debug_log->addLog(logs::GENERAL_EVENT, "Game Closing");
@@ -415,30 +413,30 @@ void PlayState::handleEvent(GameEngine *engine) {
             // enable selecting object mode
             debug_log->addLog(logs::USER_MODE, "User Mode -> SELECT");
             mouse.first_mouse = true;
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            glfwSetMouseButtonCallback(window, selectMouseFunc);
-            glfwSetCursorPosCallback(window, mouseActiveMotion);
-            glfwSetScrollCallback(window, scrollPosFunc);
+            glfwSetInputMode(current_context, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetMouseButtonCallback(current_context, selectMouseFunc);
+            glfwSetCursorPosCallback(current_context, mouseActiveMotion);
+            glfwSetScrollCallback(current_context, scrollPosFunc);
             break;
         case INTERACT:
             // enable movement in the scene, and active mouse movement
             debug_log->addLog(logs::USER_MODE, "User Mode -> INTERACT");
             mouse.first_mouse = true;
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            glfwSetMouseButtonCallback(window, mouseInputFunc);
-            glfwSetCursorPosCallback(window, mouseActiveMotion);
-            glfwSetScrollCallback(window, scrollPosFunc);
+            glfwSetInputMode(current_context, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetMouseButtonCallback(current_context, mouseInputFunc);
+            glfwSetCursorPosCallback(current_context, mouseActiveMotion);
+            glfwSetScrollCallback(current_context, scrollPosFunc);
             break;
         case PASSIVE:
             // enable passive mouse movement
             debug_log->addLog(logs::USER_MODE, "User Mode -> PASSIVE");
             mouse.first_mouse = true;
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            glfwSetCursorPosCallback(window, passiveCursorPosFunc);
-            glfwSetMouseButtonCallback(window, clearMouseActionFunc);
+            glfwSetInputMode(current_context, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetCursorPosCallback(current_context, passiveCursorPosFunc);
+            glfwSetMouseButtonCallback(current_context, clearMouseActionFunc);
 
             if (glfwRawMouseMotionSupported())
-                glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+                glfwSetInputMode(current_context, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
             break;
         default:
@@ -448,38 +446,38 @@ void PlayState::handleEvent(GameEngine *engine) {
 
     // Mouse input
     double x, y;
-    glfwGetCursorPos(window, &x, &y);
+    glfwGetCursorPos(current_context, &x, &y);
     y = HEIGHT - y;
     vec2 mouse_pos = vec2(x, y);
 
     // Camera input
     float cameraVelocity = camera.getCameraVelocity() * engine->getDeltaTime();
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    if (glfwGetKey(current_context, GLFW_KEY_W) == GLFW_PRESS) {
         // lockKey(GLFW_KEY_W);
         auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraFront();
         camera.moveCamera(pos);
     }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    if (glfwGetKey(current_context, GLFW_KEY_S) == GLFW_PRESS) {
         auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraFront();
         camera.moveCamera(pos);
     }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    if (glfwGetKey(current_context, GLFW_KEY_A) == GLFW_PRESS) {
         auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraRight();
         camera.moveCamera(pos);
     }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    if (glfwGetKey(current_context, GLFW_KEY_D) == GLFW_PRESS) {
         auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraRight();
         camera.moveCamera(pos);
     }
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+    if (glfwGetKey(current_context, GLFW_KEY_SPACE) == GLFW_PRESS) {
         auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraUp();
         camera.moveCamera(pos);
     }
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+    if (glfwGetKey(current_context, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraUp();
         camera.moveCamera(pos);
     }
-    if (glfwGetKey(window, GLFW_KEY_DELETE) == GLFW_PRESS) {
+    if (glfwGetKey(current_context, GLFW_KEY_DELETE) == GLFW_PRESS) {
         am->addAction(Action::DEL_ENTITY);
     }
 }
@@ -638,9 +636,7 @@ void PlayState::draw(GameEngine *engine) {
         showObjectPicker();
     }
 
-    timeline->render();
-
-    // debugMenu->render();
+    debugMenu->render();
 }
 
 void PlayState::clean() {

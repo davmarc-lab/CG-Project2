@@ -18,8 +18,7 @@ Text::Text(string text, const int fontSize) {
 
     error = FT_New_Face(library, "./fonts/arial.ttf", 0, &fontFace);
     if (error == FT_Err_Unknown_File_Format) {
-        cout << "Error, this font type is not supported or could not be read."
-             << endl;
+        cout << "Error, this font type is not supported or could not be read." << endl;
         exit(-1);
 
     } else if (error) {
@@ -56,8 +55,7 @@ void Text::generateText() {
         // generate buffers.texture
         glGenTextures(1, &this->buffers.texture);
         glBindTexture(GL_TEXTURE_2D, this->buffers.texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, fontFace->glyph->bitmap.width,
-                     fontFace->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE,
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, fontFace->glyph->bitmap.width, fontFace->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE,
                      fontFace->glyph->bitmap.buffer);
         // set this->buffers.texture options
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -65,11 +63,9 @@ void Text::generateText() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         // now store character for later use
-        Character character = {
-            this->buffers.texture,
-            ivec2(fontFace->glyph->bitmap.width, fontFace->glyph->bitmap.rows),
-            ivec2(fontFace->glyph->bitmap_left, fontFace->glyph->bitmap_top),
-            static_cast<unsigned int>(fontFace->glyph->advance.x)};
+        Character character = {this->buffers.texture, ivec2(fontFace->glyph->bitmap.width, fontFace->glyph->bitmap.rows),
+                               ivec2(fontFace->glyph->bitmap_left, fontFace->glyph->bitmap_top),
+                               static_cast<unsigned int>(fontFace->glyph->advance.x)};
         characters.insert(pair<char, Character>(c, character));
     }
 
@@ -81,8 +77,7 @@ void Text::generateText() {
         float height = ch.Size.y;
 
         this->totalWidth += int(ch.Advance / 64);
-        this->totalHeight =
-            this->totalHeight > height ? this->totalHeight : height;
+        this->totalHeight = this->totalHeight > height ? this->totalHeight : height;
     }
 
     // destroy FreeType once we're finished
@@ -97,10 +92,8 @@ void Text::renderText(Shader shader) {
     float y = this->position.y;
 
     auto color = vec3(this->getColorValues());
-    glUniform3fv(glGetUniformLocation(shader.getId(), "textColor"), 1,
-                 value_ptr(color));
-    glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "projection"), 1,
-                       GL_FALSE, value_ptr(this->projection));
+    glUniform3fv(glGetUniformLocation(shader.getId(), "textColor"), 1, value_ptr(color));
+    glUniformMatrix4fv(glGetUniformLocation(shader.getId(), "projection"), 1, GL_FALSE, value_ptr(this->projection));
 
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(this->buffers.vao);
@@ -115,13 +108,9 @@ void Text::renderText(Shader shader) {
         float width = ch.Size.x * this->fontScale;
         float height = ch.Size.y * this->fontScale;
 
-        float vertices[6][4] = {{xpos, ypos + height, 0.0f, 0.0f},
-                                {xpos, ypos, 0.0f, 1.0f},
-                                {xpos + width, ypos, 1.0f, 1.0f},
+        float vertices[6][4] = {{xpos, ypos + height, 0.0f, 0.0f}, {xpos, ypos, 0.0f, 1.0f},         {xpos + width, ypos, 1.0f, 1.0f},
 
-                                {xpos, ypos + height, 0.0f, 0.0f},
-                                {xpos + width, ypos, 1.0f, 1.0f},
-                                {xpos + width, ypos + height, 1.0f, 0.0f}};
+                                {xpos, ypos + height, 0.0f, 0.0f}, {xpos + width, ypos, 1.0f, 1.0f}, {xpos + width, ypos + height, 1.0f, 0.0f}};
 
         glBindTexture(GL_TEXTURE_2D, ch.TextureID);
 

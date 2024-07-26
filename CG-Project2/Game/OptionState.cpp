@@ -16,7 +16,7 @@ vector<pair<LightModel, string>> lightModels = {
 };
 unsigned int modelSelector = 2;
 
-GLFWwindow *window_context;
+inline GLFWwindow *window_context;
 
 void OptionState::init() {
     backButton = new ButtonComponent(vec3(55, HEIGHT - 35, 0), color::WHITE, "Back", 40, color::BLACK);

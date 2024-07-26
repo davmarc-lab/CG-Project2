@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Lib.hpp"
 #include "../LibLightStruct.hpp"
 
 #include "../Entity/Entity.hpp"
@@ -9,13 +8,13 @@
 extern int max_lights;
 
 class Light {
-public:
+  public:
     vec3 color = vec3(1.0f);
     float intensity = 1.0f;
     LightVectors vectors;
     LightType type;
 
-    Entity* caster = nullptr;
+    Entity *caster = nullptr;
     Shader casterShader;
     bool show_caster = true;
 
@@ -39,17 +38,20 @@ public:
 
     float getIntensity() { return this->intensity; }
 
-    void setIntensity(float intensity) { this->intensity = intensity; } 
+    void setIntensity(float intensity) { this->intensity = intensity; }
 
     LightType getType() { return this->type; }
 
     inline vec3 getPosition() { return this->caster == nullptr ? vec3(0) : this->caster->getPosition(); }
 
-    inline void setPosition(vec3 pos) { if (this->caster != nullptr) this->caster->setPosition(pos); }
+    inline void setPosition(vec3 pos) {
+        if (this->caster != nullptr)
+            this->caster->setPosition(pos);
+    }
 
-    inline Entity* getCaster() { return this->caster; }
+    inline Entity *getCaster() { return this->caster; }
 
-    inline Shader* getShader() { return &this->casterShader; }
+    inline Shader *getShader() { return &this->casterShader; }
 
     bool isCasterInstaced() { return this->caster != nullptr || this->type == LightType::DIRECTIONAL; }
 
@@ -59,9 +61,7 @@ public:
 
     inline void setCustomView(mat4 view) { this->custom_view = view; }
 
-    inline string addIndexToString(string before, int index, string after) {
-        return before + "[" + to_string(index) + "]." + after;
-    }
+    inline string addIndexToString(string before, int index, string after) { return before + "[" + to_string(index) + "]." + after; }
 
     /* ---Overrride Methods--- */
     virtual void initCaster() = 0;

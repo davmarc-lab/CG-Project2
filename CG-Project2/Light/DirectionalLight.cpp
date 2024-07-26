@@ -1,8 +1,6 @@
 #include "DirectionalLight.hpp"
 
-DirectionalLight::DirectionalLight() {
-    this->type = LightType::DIRECTIONAL;
-}
+DirectionalLight::DirectionalLight() { this->type = LightType::DIRECTIONAL; }
 
 void DirectionalLight::sendDataToShader(Shader shader, int index) {
     shader.use();
@@ -19,4 +17,3 @@ void DirectionalLight::sendDataToShader(Shader shader, int index) {
     shader.setVec3("lights[" + to_string(index) + "].diffuse", this->vectors.diffuse);
     shader.setVec3("lights[" + to_string(index) + "].specular", this->vectors.specular);
 }
-

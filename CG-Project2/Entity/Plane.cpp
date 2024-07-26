@@ -1,7 +1,7 @@
 #include "Plane.hpp"
 #include "Collider/CubeCollider.hpp"
 
-float vertices[] = { // coords.vertex coord,   texture coord,  coords.normals vectors
+inline float vertices[] = { // coords.vertex coord,   texture coord,  coords.normals vectors
     -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  0.0f,  -1.0f, 0.5f,  -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,  0.0f,  -1.0f,
     0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 0.0f,  0.0f,  -1.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 0.0f,  0.0f,  -1.0f,
     -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f, 0.0f,  0.0f,  -1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  0.0f,  -1.0f,

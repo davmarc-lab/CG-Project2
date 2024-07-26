@@ -5,19 +5,17 @@
 #include "../Menu/Logger/LogManager.hpp"
 
 class DirectionalLight : public Light {
-private:
+  private:
     vec3 direction = vec3(1, 0, 0);
 
-public:
+  public:
     DirectionalLight();
 
     inline vec3 getDirection() { return this->direction; }
 
     inline void setDirection(vec3 dir) { this->direction = dir; }
 
-    inline virtual void initCaster() override {
-        LogManager::instance()->addLog(logs::MISSING_CASTER, "No Caster Needed for Directional Light");
-    }
+    inline virtual void initCaster() override { LogManager::instance()->addLog(logs::MISSING_CASTER, "No Caster Needed for Directional Light"); }
 
     virtual void sendDataToShader(Shader shader, int index) override;
 

@@ -3,7 +3,8 @@
 #include "../Menu/Logger/LogManager.hpp"
 
 PointLight::PointLight(vec3 position, float constant, float linear, float quadratic) : PointLight() {
-    this->position = position; this->caster->setPosition(position);
+    this->position = position;
+    this->caster->setPosition(position);
     this->info.constant = constant;
     this->info.linear = linear;
     this->info.quadratic = quadratic;
@@ -11,7 +12,6 @@ PointLight::PointLight(vec3 position, float constant, float linear, float quadra
 
 void PointLight::sendDataToShader(Shader shader, int index) {
     shader.use();
-
 
     shader.setInt("lights[" + to_string(index) + "].lightType", this->type);
     shader.setFloat("lights[" + to_string(index) + "].intensity", this->intensity);

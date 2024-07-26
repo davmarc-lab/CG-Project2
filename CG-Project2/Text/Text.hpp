@@ -1,18 +1,18 @@
 #pragma once
 
+#include "../Color/Color.hpp"
 #include "../Lib.hpp"
 #include "../Shader/Shader.hpp"
-#include "../Color/Color.hpp"
 
-#include <map>
 #include <ft2build.h>
+#include <map>
 #include FT_FREETYPE_H
 
 struct Character {
-    unsigned int TextureID;     // ID handle of the glyph this->texture
-    ivec2 Size;                 // Size of glyph
-    ivec2 Bearing;              // Offset from baseline to left/top of glyph
-    unsigned int Advance;       // Horizontal offset to advance to next glyph
+    unsigned int TextureID; // ID handle of the glyph this->texture
+    ivec2 Size;             // Size of glyph
+    ivec2 Bearing;          // Offset from baseline to left/top of glyph
+    unsigned int Advance;   // Horizontal offset to advance to next glyph
 };
 
 struct TBuffers {
@@ -25,8 +25,7 @@ struct TBuffers {
  * This class create a text entity using freetype library.
  */
 class Text {
-private:
-
+  private:
     TBuffers buffers;
     mat4 projection = ortho(0.f, (float)WIDTH, 0.f, (float)HEIGHT);
     unsigned int fontSize = 20;
@@ -46,7 +45,7 @@ private:
     // Prepare the text for rendering.
     void generateText();
 
-public:
+  public:
     // Constructs an objetc with given projection, text and font size.
     Text(string text, const int fontSize);
 
@@ -83,7 +82,7 @@ public:
     inline void appendText(string text) { this->text.append(text); }
 
     // Retrieves the text.
-    inline string getText() {return this->text; }
+    inline string getText() { return this->text; }
 
     inline void setFontSize(const unsigned int size) { this->fontSize = size; }
 

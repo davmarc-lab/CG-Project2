@@ -1,6 +1,8 @@
 #include "Scene.hpp"
 #include <algorithm>
 
+inline int n_elem = 0;
+
 void Scene::addElement(Entity *e, Shader *s) {
     if (!e->isInstanced()) {
         e->createVertexArray();
@@ -25,7 +27,7 @@ void Scene::addLight(Light *l) {
 }
 
 void Scene::draw() {
-    int index = 0;
+    n_elem = 0;
 
     for (auto e : this->elements) {
         // if the entity is affected by lights, checks if there are lights
@@ -37,10 +39,10 @@ void Scene::draw() {
 
             // If there is a light in the scene sends data
             if (this->lights.size() >= 1) {
-                index = 0;
+                n_elem = 0;
                 for (auto l : this->lights) {
-                    l->sendDataToShader(*e.second, index);
-                    index++;
+                    l->sendDataToShader(*e.second, n_elem);
+                    n_elem++;
                 }
             }
         }

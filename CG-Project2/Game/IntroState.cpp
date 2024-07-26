@@ -11,7 +11,7 @@ IntroState IntroState::introState;
 
 ButtonComponent *playButton, *optionButton, *exitButton;
 GLenum oldState = GL_FALSE;
-GLFWwindow* window_context;
+inline GLFWwindow* window_context;
 
 void IntroState::init() {
     playButton = new ButtonComponent(vec3(WIDTH / 2, HEIGHT / 2, 0), color::WHITE, "Play", 40, color::BLACK);
