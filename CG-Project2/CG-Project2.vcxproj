@@ -215,6 +215,7 @@
     <ClInclude Include="Light\Light.hpp" />
     <ClInclude Include="Light\Pointlight.hpp" />
     <ClInclude Include="Light\SpotLight.hpp" />
+    <ClInclude Include="Menu\Breakpoint\Breakpoint.hpp" />
     <ClInclude Include="Menu\ButtonComponent.hpp" />
     <ClInclude Include="Menu\Component.hpp" />
     <ClInclude Include="Menu\IGCamera.hpp" />
@@ -224,6 +225,8 @@
     <ClInclude Include="Menu\IGMenu.hpp" />
     <ClInclude Include="Menu\IGMode.hpp" />
     <ClInclude Include="Menu\IGMousePopup.hpp" />
+    <ClInclude Include="Menu\IGTimeline.hpp" />
+    <ClInclude Include="Menu\IGViewport.hpp" />
     <ClInclude Include="Menu\Logger\Log.hpp" />
     <ClInclude Include="Menu\Logger\LogManager.hpp" />
     <ClInclude Include="Menu\OptionPane.hpp" />
