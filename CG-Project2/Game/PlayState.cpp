@@ -228,24 +228,6 @@ void mouseInputFunc(GLFWwindow *window, int button, int action, int mod) {
         }
     }
 
-    // you can handle your ImGui::popup here
-    // that's because you cannot see the mouse in passive mode
-    // in select mode with left click you select objects
-
-    // seg fault in IsPopupOpen :/
-    /* if (user_mode == InputMode::INTERACT) {
-        // handle mouse input using ImGui
-        if (button == GLFW_MOUSE_BUTTON_2) {
-            // open popup
-            show_popup = true;
-        }
-
-        // left click out of the popup
-        if (show_popup && button == GLFW_MOUSE_BUTTON_1 && ImGui::IsPopupOpen(popup_name.c_str())) {
-            show_popup = false;
-        }
-    } */
-
     imGuiMouse2Popup();
 
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);

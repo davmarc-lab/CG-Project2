@@ -13,23 +13,6 @@ GameEngine::GameEngine(Window *window, unsigned int width, unsigned int height) 
     this->height = height;
 }
 
-void mouseMovementCallback(GLFWwindow *window, double xposIn, double yposIn) {
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-
-    if (input.first_mouse) {
-        input.first_mouse = false;
-        input.lastX = xpos;
-        input.lastY = ypos;
-    }
-
-    // float xoffset = xpos - input.lastX;
-    // float yoffset = ypos - input.lastY;
-
-    input.lastX = xpos;
-    input.lastY = ypos;
-}
-
 void GameEngine::init() { this->running = true; }
 
 void GameEngine::changeState(GameState *state) {

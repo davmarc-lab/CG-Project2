@@ -11,28 +11,34 @@
 class Entity {
 public:
 
+    // Stores all buffers to be used in the pipeline.
     Buffers buffers;
 
+    // Stores all vertices data.
     Coords coords;
 
+    // Stores all transformation data (translation, scale, rotation).
     Transform transform;
 
+    // Store Entity's Texture.
     Texture texture;
 
+    // Store Entity's Material.
     Material material = material::NONE;
 
+    // Define the Light complexity for each Entity.
     int light_comp = LightComp::PHONG;
 
-    Physic physics;
-    bool m_static = false;
-
+    // Store Entity's Collider shape.
     Collider* collider;
 
     int nvertex;
+    // Flag used to check if the Entity vao is already created.
     bool m_isInstaced = false;
 
     Entity() {}
 
+    // Retrieves the minimum vertex for AABB collisions.
     inline vec3 getMinVertex() {
         vec3 point = vec3(2);
         for (const auto p : this->coords.vertex) {
@@ -49,6 +55,7 @@ public:
         return this->getModelMatrix() * vec4(point, 1);
     }
 
+    // Retrieves the maximum vertex for AABB collisions.
     inline vec3 getMaxVertex() {
         vec3 point = vec3(-2);
         for (const auto p : this->coords.vertex) {
@@ -77,41 +84,12 @@ public:
 
     inline void setRotation(const vec3 rotation) { this->transform.setRotation(rotation); }
 
+    // Retrieves from the Transform object the updated model matrix using position, scale and rotation data.
     inline mat4 getModelMatrix() { return this->transform.getModelMatrix(); }
-
-    // inline mat4 refreshModelMatrix() { return this->transform.refreshModelMatrix(); }
 
     inline void setModelMatrix(const mat4 transform) { this->transform.setModelMatrix(transform); }
 
     inline Transform* getTransform() { return &this->transform; }
-
-    inline float getMass() { return this->physics.mass; }
-
-    inline void setMass(const float mass) { this->physics.mass = mass; }
-
-    inline vec3 getForce() { return this->physics.force; }
-
-    inline void setForce(const vec3 force) { this->physics.force = force; }
-
-    inline void addForce(const vec3 force) { this->setForce(this->getForce() + force); }
-
-    inline vec3 getAcceleration() { return this->physics.acceleration; }
-
-    inline void setAcceleration(const vec3 acceleration) { this->physics.acceleration = acceleration; }
-
-    inline void addAcceleration(const vec3 acceleration) { this->physics.acceleration += acceleration; }
-
-    inline vec3 getVelocity() { return this->physics.velocity; }
-
-    inline void setVelocity(const vec3 velocity) { this->physics.velocity = velocity; }
-
-    inline void addVelocity(const vec3 velocity) { this->setVelocity(this->getVelocity() + velocity); }
-
-    inline float getMotionTime() { return this->physics.motionTime; }
-
-    inline void setMotionTime(const float time) { this->physics.motionTime = time; }
-
-    inline void addMotionTime(const float time) { this->physics.motionTime += time; }
 
     inline Collider* getCollider() { return this->collider; }
 
@@ -124,20 +102,17 @@ public:
 
     inline void setCollStatic() { this->collider->setStaticColl(); }
 
-    inline bool isStatic() { return this->m_static; }
-
-    inline void setStatic() { this->m_static = true; }
-
-    inline void setDynamic() { this->m_static = false; }
-
+    // Retrieves the Entity texture.
     inline Texture getTexture() { return this->texture; }
-
+    
+    // Changes the current Texture.
     inline void changeTexture(const string path) {
         this->texture = Texture(path.c_str());
         this->texture.createTexture();
         this->attachTexture(this->getTexture());
     }
 
+    // Attaches a Texture object to an Entity.
     inline void attachTexture(Texture texture) {
         this->texture = texture;
 
@@ -157,7 +132,8 @@ public:
     inline Material getMaterial() { return this->material; }
 
     inline void setMaterial(Material material) { this->material = material; }
-
+    
+    // Retrieves true if the Entity should be affected by the lights in the Scene.
     inline bool isAffectedByLight() { return this->light_comp != LightComp::NONE; }
 
     inline void setLightComputation(int val) { this->light_comp = val; }
@@ -166,8 +142,13 @@ public:
 
     inline bool isInstanced() { return this->m_isInstaced; }
 
+    // Instances all the buffer in the gpu pipeline.
     virtual void createVertexArray() = 0;
 
+    /*
+     * Draws the Entity in the window, but before doing that it sends to the shader
+     * all the information about texture and material for lighting.
+     */
     virtual void draw(Shader shader) = 0;
 
     // virtual void clear() = 0;

@@ -20,6 +20,9 @@ public:
 
     Application(const float width, const float height, const string name) : width(width), height(height), name(name) {}
 
+    /*
+     * Launch the application and enters in GameLoop.
+     */
     void launch();
 
     ~Application() = default;

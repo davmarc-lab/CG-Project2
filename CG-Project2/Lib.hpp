@@ -78,15 +78,6 @@ struct BoundingBox {
     vec3 topRight = vec3(-2);
 };
 
-struct Physic {
-    vec3 velocity = vec3(0);
-    vec3 acceleration = vec3(0);
-    vec3 force = vec3(0);
-    float mass = 1.f;
-
-    float motionTime = 0.f;
-};
-
 struct Mouse {
     bool first_mouse = true;
     bool active_mode = false;

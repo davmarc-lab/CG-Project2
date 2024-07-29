@@ -25,10 +25,11 @@ vector<string> faces = {
     "./resources/textures/skybox/bottom.jpg", "./resources/textures/skybox/front.jpg", "./resources/textures/skybox/back.jpg",
 };
 
-unsigned char *data_read;
 
+// Loads a cubemap from a jpg file, all paths are stored in the faces Vector above.
 GLuint loadCubemap() {
     unsigned int textureID;
+    unsigned char *data_read;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 

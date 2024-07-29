@@ -95,13 +95,10 @@ class IGEntity : public IGMenu {
                 ImGui::SeparatorText("Position");
                 ImGui::Text("Position:");
                 if (ImGui::DragFloat("x", &pos.x, 0.005, 0.f)) {
-                    this->obj_observer->setMotionTime(0);
                 }
                 if (ImGui::DragFloat("y", &pos.y, 0.005)) {
-                    this->obj_observer->setMotionTime(0);
                 }
                 if (ImGui::DragFloat("z", &pos.z, 0.005)) {
-                    this->obj_observer->setMotionTime(0);
                 }
                 if (ImGui::Button("Reset")) {
                     pos = vec3(0);

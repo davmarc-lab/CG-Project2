@@ -41,7 +41,6 @@ void PlaneEntity::buildPlane() {
     this->setRotation(vec3(0));
 
     this->setCollider(new CubeCollider(&this->transform));
-    this->setStatic();
 }
 
 void PlaneEntity::createVertexArray() {

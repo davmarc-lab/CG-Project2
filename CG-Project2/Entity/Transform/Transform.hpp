@@ -5,20 +5,31 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+/*
+ * This class provides features to modify Entity shape, like translating, scaling and rotating.
+ */
 class Transform {
   private:
+    // Stores all position, scale and rotation data.
     Model model;
 
     mat4 modelMatrix = mat4(1.0);
 
+    // Flag used to tell if position or scale or rotation is changed.
     bool is_changed = false;
 
     mat4 m_base = mat4(1);
     mat4 m_trans = mat4(1);
     mat4 m_sca = mat4(1);
+    // Using quaternion to calculate the rotation matrix.
     quat m_q = quat(vec3(0));
     mat4 m_rot = mat4(1);
 
+    /*
+     * This method creates the model matrix from position, scale and rotation information.
+     * It uses quaternion to calculate the rotation matrix, but the users uses Euler Angles to interact.
+     * This feature could be useful to implement multiple rotation at the same time.
+     */
     inline void updateModelMatrix() {
         this->m_trans = translate(this->m_base, this->getPosition());
         this->m_sca = scale(this->m_base, this->getScale());
@@ -55,9 +66,11 @@ class Transform {
 
     inline void setModelMatrix(const mat4 mat) { this->modelMatrix = mat4(mat); }
 
+    // Retrieves the model matrix, if some information are changed.
     inline mat4 getModelMatrix() {
         if (this->is_changed) {
             this->updateModelMatrix();
+            this->is_changed = false;
         }
         return this->modelMatrix;
     }

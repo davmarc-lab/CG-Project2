@@ -2,6 +2,9 @@
 
 #include "Game.hpp"
 
+/*
+ * This interface permits to create a Singleton GameState object.
+ */
 class GameState {
   public:
     virtual void init() = 0;
