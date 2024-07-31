@@ -382,10 +382,10 @@ void PlayState::handleEvent(GameEngine *engine) {
     }
     if (glfwGetKey(current_context, GLFW_KEY_Q) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_Q)) {
         // This changeState kinda work for PlayState but need to test more
-        // engine->changeState(IntroState::instance());
+        engine->changeState(IntroState::instance());
         debug_log->addLog(logs::GENERAL_EVENT, "Game Closing");
         // Print all logs in a txt file
-        engine->quit();
+        // engine->quit();
     }
 
     if (user_mode != old_user_mode) {
@@ -624,12 +624,23 @@ void PlayState::draw(GameEngine *engine) {
 void PlayState::clean() {
     // delete obj_selected;
     // delete shader_selected;
+
+    delete cube;
+    delete sphere;
     delete plane;
     delete skybox;
-    delete entityMenu;
+    delete obj;
+
+    delete pl;
+    delete ll;
+
+    delete shader_selected;
+
     delete modeMenu;
     delete cameraMenu;
     delete lightsMenu;
+    delete entityMenu;
     delete mousePopup;
     delete debugMenu;
+    delete viep;
 }
