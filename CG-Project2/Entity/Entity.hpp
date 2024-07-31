@@ -9,13 +9,8 @@
 #include "Transform/Transform.hpp"
 
 class Entity {
-<<<<<<< Updated upstream
-public:
-
-    // Stores all buffers to be used in the pipeline.
-=======
   public:
->>>>>>> Stashed changes
+
     Buffers buffers;
 
     // Stores all vertices data.
@@ -33,15 +28,8 @@ public:
     // Define the Light complexity for each Entity.
     int light_comp = LightComp::PHONG;
 
-<<<<<<< Updated upstream
     // Store Entity's Collider shape.
     Collider* collider;
-=======
-    Physic physics;
-    bool m_static = false;
-
-    Collider *collider;
->>>>>>> Stashed changes
 
     int nvertex;
     // Flag used to check if the Entity vao is already created.
@@ -102,39 +90,7 @@ public:
 
     inline Transform *getTransform() { return &this->transform; }
 
-<<<<<<< Updated upstream
     inline Collider* getCollider() { return this->collider; }
-=======
-    inline float getMass() { return this->physics.mass; }
-
-    inline void setMass(const float mass) { this->physics.mass = mass; }
-
-    inline vec3 getForce() { return this->physics.force; }
-
-    inline void setForce(const vec3 force) { this->physics.force = force; }
-
-    inline void addForce(const vec3 force) { this->setForce(this->getForce() + force); }
-
-    inline vec3 getAcceleration() { return this->physics.acceleration; }
-
-    inline void setAcceleration(const vec3 acceleration) { this->physics.acceleration = acceleration; }
-
-    inline void addAcceleration(const vec3 acceleration) { this->physics.acceleration += acceleration; }
-
-    inline vec3 getVelocity() { return this->physics.velocity; }
-
-    inline void setVelocity(const vec3 velocity) { this->physics.velocity = velocity; }
-
-    inline void addVelocity(const vec3 velocity) { this->setVelocity(this->getVelocity() + velocity); }
-
-    inline float getMotionTime() { return this->physics.motionTime; }
-
-    inline void setMotionTime(const float time) { this->physics.motionTime = time; }
-
-    inline void addMotionTime(const float time) { this->physics.motionTime += time; }
-
-    inline Collider *getCollider() { return this->collider; }
->>>>>>> Stashed changes
 
     inline void setCollider(Collider *collider) {
         this->collider = collider;

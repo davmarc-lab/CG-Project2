@@ -621,8 +621,6 @@ void PlayState::draw(GameEngine *engine) {
 }
 
 void PlayState::clean() {
-    // delete obj_selected;
-    // delete shader_selected;
 
     delete cube;
     delete sphere;
@@ -630,8 +628,7 @@ void PlayState::clean() {
     delete skybox;
     delete obj;
 
-    delete pl;
-    delete ll;
+    delete sun;
 
     delete shader_selected;
 
