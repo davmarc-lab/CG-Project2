@@ -33,8 +33,7 @@ Cubemap *skybox;
 Shader lightShader, planeShader, skyboxShader, modelShader;
 Object *obj;
 
-DirectionalLight *pl = new DirectionalLight();
-SpotLight *ll = new SpotLight();
+DirectionalLight *sun = new DirectionalLight();
 
 Entity *obj_selected = nullptr;
 Shader *shader_selected = nullptr;
@@ -106,7 +105,7 @@ void PlayState::init() {
     planeShader.setMat4("projection", projection);
     planeShader.setInt("color", 1);
 
-    plane = new PlaneEntity(color::RED);
+    plane = new PlaneEntity();
     plane->createVertexArray();
     debug_log->addLog(logs::SILENCE, "Instanced buffers for Plane");
 
@@ -123,12 +122,12 @@ void PlayState::init() {
     obj_scene.addElement(cube, &lightShader);
     obj_scene.addElement(sphere, &lightShader);
 
-    ll->initCaster();
-    ll->setPosition(vec3(1));
-    ll->setDirection(vec3(0, 1, 0));
+    sun->initCaster();
+    sun->setColor(vec3(0.7, 0.5, 0.98));
+    sun->setIntensity(1.3f);
+    sun->setDirection(vec3(1, -1, 0));
 
-    // obj_scene.addLight(pl);
-    obj_scene.addLight(ll);
+    obj_scene.addLight(sun);
 
     modelShader = Shader("./resources/shaders/lightVertexShader.glsl", "./resources/shaders/lightFragmentShader.glsl");
     modelShader.use();
