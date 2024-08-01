@@ -13,6 +13,7 @@ ButtonComponent *playButton, *optionButton, *exitButton;
 GLenum oldState = GL_FALSE;
 inline GLFWwindow* window_context;
 
+// Creates custom button.
 void IntroState::init() {
     playButton = new ButtonComponent(vec3(WIDTH / 2, HEIGHT / 2, 0), color::WHITE, "Play", 40, color::BLACK);
     optionButton = new ButtonComponent(vec3(WIDTH / 2, HEIGHT / 2 - 100, 0), color::WHITE, "Option", 40, color::BLACK);
@@ -38,6 +39,7 @@ bool isMouseInButton(ButtonComponent* button, vec2 pos) {
     return button->isMouseColliding(pos);
 }
 
+// Manages input for the buttons, getting the cursor position.
 void IntroState::handleEvent(GameEngine *engine) {
     window_context = engine->getWindow()->getGLFWContext();
     double x, y;

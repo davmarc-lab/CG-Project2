@@ -2,6 +2,9 @@
 
 #include "GameState.hpp"
 
+/*
+ * Creates the actual game.
+ */
 class PlayState : public GameState {
 
   public:

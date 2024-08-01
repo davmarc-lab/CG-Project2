@@ -20,8 +20,8 @@ void Application::launch() {
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking Feature
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable MultiViewport Feature
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window.getGLFWContext(),
@@ -35,12 +35,12 @@ void Application::launch() {
     game.changeState(IntroState::instance());
     LogManager::instance()->addLog(logs::STATE, "Instanced IntroState");
 
-    // These variables are used to calculate the deltaTime between every frame.    
+    // These variables are used to calculate the deltaTime between every frame.
     float lastFrame = 0;
     float current_frame = 0;
 
     // backup window for imgui
-    GLFWwindow* backup_current_context;
+    GLFWwindow *backup_current_context;
 
     // Starting the game loop until the GLFWwindow closes or the engine stops
     while (!glfwWindowShouldClose(window.getGLFWContext()) && game.isRunning()) {

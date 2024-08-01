@@ -20,8 +20,10 @@ void GameEngine::changeState(GameState *state) {
     if (!this->states.empty()) {
         this->states.back()->clean();
     }
+    // add the new state to the buffer
     this->states.push_back(state);
     LogManager::instance()->addLog(logs::STATE, "Changing State");
+    // invoke the init method of the new state
     this->states.back()->init();
 }
 

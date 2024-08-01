@@ -2,6 +2,9 @@
 
 #include "GameState.hpp"
 
+/*
+ * Creates the Option section in the Main menu.
+ */
 class OptionState : public GameState {
 
   public:

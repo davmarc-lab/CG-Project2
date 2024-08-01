@@ -37,7 +37,7 @@ const mat4 textProjection = ortho(0.f, WIDTH, 0.f, HEIGHT);
 
 inline mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
 
-// mmmmm
+// method used to update the perspective matrix if the camera zoom is modified.
 inline void updatePerspective(float zoom) {
       projection = glm::perspective(glm::radians(zoom), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
 }
@@ -51,6 +51,7 @@ const float OFFSET_CUBE = 0.000001f;
 
 inline Camera camera = Camera();
 
+// Struct containing all common OpenGl buffers.s
 struct Buffers {
     GLuint vao;
     GLuint vbo_g;
@@ -60,6 +61,7 @@ struct Buffers {
     GLuint ebo;
 };
 
+// Struct containing all common vertex information.
 struct Coords {
     vector<vec3> vertex;
     vector<vec4> colors;
@@ -67,17 +69,20 @@ struct Coords {
     vector<vec3> normals;
 };
 
+// Struct containing each Entity world information.
 struct Model {
     vec3 position = vec3(0);
     vec3 scale = vec3(1);
     vec3 rotation = vec3(0);
 };
 
+// AABB Collision System not used in this simulation (but implementation is written)
 struct BoundingBox {
     vec3 botLeft = vec3(2);
     vec3 topRight = vec3(-2);
 };
 
+// Struct containing mouse information.
 struct Mouse {
     bool first_mouse = true;
     bool active_mode = false;
@@ -85,6 +90,7 @@ struct Mouse {
     float lastY;
 };
 
+// PlayState Input modes.
 enum InputMode {
     // in select mode user can select objects
     SELECT,
@@ -92,8 +98,10 @@ enum InputMode {
     INTERACT,
     // in passive mode user can move camera using passive mouse motion
     PASSIVE,
+    EMPTY
 };
 
+// Retrieves the String associated to each InputMode.
 inline string calcInputMode(InputMode mode) {
     switch (mode) {
     case SELECT:

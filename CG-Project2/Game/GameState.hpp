@@ -17,6 +17,9 @@ class GameState {
     virtual void update(GameEngine *engine) = 0;
     virtual void draw(GameEngine *engine) = 0;
 
+    /*
+     * Changes the current state in the new state given.
+     */
     inline void changeState(GameEngine *engine, GameState *state) { engine->changeState(state); }
 
   protected:
