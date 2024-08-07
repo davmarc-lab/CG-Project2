@@ -13,8 +13,7 @@ struct Colors {
 };
 
 struct Render {
-    Shader shader = Shader("./resources/shaders/menuVertexShader.glsl",
-                           "./resources/shaders/menuFragmentShader.glsl");
+    Shader shader = Shader("./resources/shaders/menuVertexShader.glsl", "./resources/shaders/menuFragmentShader.glsl");
     mat4 projection = mat4(1.0f);
 };
 
@@ -22,8 +21,11 @@ struct Addon {
     vector<Text *> labels;
 };
 
+/*
+ * This abstract class creates a simple button on the screen with a label and back/foreground color
+ */
 class Component {
-public:
+  public:
     Buffers buffers;
     Coords coords;
     Model model;
@@ -36,14 +38,12 @@ public:
         this->render.shader.setMat4("projection", textProjection);
     }
 
-    Component(vector<vec3> vertex, vector<vec4> colors)
-    : coords({vertex, colors}) {
+    Component(vector<vec3> vertex, vector<vec4> colors) : coords({vertex, colors}) {
         this->render.shader.use();
         this->render.shader.setMat4("projection", textProjection);
     }
 
-    Component(vector<vec3> vertex, vector<vec4> colors, vec3 pos, vec3 scale)
-    : coords({vertex, colors}), model({pos, scale}) {
+    Component(vector<vec3> vertex, vector<vec4> colors, vec3 pos, vec3 scale) : coords({vertex, colors}), model({pos, scale}) {
         this->render.shader.use();
         this->render.shader.setMat4("projection", textProjection);
     }
@@ -62,8 +62,7 @@ public:
 
     inline mat4 getModelMatrix() {
         const mat4 base = mat4(1.0f);
-        return base * translate(base, this->model.position) *
-            scale(base, this->model.scale);
+        return base * translate(base, this->model.position) * scale(base, this->model.scale);
     }
 
     inline Color getBackColor() { return this->color.bgColor; }
@@ -84,13 +83,11 @@ public:
 
     inline Color getFrontColor() { return this->color.fgColor; }
 
-    inline void setFrontColor(const Color color) {
-        this->color.fgColor = color;
-    }
+    inline void setFrontColor(const Color color) { this->color.fgColor = color; }
 
     /*
-    * This method takes all labels of a Component and re-center them.
-    */
+     * This method takes all labels of a Component and re-center them.
+     */
     inline void refreshLabelCenter() {
         for (const auto elem : this->addons.labels) {
             auto center = this->getPosition();

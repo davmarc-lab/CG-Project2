@@ -9,13 +9,19 @@
 #include <cmath>
 #include <set>
 
+/*
+ * This class creates an ImGui debug panel to check all logs during the execution.
+ */
 class IGDebug : private IGMenu {
   private:
     LogManager *log_manager = LogManager::instance();
 
+    // Current log to filter
     std::set<LogType> active_log_filter;
 
+    // Keep the focus on the last log
     bool track_logs = true;
+    // Flag that tells if the logs has a defined size or not. (If disabled could bring to lack of performance)
     bool m_active_autoclear = log_manager->getAutoclear();
 
     static void HelpMarker(const char *desc) {
@@ -40,13 +46,17 @@ class IGDebug : private IGMenu {
         ImGui::Begin("Debug Logger");
         ImGui::SeparatorText("Log Type Filter");
         ImGui::BeginGroup();
+
+        // Prints all the filter available
         for (auto t : logs::log_types) {
             ImGui::PushID(&t);
+            // If the filter is already activated, change the color of the button
             if (this->active_log_filter.find(t) != this->active_log_filter.end()) {
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8, 0, 0, 1));
             } else {
                 ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_Button));
             }
+            // When button is clicked remove or add the filter to the Set
             if (ImGui::Button(t.getLogTypeText())) {
                 if (this->active_log_filter.find(t) != this->active_log_filter.end())
                     this->active_log_filter.erase(t);
@@ -77,33 +87,40 @@ class IGDebug : private IGMenu {
         if (ImGui::BeginChild("Log Messages", ImVec2(-FLT_MIN, ImGui::GetTextLineHeightWithSpacing() * 8),
                               ImGuiChildFlags_Border | ImGuiChildFlags_ResizeY)) {
             ImGui::PopStyleColor();
+
+            // Start printing all logs every frame
             for (auto elem : log_manager->getLogs()) {
                 if (this->active_log_filter.find(elem.getLogTypeObject()) != this->active_log_filter.end()) {
                     ImGui::PushID(&elem);
+                    // Every Log has his color.
                     ImGui::TextColored(elem.getLogTypeColor(), "(%s) [%s]", elem.getLogTime(), elem.getLogType());
                     ImGui::SameLine();
                     ImGui::Text("=> %s", elem.getLogText());
                     ImGui::PopID();
                 }
+                // If track is enabled scroll to the last log in the set
                 if (this->track_logs && log_manager->getTrack() == log_manager->getLogs().size() - 1) {
                     ImGui::SetScrollHereY();
                 }
             }
         }
         ImGui::EndChild();
+        // Enable/Disable auto scroll to last log
         ImGui::Checkbox("Track", &this->track_logs);
         if (ImGui::Button("Clear##1")) {
             log_manager->clear();
             log_manager->resetTrack();
         }
         ImGui::SameLine();
+        // Enable/Disable autoclear feature
         if (ImGui::Checkbox("AutoClear", &this->m_active_autoclear)) {
             log_manager->setAutoclear(this->m_active_autoclear);
         }
         ImGui::SameLine();
+        // Info popup
         IGDebug::HelpMarker("If you are experiencing some lag, it might be here the problem.\n"
                             "This Logger is a bit expensive, every frame writes all the logs.\n"
-                            "So I implemented in a way that after \"255\" logs, it deletes the first log sent.\n"
+                            "So I implemented in a way that after \"50\" logs, it deletes the first log sent.\n"
                             "To disable this feature check the checkbox near clear, called \'AutoClear\'.\n"
                             "If you improve performance click the \'Clear\' button.");
 

@@ -7,6 +7,11 @@
 #include "Logger/LogManager.hpp"
 #include <cstdint>
 
+/*
+ * This class creates a custom ImGui Window and every frame renders an image that correspond
+ * to a texture obtained by drawing on a custom FrameBuffer and using a custom RenderBuffer
+ * Link: https://learnopengl.com/Advanced-OpenGL/Framebuffers
+ */
 class IGViewport : public IGMenu {
   private:
     float width;
@@ -71,6 +76,7 @@ class IGViewport : public IGMenu {
     inline void unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
     inline virtual void render() override {
+        // Start drawing on the custom frame buffer
         glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
         ImGui::Begin("Viewport");
         ImGui::BeginChild("Render");
@@ -78,10 +84,12 @@ class IGViewport : public IGMenu {
         this->width = ImGui::GetContentRegionAvail().x;
         this->height = ImGui::GetContentRegionAvail().y;
 
+        // Draw the texture obtained by binding the framebuffer, drawing the elements and restoring the default one.
         ImGui::Image((void *)(intptr_t)texture, ImGui::GetContentRegionAvail(), ImVec2(0, 1), ImVec2(1, 0));
 
         ImGui::EndChild();
         ImGui::End();
+        // Restore the original one
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 

@@ -3,9 +3,11 @@
 #include "../LibCustomGui.hpp"
 
 class IGMenu {
-private:
-
-public:
+  private:
+    /*
+     * This interface provides method to render an ImGui window.
+     */
+  public:
     IGMenu() {}
 
     virtual void render() = 0;

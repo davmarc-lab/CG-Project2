@@ -6,8 +6,11 @@
 
 #include "../Lib.hpp"
 
+/*
+ * This class creates the ImGui camera panel, to manage camera properties.
+ */
 class IGCamera : public IGMenu {
-public:
+  public:
     IGCamera() {}
 
     inline void render() {
@@ -20,6 +23,7 @@ public:
             updatePerspective(zoom);
             ActionManager::instance()->addAction(REFRESH_PROJ);
         }
+        // Restore the default camera fov
         if (ImGui::Button("Reset##1")) {
             camera.setCameraZoom(cmr::ZOOM);
             updatePerspective(cmr::ZOOM);
@@ -34,7 +38,6 @@ public:
         if (ImGui::Button("Reset##2")) {
             camera.moveCamera(cmr::POSITION);
         }
-        // Camera Rotation ?
 
         // Camera velocity
         auto velocity = camera.getCameraVelocity();

@@ -11,12 +11,18 @@
 
 extern int max_lights;
 
+/*
+ * This class creates an ImGui panel to manage all the lights in the scene.
+ */
 class IGLights : public IGMenu {
   private:
+    // List of all lights.
     vector<Light *> lights;
 
-    Light* del_light = nullptr;
+    // Selected light to be deleted.
+    Light *del_light = nullptr;
 
+    // Renders extra properties for directional light
     inline void renderDirectional(DirectionalLight *l) {
         ImGui::SeparatorText("Directional Light##1");
         auto dir = l->getDirection();
@@ -25,6 +31,7 @@ class IGLights : public IGMenu {
         }
     }
 
+    // Renders extra properties for point lights
     inline void renderPoint(PointLight *l) {
         ImGui::SeparatorText("Point Light");
 
@@ -50,6 +57,7 @@ class IGLights : public IGMenu {
         }
     }
 
+    // Renders extra properties for spot lights
     inline void renderSpot(SpotLight *l) {
         ImGui::SeparatorText("Spot Light");
 
@@ -98,9 +106,9 @@ class IGLights : public IGMenu {
 
     IGLights(vector<Light *> lights) : lights(lights) {}
 
-    inline void refreshLights(vector<Light*> lights) { this->lights = lights; }
+    inline void refreshLights(vector<Light *> lights) { this->lights = lights; }
 
-    inline Light* getLightToDelete() { return this->del_light; }
+    inline Light *getLightToDelete() { return this->del_light; }
 
     inline virtual void render() override {
         ImGui::Begin("Lights");
@@ -115,6 +123,7 @@ class IGLights : public IGMenu {
         }
 
         ImGui::SeparatorText("Light Sources");
+        // Print all lights common properties and after it render the extra ones.
         for (auto l : this->lights) {
             ImGui::PushID(l);
             auto type = getLightTypeName(l->getType());
@@ -164,6 +173,7 @@ class IGLights : public IGMenu {
                 }
             }
 
+            // If clicked adds an Action that will be handled in the PlayState
             if (ImGui::Button("Delete")) {
                 this->del_light = l;
                 ActionManager::instance()->addAction(Action::DEL_CUSTOM_LIGHT);
