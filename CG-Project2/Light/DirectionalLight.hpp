@@ -4,8 +4,12 @@
 
 #include "../Menu/Logger/LogManager.hpp"
 
+/*
+ * Creates a Directional light (usually is the sun).
+ */
 class DirectionalLight : public Light {
   private:
+    // Pointing direction of the light.
     vec3 direction = vec3(1, 0, 0);
 
   public:

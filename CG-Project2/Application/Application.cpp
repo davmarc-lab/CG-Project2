@@ -24,8 +24,9 @@ void Application::launch() {
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable MultiViewport Feature
 
     // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(window.getGLFWContext(),
-                                 true); // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    ImGui_ImplGlfw_InitForOpenGL(window.getGLFWContext(), true);
+    // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+
     ImGui_ImplOpenGL3_Init();
 
     game.init();
@@ -44,18 +45,19 @@ void Application::launch() {
 
     // Starting the game loop until the GLFWwindow closes or the engine stops
     while (!glfwWindowShouldClose(window.getGLFWContext()) && game.isRunning()) {
-        // Defines the GLFWwindow clear color (background color)
-        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        // Sets some flags for rendering purpose: enables the color buffer and the depth buffer for 3D
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // Polls all GLFW events like keyboard input, mouse input, etc.
+        glfwPollEvents();
 
         // Manages ImGui window every frame to adjust internal parameters
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // Polls all GLFW events like keyboard input, mouse input, etc.
-        glfwPollEvents();
+        // Defines the GLFWwindow clear color (background color)
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        // Sets some flags for rendering purpose: enables the color buffer and the depth buffer for 3D
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         current_frame = glfwGetTime();
         game.setDeltaTime(current_frame - lastFrame);
         lastFrame = current_frame;

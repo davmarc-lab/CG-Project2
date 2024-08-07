@@ -4,8 +4,12 @@
 
 #include "../Entity/Sphere.hpp"
 
+/*
+ * This class implements a simple Point light.
+ */
 class PointLight : public Light {
   private:
+    // Light and caster position.
     vec3 position = vec3(0);
     LightInfo info;
 

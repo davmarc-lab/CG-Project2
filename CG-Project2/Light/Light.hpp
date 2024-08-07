@@ -7,18 +7,22 @@
 
 extern int max_lights;
 
+/*
+ * Interface used to define Light classes behavior.
+ */
 class Light {
   public:
     vec3 color = vec3(1.0f);
     float intensity = 1.0f;
     LightVectors vectors;
+    // Defines the kind of light (Directional, Point or Spot).
     LightType type;
 
+    // Create the light caster if necessary (not for Directional lights).
     Entity *caster = nullptr;
+    // Caster Shader.
     Shader casterShader;
     bool show_caster = true;
-
-    mat4 custom_view = mat4(1.0f);
 
     vec3 getAmbient() { return this->vectors.ambient; }
 
@@ -53,19 +57,19 @@ class Light {
 
     inline Shader *getShader() { return &this->casterShader; }
 
+    // Retrieves true if the caster is allocated in memory.
     bool isCasterInstaced() { return this->caster != nullptr || this->type == LightType::DIRECTIONAL; }
 
+    // Tells to the scene if it must draw the light caster or not.
     bool showCaster() { return this->show_caster; }
 
-    inline mat4 getCustomView() { return this->custom_view; }
-
-    inline void setCustomView(mat4 view) { this->custom_view = view; }
-
+    // Simple toString to send data to the shader.
     inline string addIndexToString(string before, int index, string after) { return before + "[" + to_string(index) + "]." + after; }
 
-    /* ---Overrride Methods--- */
+    /* ---Override Methods--- */
     virtual void initCaster() = 0;
 
+    // Virtual method to send all the necessary data of each light to the shader.
     virtual void sendDataToShader(Shader shader, int index) = 0;
 
     virtual void drawCaster() = 0;
