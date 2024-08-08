@@ -37,11 +37,10 @@ void PlaneEntity::buildPlane() {
     }
 
     this->setPosition(vec3(0, -1, 0));
-    this->setScale(vec3(100, 0.00001f, 100));
+    this->setScale(vec3(100, 0, 100));
     this->setRotation(vec3(0));
 
     this->setCollider(new CubeCollider(&this->transform));
-    this->setStatic();
 }
 
 void PlaneEntity::createVertexArray() {

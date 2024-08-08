@@ -6,6 +6,9 @@
 
 inline ActionManager *am = ActionManager::instance();
 
+/*
+ * This class creates a popup menu to 
+ */
 class IGMousePopup : public IGMenu {
   private:
     const char *string_id;
@@ -23,13 +26,19 @@ class IGMousePopup : public IGMenu {
         if (ImGui::BeginPopup(this->string_id)) {
             ImGui::SeparatorText("Utility Menu");
 
+            // Print all available actions
             for (int i = 0; i < IM_ARRAYSIZE(actions); i++) {
+                // If is the Add option draw this sub menu
                 if (i == 0) {
                     if (ImGui::BeginMenu(actions[0])) {
+                        // Print all Add actions
                         for (int i = 0; i < IM_ARRAYSIZE(add_actions); i++) {
+                            // If is Lights, creates another submenu
                             if (i == 3) {
                                 if (ImGui::BeginMenu(add_actions[3])) {
+                                    // Print all light casters
                                     for (int j = 0; j < IM_ARRAYSIZE(light_types); j++) {
+                                        // Creates the menu entry and when clicked execute these actions.
                                         if (ImGui::MenuItem(light_types[j])) {
                                             switch (j) {
                                             case 0:
@@ -50,6 +59,7 @@ class IGMousePopup : public IGMenu {
                                 }
                                 continue;
                             }
+                            // Creates a menu entry for each element in the array above
                             if (ImGui::MenuItem(add_actions[i])) {
                                 switch (i) {
                                 case 0:

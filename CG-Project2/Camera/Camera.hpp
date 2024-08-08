@@ -7,6 +7,7 @@
 
 using namespace glm;
 
+// This namespace defines some camera default parameters used for initialization and reset button.
 namespace cmr {
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
@@ -17,6 +18,7 @@ const vec3 POSITION = vec3(0, 0, 3);
 const float TB_SPEED = 20.0f;
 } // namespace cmr
 
+// Store all the camera vectors.
 struct CameraVectors {
     vec3 cameraPos = cmr::POSITION;
     vec3 cameraFront = vec3(0, 0, -1);
@@ -26,6 +28,7 @@ struct CameraVectors {
     vec3 target = vec3(0);
 };
 
+// Store all the camera properties.
 struct CameraInfo {
     float speed = cmr::SPEED;
     float sensitivity = cmr::SENSITIVITY;
@@ -33,18 +36,24 @@ struct CameraInfo {
     float tb_speed = cmr::TB_SPEED;
 };
 
+// Used to store the camera rotation data.
 struct CameraRotation {
     float pitch = cmr::PITCH; // rotation around x axis
     float yaw = cmr::YAW;     // rotation around y axis
 };
 
+/*
+ * This class is used to create a camera pointed in a direction.
+ */
 class Camera {
   private:
+    // Defines the world y axis.
     vec3 worldUp = vec3(0, 1, 0);
     CameraVectors vectors;
     CameraInfo info;
     CameraRotation rotation;
 
+    // Update the camera vector after every movement.
     void updateCameraVectors() {
         this->vectors.cameraFront =
             normalize(vec3(cos(radians(this->rotation.yaw)) * cos(radians(this->rotation.pitch)),
@@ -57,6 +66,7 @@ class Camera {
   public:
     Camera() { this->updateCameraVectors(); }
 
+    // Retrieves the View matrix.
     inline mat4 getViewMatrix() {
         return glm::lookAt(this->vectors.cameraPos, this->vectors.cameraPos + this->vectors.cameraFront, this->vectors.cameraUp);
     }
@@ -95,11 +105,11 @@ class Camera {
 
     inline void setCameraTarget(vec3 target) { this->vectors.target = target; }
 
+    // This method changes the camera position and updates the camera vectors.
     void moveCamera(vec3 position);
 
+    // This method can be used to process the mouse input to move the camera in the space, it updates the vectors as well.
     void processMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
-
-    void rotateCamera(vec3 rotationAxis, float rotationValue);
 
     ~Camera() = default;
 };

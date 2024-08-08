@@ -57,7 +57,7 @@ class Shader {
     // This method use the shader.
     void use();
 
-    //---List of method for uniform values---
+    // ---List of method for sending uniform values---
 
     void setBool(const string &name, bool value);
     void setInt(const string &name, int value);

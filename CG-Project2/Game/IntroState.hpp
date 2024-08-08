@@ -2,6 +2,9 @@
 
 #include "GameState.hpp"
 
+/*
+* Creates the initial state of the game (Main menu).
+*/
 class IntroState : public GameState {
 
   public:

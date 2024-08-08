@@ -21,7 +21,6 @@
 #include "../Menu/Logger/LogManager.hpp"
 
 #include "Game.hpp"
-#include "IntroState.hpp"
 
 PlayState PlayState::playState;
 string mouse_popup_name = "Menu";
@@ -31,19 +30,19 @@ Sphere *sphere;
 PlaneEntity *plane;
 Cubemap *skybox;
 Shader lightShader, planeShader, skyboxShader, modelShader;
-Object *obj;
 
-DirectionalLight *pl = new DirectionalLight();
-SpotLight *ll = new SpotLight();
+DirectionalLight *sun = new DirectionalLight();
 
 Entity *obj_selected = nullptr;
 Shader *shader_selected = nullptr;
 
 Scene obj_scene;
 
+// Used to keep track of the current mode
 InputMode user_mode = InputMode::INTERACT;
-InputMode old_user_mode = user_mode;
+InputMode old_user_mode = InputMode::EMPTY;
 
+// All the imgui panels
 IGMode *modeMenu;
 IGCamera *cameraMenu;
 IGLights *lightsMenu;
@@ -61,13 +60,14 @@ Light *light_selected = nullptr;
 
 Mouse mouse;
 
-string string_buffer = "";
-
+// Getting global instances for the managerss
 ActionManager *action_manager = ActionManager::instance();
 LogManager *debug_log = LogManager::instance();
 
-GLFWwindow* current_context;
+// Backup glfw context
+GLFWwindow *current_context;
 
+// Callback used for the custom framebuffer used.
 void viewportFramebufferCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
     viep->rescaleRenderBuffer(width, height);
@@ -78,9 +78,15 @@ void PlayState::init() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
+    // Setting up the shader using light computation
     lightShader = Shader("./resources/shaders/lightVertexShader.glsl", "./resources/shaders/lightFragmentShader.glsl");
+
+    // Creating some starting textures
     Texture cube_texture = Texture("./resources/textures/web-dirt.png");
     cube_texture.createTexture();
+
+    Texture sphere_texture = Texture("./resources/textures/web-dirt.png");
+    sphere_texture.createTexture();
 
     cube = new CubeEntity();
     cube->createVertexArray();
@@ -88,10 +94,6 @@ void PlayState::init() {
     cube->setPosition(vec3(0, 1, 0));
     cube->setScale(vec3(1));
     cube->attachTexture(cube_texture);
-    // cube->setMaterial(material::NONE);
-
-    Texture sphere_texture = Texture("./resources/textures/web-dirt.png");
-    sphere_texture.createTexture();
 
     sphere = new Sphere();
     sphere->createVertexArray();
@@ -99,14 +101,14 @@ void PlayState::init() {
     sphere->setPosition(vec3(2, 0, 0));
     sphere->setScale(vec3(1));
     sphere->attachTexture(sphere_texture);
-    // sphere->setMaterial(material::NONE);
 
+    // Setting up the shader for the plane
     planeShader = Shader("./resources/shaders/vertexShader.glsl", "./resources/shaders/fragmentShader.glsl");
     planeShader.use();
     planeShader.setMat4("projection", projection);
     planeShader.setInt("color", 1);
 
-    plane = new PlaneEntity(color::RED);
+    plane = new PlaneEntity();
     plane->createVertexArray();
     debug_log->addLog(logs::SILENCE, "Instanced buffers for Plane");
 
@@ -123,44 +125,38 @@ void PlayState::init() {
     obj_scene.addElement(cube, &lightShader);
     obj_scene.addElement(sphere, &lightShader);
 
-    ll->initCaster();
-    ll->setPosition(vec3(1));
-    ll->setDirection(vec3(0, 1, 0));
+    sun->setColor(vec3(0.7, 0.5, 0.98));
+    sun->setIntensity(1.3f);
+    sun->setDirection(vec3(1, -1, 0));
 
-    // obj_scene.addLight(pl);
-    obj_scene.addLight(ll);
+    obj_scene.addLight(sun);
 
+    // shader used for imported Objects
     modelShader = Shader("./resources/shaders/lightVertexShader.glsl", "./resources/shaders/lightFragmentShader.glsl");
     modelShader.use();
     modelShader.setMat4("projection", projection);
 
-    obj = new Object("./resources/models/backpack/backpack.obj", Flip::VERTICALLY);
-    debug_log->addLog(logs::SILENCE, "Instanced buffers for imported Object");
-    obj->setPosition(vec3(0));
-    obj->setScale(vec3(0.5));
-    obj_scene.addElement(obj, &lightShader);
-
-    // imgui
+    // imgui panel init
     debug_log->addLog(logs::INIT, "Start Init ImGui menus");
 
     entityMenu = new IGEntity();
     modeMenu = new IGMode(&user_mode);
     cameraMenu = new IGCamera();
     lightsMenu = new IGLights(obj_scene.getLights());
+    viep->init();
     debug_log->addLog(logs::INIT, "End Init ImGui menus");
 
     debug_log->addLog(logs::INIT, "End Init PlayState");
-    viep->init();
 }
 
 void PlayState::pause() {}
 
 void PlayState::resume() {}
 
-GLenum val = GL_FALSE;
-
+// Callback used to manage cursor position in ImGui Windows.
 void clearCursorPosFunc(GLFWwindow *window, double x, double y) { ImGui_ImplGlfw_CursorPosCallback(window, x, y); }
 
+// Callback used to manage mouse click action in ImGui Windows.
 void clearMouseActionFunc(GLFWwindow *window, int button, int action, int mod) { ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod); }
 
 vec3 getTrackBallPoint(float x, float y) {
@@ -178,6 +174,7 @@ vec3 getTrackBallPoint(float x, float y) {
     return normalize(point);
 }
 
+// Callback used to manage the trackball movement in the scene.
 void mouseActiveMotion(GLFWwindow *window, double x, double y) {
     float speed = camera.getTrackballSpeed();
 
@@ -206,6 +203,7 @@ void mouseActiveMotion(GLFWwindow *window, double x, double y) {
     mouse.lastX = x;
     mouse.lastY = y;
 
+    // Necessary to not lose the ImGui Mouse inputs.
     ImGui_ImplGlfw_CursorPosCallback(window, x, y);
 }
 
@@ -217,6 +215,7 @@ void imGuiMouse2Popup() {
     }
 }
 
+// Callback used to activate the trackball movement
 void mouseInputFunc(GLFWwindow *window, int button, int action, int mod) {
 
     // for trackball input
@@ -228,29 +227,13 @@ void mouseInputFunc(GLFWwindow *window, int button, int action, int mod) {
         }
     }
 
-    // you can handle your ImGui::popup here
-    // that's because you cannot see the mouse in passive mode
-    // in select mode with left click you select objects
-
-    // seg fault in IsPopupOpen :/
-    /* if (user_mode == InputMode::INTERACT) {
-        // handle mouse input using ImGui
-        if (button == GLFW_MOUSE_BUTTON_2) {
-            // open popup
-            show_popup = true;
-        }
-
-        // left click out of the popup
-        if (show_popup && button == GLFW_MOUSE_BUTTON_1 && ImGui::IsPopupOpen(popup_name.c_str())) {
-            show_popup = false;
-        }
-    } */
-
     imGuiMouse2Popup();
 
+    // Necessary to not lose the ImGui Mouse inputs.
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);
 }
 
+// Callback used to manage passive mouse action.
 void passiveCursorPosFunc(GLFWwindow *window, double x, double y) {
     if (mouse.first_mouse) {
         mouse.first_mouse = false;
@@ -310,6 +293,7 @@ bool isRayInSphere(vec3 ray, vec3 sphere_pos, float sphere_radius, float *id) {
     }
 }
 
+// Callback used to manage mouse input during SELECT mode.
 void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
     // trackball movement
     if (button == GLFW_MOUSE_BUTTON_3) {
@@ -337,7 +321,7 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
             // distance between ray and object
             float dist = 0.f;
 
-            // check all the element of the scene for intersection with ray
+            // check all entities of the scene for intersection with ray
             for (auto elem : obj_scene.getElements()) {
                 auto current = elem.first;
                 auto shader = elem.second;
@@ -354,6 +338,7 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
             }
 
             debug_log->addLog(logs::ERROR, "Sphere radius value (0.1f) could be incorrect");
+            // for each light in the scene check if their caster is selected.
             for (auto caster : obj_scene.getLights()) {
                 if (caster->getType() != LightType::DIRECTIONAL && isRayInSphere(ray, caster->getCaster()->getPosition(), 0.1f, &dist)) {
                     if (obj_selected == nullptr || dist <= ci) {
@@ -379,11 +364,14 @@ void selectMouseFunc(GLFWwindow *window, int button, int action, int mod) {
 
     imGuiMouse2Popup();
 
+    // Necessary to not lose the ImGui Mouse inputs.
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);
 }
 
+// Callback used to not lose scroll input in ImGui Windows.
 void scrollPosFunc(GLFWwindow *window, double xoffset, double yoffset) { ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset); }
 
+// MAnage user input.
 void PlayState::handleEvent(GameEngine *engine) {
     current_context = engine->getWindow()->getGLFWContext();
     const float dt = engine->getDeltaTime();
@@ -399,14 +387,11 @@ void PlayState::handleEvent(GameEngine *engine) {
         user_mode = InputMode::PASSIVE;
     }
     if (glfwGetKey(current_context, GLFW_KEY_Q) == GLFW_PRESS || ImGui::IsKeyPressed(ImGuiKey_Q)) {
-        // This changeState kinda work for PlayState but need to test more
-        // engine->changeState(IntroState::instance());
-        debug_log->addLog(logs::GENERAL_EVENT, "Game Closing");
-        // Print all logs in a txt file
         engine->quit();
     }
 
-    if (user_mode != old_user_mode) {
+    // if is set the EMPTY InputMode or is different from the old one it changes mouse mode
+    if (user_mode != old_user_mode || old_user_mode == InputMode::EMPTY) {
         old_user_mode = user_mode;
         switch (user_mode) {
         case SELECT:
@@ -453,7 +438,6 @@ void PlayState::handleEvent(GameEngine *engine) {
     // Camera input
     float cameraVelocity = camera.getCameraVelocity() * engine->getDeltaTime();
     if (glfwGetKey(current_context, GLFW_KEY_W) == GLFW_PRESS) {
-        // lockKey(GLFW_KEY_W);
         auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraFront();
         camera.moveCamera(pos);
     }
@@ -485,6 +469,7 @@ void PlayState::handleEvent(GameEngine *engine) {
 void PlayState::update(GameEngine *engine) {
     glfwSetFramebufferSizeCallback(engine->getWindow()->getGLFWContext(), viewportFramebufferCallback);
     if (action_manager->isActionPresent()) {
+        // Gets all the action created during a single frame and execute them
         for (auto act : action_manager->getActions()) {
             switch (act) {
             case Action::ADD_CUBE_ENTITY:
@@ -528,7 +513,7 @@ void PlayState::update(GameEngine *engine) {
                 }
                 break;
             case Action::DEL_CUSTOM_LIGHT:
-                cout << obj_scene.removeElement(nullptr, nullptr, true, lightsMenu->getLightToDelete()) << endl;
+                // cout << obj_scene.removeElement(nullptr, nullptr, true, lightsMenu->getLightToDelete()) << endl;
                 lightsMenu->refreshLights(obj_scene.getLights());
                 break;
             case Action::REFRESH_PROJ:
@@ -549,9 +534,11 @@ void PlayState::update(GameEngine *engine) {
                 break;
             }
         }
+        // At the end of the computation clears the Action queue
         action_manager->clear();
     }
 
+    // Sets for each shader all view information.
     lightShader.use();
     lightShader.setMat4("view", camera.getViewMatrix());
     lightShader.setVec3("viewPos", camera.getCameraPosition());
@@ -567,6 +554,7 @@ void PlayState::update(GameEngine *engine) {
     skyboxShader.setMat4("view", mat4(mat3(camera.getViewMatrix())));
 }
 
+// Online library to open a simple file picker.
 void showObjectPicker() {
     IGFD::FileDialogConfig config;
     config.path = "./resources/models/";
@@ -614,18 +602,22 @@ void showObjectPicker() {
 }
 
 void PlayState::draw(GameEngine *engine) {
+    // If is clicked the Play button it opens a little ImGui Window and now it renders in that window.
+    // All the inputs are still read from the main viewport (problem).
     if (simulation_running) {
         viep->bind();
     }
     skybox->draw(skyboxShader);
     plane->draw(planeShader);
 
+    // Draw the scene (objects and light casters)
     obj_scene.draw();
     if (simulation_running) {
         viep->unbind();
         viep->render();
     }
 
+    // Draw all the ImGui Windows
     entityMenu->render();
     modeMenu->render();
     cameraMenu->render();
@@ -640,14 +632,21 @@ void PlayState::draw(GameEngine *engine) {
 }
 
 void PlayState::clean() {
-    // delete obj_selected;
-    // delete shader_selected;
+
+    delete cube;
+    delete sphere;
     delete plane;
     delete skybox;
-    delete entityMenu;
+
+    delete sun;
+
+    delete shader_selected;
+
     delete modeMenu;
     delete cameraMenu;
     delete lightsMenu;
+    delete entityMenu;
     delete mousePopup;
     delete debugMenu;
+    delete viep;
 }

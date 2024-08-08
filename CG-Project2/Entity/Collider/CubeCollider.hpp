@@ -63,13 +63,13 @@ public:
         vec3 topPoint = ((CubeCollider *)collider)->getBoundingBox().topRight;
         vec3 botPoint = ((CubeCollider *)collider)->getBoundingBox().botLeft;
 
-        bool botCollisionX = this->box.botLeft.x - MARGIN_CUBE <= topPoint.x + MARGIN_CUBE && this->box.topRight.x - MARGIN_CUBE >= botPoint.x + MARGIN_CUBE;
-        bool botCollisionY = this->box.botLeft.y - MARGIN_CUBE <= topPoint.y + MARGIN_CUBE && this->box.topRight.y - MARGIN_CUBE >= botPoint.y + MARGIN_CUBE;
-        bool botCollisionZ = this->box.botLeft.z - MARGIN_CUBE <= topPoint.z + MARGIN_CUBE && this->box.topRight.z - MARGIN_CUBE >= botPoint.z + MARGIN_CUBE;
+        bool botCollisionX = this->box.botLeft.x <= topPoint.x && this->box.topRight.x >= botPoint.x;
+        bool botCollisionY = this->box.botLeft.y <= topPoint.y && this->box.topRight.y >= botPoint.y;
+        bool botCollisionZ = this->box.botLeft.z <= topPoint.z && this->box.topRight.z >= botPoint.z;
 
-        bool topCollisionX = this->box.botLeft.x - MARGIN_CUBE <= topPoint.x + MARGIN_CUBE && this->box.topRight.x - MARGIN_CUBE >= botPoint.x + MARGIN_CUBE;
-        bool topCollisionY = this->box.botLeft.y - MARGIN_CUBE <= topPoint.y + MARGIN_CUBE && this->box.topRight.y - MARGIN_CUBE >= botPoint.y + MARGIN_CUBE;
-        bool topCollisionZ = this->box.botLeft.z - MARGIN_CUBE <= topPoint.z + MARGIN_CUBE && this->box.topRight.z - MARGIN_CUBE >= botPoint.z + MARGIN_CUBE;
+        bool topCollisionX = this->box.botLeft.x <= topPoint.x && this->box.topRight.x >= botPoint.x;
+        bool topCollisionY = this->box.botLeft.y <= topPoint.y && this->box.topRight.y >= botPoint.y;
+        bool topCollisionZ = this->box.botLeft.z <= topPoint.z && this->box.topRight.z >= botPoint.z;
 
         return (botCollisionX && botCollisionY && botCollisionZ) && (topCollisionX && topCollisionY && topCollisionZ);
     }

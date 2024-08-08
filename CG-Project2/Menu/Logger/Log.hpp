@@ -7,6 +7,9 @@
 
 static int auto_id = 0;
 
+/*
+ * This class defines the behaviour of a Log category to manage filters.
+ */
 class LogType {
   private:
     int id;
@@ -22,8 +25,7 @@ class LogType {
         auto_id++;
     }
 
-    inline static void incrementIndex() { auto_id++; }
-
+    // Simple operator to keep logs sorted by time.
     friend bool operator<(LogType t1, LogType t2) { return t1.id < t2.id; }
 
     inline const char *getLogType() { return this->m_log_type; }
@@ -55,6 +57,9 @@ inline std::set<LogType> log_types = {GENERAL_EVENT, USER_MODE,     MISSING_IMPL
 
 } // namespace logs
 
+/*
+ * This class defines a Log with a category, description and time.
+ */
 class Log {
   private:
     LogType m_type;

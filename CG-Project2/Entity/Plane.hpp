@@ -10,7 +10,7 @@ class PlaneEntity : public Entity {
     void buildPlane();
 
   public:
-    PlaneEntity() : PlaneEntity(color::BLACK) {}
+    PlaneEntity() : PlaneEntity(color::GRAY) {}
 
     PlaneEntity(Color color) {
         this->color = color;

@@ -10,15 +10,23 @@
 #include <string>
 #endif
 
+/*
+ * This class creates an ImGui entity manager panel.
+ */
 class IGEntity : public IGMenu {
 
   private:
+    // Selected entity
     Entity *obj_observer = nullptr;
+    // His shader
     Shader *shader_observer = nullptr;
 
+    // All light models implemented
     const char *light_models[5] = {"Phong", "Blinn-Phong", "Int Phong", "Int Blinn-Phong", "None"};
     int selected_model = 0;
     int selected_material = 0;
+
+    bool scale_lock_flag = false;
 
     enum AXIS { X, Y, Z, NONE };
 
@@ -88,21 +96,16 @@ class IGEntity : public IGMenu {
             auto scale = this->obj_observer->getScale();
             auto rot = this->obj_observer->getRotation();
 
-            static bool lockFlag = false;
             vector<AXIS> scaleAxis;
 
             if (ImGui::CollapsingHeader("Transform")) {
                 ImGui::SeparatorText("Position");
                 ImGui::Text("Position:");
-                if (ImGui::DragFloat("x", &pos.x, 0.005, 0.f)) {
-                    this->obj_observer->setMotionTime(0);
-                }
-                if (ImGui::DragFloat("y", &pos.y, 0.005)) {
-                    this->obj_observer->setMotionTime(0);
-                }
-                if (ImGui::DragFloat("z", &pos.z, 0.005)) {
-                    this->obj_observer->setMotionTime(0);
-                }
+
+                ImGui::DragFloat("x", &pos.x, 0.005, 0.f);
+                ImGui::DragFloat("y", &pos.y, 0.005);
+                ImGui::DragFloat("z", &pos.z, 0.005);
+
                 if (ImGui::Button("Reset")) {
                     pos = vec3(0);
                 }
@@ -123,8 +126,8 @@ class IGEntity : public IGMenu {
                     scale = vec3(1);
                 }
 
-                ImGui::Checkbox("Lock All", &lockFlag);
-                if (lockFlag) {
+                ImGui::Checkbox("Lock All", &scale_lock_flag);
+                if (scale_lock_flag) {
                     scale = updateOtherValues(scale, findAxis(scaleAxis));
                 }
 
@@ -161,7 +164,7 @@ class IGEntity : public IGMenu {
                         std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
                         std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
 
-                        // action
+                        // if is using windows parse the path before using
 #ifdef _WIN32
                         {
                             // make custom path for windows
@@ -200,12 +203,14 @@ class IGEntity : public IGMenu {
             if (ImGui::CollapsingHeader("Material")) {
                 auto mat = this->obj_observer->getMaterial();
                 if (ImGui::BeginCombo("Material Selected", material::materials[this->selected_material].getName())) {
+                    // Opens a list of default materials, and apply changes when one is clicked.
                     for (int i = 0; i < material::materials.size(); i++) {
                         if (ImGui::Selectable(material::materials[i].getName(), (this->selected_material == i))) {
                             this->selected_material = i;
                             this->obj_observer->setMaterial(material::materials[i]);
                         }
 
+                        // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
                         if (this->selected_material == i) {
                             ImGui::SetItemDefaultFocus();
                         }
@@ -216,14 +221,15 @@ class IGEntity : public IGMenu {
 
             if (ImGui::CollapsingHeader("Light Complexity")) {
                 if (ImGui::BeginCombo("Light Model", this->light_models[this->selected_model])) {
-                    for (int n = 0; n < IM_ARRAYSIZE(this->light_models); n++) {
-                        if (ImGui::Selectable(this->light_models[n], this->selected_model == n)) {
-                            this->selected_model = n;
+                    // Opens a list of default light model, apply changes when one is clicked.
+                    for (int i = 0; i < IM_ARRAYSIZE(this->light_models); i++) {
+                        if (ImGui::Selectable(this->light_models[i], this->selected_model == i)) {
+                            this->selected_model = i;
                             this->obj_observer->setLightComputation(this->selected_model);
                         }
 
                         // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-                        if (this->selected_model == n)
+                        if (this->selected_model == i)
                             ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();

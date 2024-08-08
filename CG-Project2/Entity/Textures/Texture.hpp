@@ -2,6 +2,9 @@
 
 #include "../../Lib.hpp"
 
+/*
+ * This class is used to create Texture for Entity objects.
+ */
 class Texture
 {
 private:

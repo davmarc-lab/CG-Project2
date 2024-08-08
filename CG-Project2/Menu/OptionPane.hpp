@@ -5,6 +5,9 @@
 
 enum LightModel { PHONG, BLINN_PHONG, STANDARD };
 
+/*
+ * This class creates the Option section when starts the application.
+ */
 class OptionPane {
 private:
     vector<pair<LightModel, string>> lightModels = {

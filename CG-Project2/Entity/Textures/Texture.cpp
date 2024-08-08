@@ -14,8 +14,10 @@ Texture::Texture(const char *path) : path(path) {
     this->data = stbi_load(path, &this->width, &this->height, &this->channelsNumber, 0);
 }
 
+// Creates a texture using the OpenGL default mode.
 void Texture::createTexture(bool pixelated) { this->createTexture(DEFAULT_MODE, pixelated); }
 
+// Creates a texture using the given OpenGL mode.
 void Texture::createTexture(GLuint mode, bool pixelated) {
     if (this->data != NULL) {
         GLenum format;

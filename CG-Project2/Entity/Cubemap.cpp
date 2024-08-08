@@ -21,14 +21,15 @@ float skyboxVertices[] = {
     -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
 
 vector<string> faces = {
-    "./resources/textures/skybox/right.jpg",  "./resources/textures/skybox/left.jpg",  "./resources/textures/skybox/top.jpg",
-    "./resources/textures/skybox/bottom.jpg", "./resources/textures/skybox/front.jpg", "./resources/textures/skybox/back.jpg",
+    "./resources/textures/skybox/space/right.jpg",  "./resources/textures/skybox/space/left.jpg",  "./resources/textures/skybox/space/top.jpg",
+    "./resources/textures/skybox/space/bottom.jpg", "./resources/textures/skybox/space/front.jpg", "./resources/textures/skybox/space/back.jpg",
 };
 
-unsigned char *data_read;
 
+// Loads a cubemap from a jpg file, all paths are stored in the faces Vector above.
 GLuint loadCubemap() {
     unsigned int textureID;
+    unsigned char *data_read;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 

@@ -2,8 +2,11 @@
 
 #include "Component.hpp"
 
+/*
+ * A ButtonComponent provides features to manage a button on the screen.
+ */
 class ButtonComponent : public Component {
-private:
+  private:
     float vertices[12] = {
         -1.0f, -1.0f, 0.0f, // bottom left
         -1.0f, 1.0f,  0.0f, // top left
@@ -15,16 +18,16 @@ private:
     int nvertex = 6;
 
     Text *label;
+    Shader shader;
 
-public:
+  public:
     ButtonComponent() : Component() {
         label = new Text("No Label", 20);
         this->addons.labels.push_back(label);
+        this->shader = Shader("./resources/shaders/textVertexShader.glsl", "./resources/shaders/textFragmentShader.glsl");
     }
 
-    ButtonComponent(vec3 buttonPos, Color color, string text,
-                    unsigned int textSize, Color textColor)
-        : Component() {
+    ButtonComponent(vec3 buttonPos, Color color, string text, unsigned int textSize, Color textColor) : Component() {
         this->color.bgColor = color;
         this->color.fgColor = textColor;
 
@@ -37,11 +40,10 @@ public:
         this->label->setColor(this->getFrontColor());
         this->setPosition(buttonPos);
         this->addLabel(label);
+        this->shader = Shader("./resources/shaders/textVertexShader.glsl", "./resources/shaders/textFragmentShader.glsl");
     }
 
-    inline void setFontSize(const unsigned int size) {
-        this->label->setFontSize(size);
-    }
+    inline void setFontSize(const unsigned int size) { this->label->setFontSize(size); }
 
     inline void setText(string text) { this->label->setText(text); }
 
@@ -51,6 +53,7 @@ public:
 
     inline void setLabelColor(Color color) { this->label->setColor(color); }
 
+    // Retrieves if the mouse is in the button bounding box. (AABB vs Point)
     inline bool isMouseColliding(const vec2 mousePos) {
         vec3 topRight = vec3(this->getModelMatrix() * vec4(1));
         vec3 botLeft = vec3(this->getModelMatrix() * vec4(-1, -1, -1, 1));
@@ -69,20 +72,16 @@ public:
         glBindVertexArray(this->buffers.vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, this->buffers.vbo_g);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(this->vertices), this->vertices,
-                     GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(this->vertices), this->vertices, GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->buffers.ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(this->indices),
-                     this->indices, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(this->indices), this->indices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-                              (void *)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
         glEnableVertexAttribArray(0);
 
         glBindBuffer(GL_ARRAY_BUFFER, this->buffers.vbo_c);
-        glBufferData(GL_ARRAY_BUFFER, this->coords.colors.size() * sizeof(vec4),
-                     this->coords.colors.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, this->coords.colors.size() * sizeof(vec4), this->coords.colors.data(), GL_STATIC_DRAW);
 
         glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
         glEnableVertexAttribArray(1);
@@ -100,12 +99,8 @@ public:
         // render addons
         // --- Text ---
         if (this->addons.labels.size() > 0) {
-            // create Shader for text
-            Shader textShader =
-                Shader("./resources/shaders/textVertexShader.glsl",
-                       "./resources/shaders/textFragmentShader.glsl");
             for (Text *elem : this->addons.labels) {
-                elem->renderText(textShader);
+                elem->renderText(this->shader);
             }
         }
     }
@@ -113,14 +108,13 @@ public:
     inline void refresh() override {
         // refresh colors buffer
         glBindBuffer(GL_ARRAY_BUFFER, this->buffers.vbo_c);
-        glBufferData(GL_ARRAY_BUFFER, this->coords.colors.size() * sizeof(vec4),
-                     this->coords.colors.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, this->coords.colors.size() * sizeof(vec4), this->coords.colors.data(), GL_STATIC_DRAW);
     }
 
     inline void clear() override {
         this->label->clear();
 
-        for (const auto elem: this->addons.labels) {
+        for (const auto elem : this->addons.labels) {
             elem->clear();
         }
 

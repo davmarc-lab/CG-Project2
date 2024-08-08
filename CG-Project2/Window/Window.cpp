@@ -16,6 +16,7 @@ Window::Window(const char *name, int w, int h) {
 
     if (this->initializeWindow() != 0) {
         cout << "Cannot start the application, due to GLFW error" << endl;
+        exit(-1);
     }
 }
 

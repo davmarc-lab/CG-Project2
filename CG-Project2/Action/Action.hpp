@@ -1,5 +1,9 @@
 #pragma once
 
+/*
+ * This enum is used to tell what Action should do the Engine when something
+ * happen in ImGui windows.
+ */
 enum Action {
     ADD_CUBE_ENTITY,
     ADD_SPHERE_ENTITY,

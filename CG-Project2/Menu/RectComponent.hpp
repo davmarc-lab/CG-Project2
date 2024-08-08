@@ -2,6 +2,9 @@
 
 #include "Component.hpp"
 
+/*
+ * This class creates a simple rectangle with a label inside.
+ */
 class RectComponent : public Component {
 private:
     float vertices[12] = {

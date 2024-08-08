@@ -2,6 +2,9 @@
 
 #include "Game.hpp"
 
+/*
+ * This interface permits to create a Singleton GameState object.
+ */
 class GameState {
   public:
     virtual void init() = 0;
@@ -14,6 +17,9 @@ class GameState {
     virtual void update(GameEngine *engine) = 0;
     virtual void draw(GameEngine *engine) = 0;
 
+    /*
+     * Changes the current state in the new state given.
+     */
     inline void changeState(GameEngine *engine, GameState *state) { engine->changeState(state); }
 
   protected:

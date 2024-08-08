@@ -4,11 +4,15 @@
 
 #include "../Entity/Sphere.hpp"
 
+/*
+ * This class implements a Spot light (something like a torch).
+ */
 class SpotLight : public Light {
   private:
     vec3 position = vec3(0);
     vec3 direction = vec3(1);
     LightInfo info;
+    // Light extra parameters.
     float cutOff = 12.5f;
     float outer_cutOff = 17.5f;
 

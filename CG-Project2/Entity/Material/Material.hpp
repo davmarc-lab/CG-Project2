@@ -5,20 +5,25 @@
 #include <glm/vec3.hpp>
 #include <vector>
 
+/*
+ * Class used to create Materials for the Entities.
+ */
 class Material {
   private:
     LightVectors vectors;
 
     float shininess;
 
-    const char* name;
+    const char *name;
 
   public:
     // default material = RED_PLASTIC
     Material() : Material(glm::vec3(0), glm::vec3(0.5, 0, 0), glm::vec3(0.7, 0.6, 0.6), 32, "None") {}
 
-    Material(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float shininess, const char* name);
+    // Constructs custom material from the given parameters.
+    Material(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float shininess, const char *name);
 
+    // Define a simple operator to compare Materials objects.
     inline friend bool operator==(Material m1, Material m2) {
         return m1.shininess == m2.shininess && m1.vectors.ambient == m2.vectors.ambient && m1.vectors.diffuse == m2.vectors.diffuse &&
                m1.vectors.specular == m2.vectors.specular;
@@ -32,13 +37,18 @@ class Material {
 
     inline float getShininess() { return this->shininess; }
 
-    inline const char* getName() { return this->name; }
+    inline const char *getName() { return this->name; }
 
     ~Material() = default;
 };
 
+/*
+ * This namespace provides some material that can be used in the application.
+ * ImGui uses the materials Vector to process ui informations.
+ */
 namespace material {
-const Material EMERALD(glm::vec3(0.0215f, 0.1745f, 0.0215f), glm::vec3(0.07568f, 0.61424f, 0.07568f), glm::vec3(0.633f, 0.727811f, 0.633f), 76.8f, "Emerald");
+const Material EMERALD(glm::vec3(0.0215f, 0.1745f, 0.0215f), glm::vec3(0.07568f, 0.61424f, 0.07568f), glm::vec3(0.633f, 0.727811f, 0.633f), 76.8f,
+                       "Emerald");
 
 const Material BRASS(glm::vec3(0.329412f, 0.223529f, 0.027451f), glm::vec3(0.780392f, 0.568627f, 0.113725f),
                      glm::vec3(0.992157f, 0.941176f, 0.807843f), 27.8974f, "Brass");
@@ -52,4 +62,3 @@ const Material YELLOW_PLASTIC(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.5f, 0.5f,
 const Material NONE(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 32.0f, "None");
 inline std::vector<Material> materials = {NONE, EMERALD, BRASS, SLATE, RED_PLASTIC, YELLOW_PLASTIC};
 } // namespace material
-
