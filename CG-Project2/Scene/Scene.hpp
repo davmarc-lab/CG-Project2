@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Entity/Entity.hpp"
-#include "../Entity/Object.hpp"
 #include "../Shader/Shader.hpp"
 
 #include "../Light/Light.hpp"
@@ -9,20 +8,25 @@
 #include <cassert>
 #include <vector>
 
+/*
+ * This class create a Scene containing each entity, shader and light in the viewport.
+ */
 class Scene {
   private:
+    // Stores all the entity with the corrisponding shader to be used
     vector<std::pair<Entity *, Shader *>> elements;
-    vector<std::pair<Object *, Shader *>> custom_obj;
 
+    // Vector used to draw lights caster
     vector<Light *> lights;
 
   public:
     Scene() {}
 
+    // Add an entity in the scene.
     void addElement(Entity *e, Shader *shader);
 
-    void addCustomObj(Object *m, Shader *shader);
-
+    // Remove an entity or a lights from the scene.
+    // Retrieves true if the element was erased.
     bool removeElement(Entity *e, Shader *s, bool is_light_selected, Light *light_selected);
 
     inline vector<std::pair<Entity *, Shader *>> getElements() { return this->elements; }
@@ -31,6 +35,7 @@ class Scene {
 
     inline vector<Light *> getLights() { return this->lights; }
 
+    // Draw all the elements in the scene.
     void draw();
 
     inline void clear() {
@@ -40,7 +45,6 @@ class Scene {
         }
 
         this->elements.clear();
-        this->custom_obj.clear();
         this->lights.clear();
     }
 

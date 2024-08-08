@@ -21,7 +21,6 @@
 #include "../Menu/Logger/LogManager.hpp"
 
 #include "Game.hpp"
-#include "IntroState.hpp"
 
 PlayState PlayState::playState;
 string mouse_popup_name = "Menu";

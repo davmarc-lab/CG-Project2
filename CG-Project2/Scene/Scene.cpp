@@ -10,13 +10,12 @@ void Scene::addElement(Entity *e, Shader *s) {
     this->elements.push_back(std::make_pair(e, s));
 }
 
-void Scene::addCustomObj(Object *o, Shader *s) { this->custom_obj.push_back(std::make_pair(o, s)); }
-
 bool Scene::removeElement(Entity *e, Shader *s, bool is_light_selected = false, Light *light_selcted = nullptr) {
     // if is selected a light, delete from light scene
     if (is_light_selected) {
         return this->lights.erase(std::find(this->lights.begin(), this->lights.end(), light_selcted)) != this->lights.end();
     }
+    // find the corresponding iterator (element) to be removed, and if is present erase it.
     return this->elements.erase(std::remove(this->elements.begin(), this->elements.end(), pair(e, s)), this->elements.end()) != this->elements.end();
 }
 
@@ -46,9 +45,11 @@ void Scene::draw() {
                 }
             }
         }
+        // After light informations was sent, draw the entity.
         e.first->draw(*e.second);
     }
 
+    // If there are Spotligt or Pointlight draw their caster.
     if (this->lights.size() >= 1) {
         // draw light caster
         for (auto l : this->getLights()) {

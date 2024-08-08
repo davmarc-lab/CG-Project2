@@ -1,26 +1,32 @@
 #pragma once
 
-#include "Camera/Camera.hpp"
-#include <vector>
 #define GLM_ENABLE_EXPERIMENTAL
 
+#include "Camera/Camera.hpp"
+
+// Libraries path for Visual Studio solution
 #ifdef _WIN32
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#else
+#else // Libraries path using terminal
 #include "dependencies/include/glad/glad.h"
 #include "dependencies/include/GLFW/glfw3.h"
 #endif
+
+// glm must be installed in the system if not using VS solution
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
+
 #include <iostream>
+#include <vector>
 
 using namespace std;
 using namespace glm;
 
+// Useful methods to fast print values
 inline void debug(string text) { cout << "-- DEBUG -- " << text << endl; }
 
 inline void warning(string text) { cout << "-- WARNING -- " << text << endl; }
@@ -31,23 +37,22 @@ inline void printVec2(vec2 vec) { cout << to_string(vec) << endl; }
 
 inline void printMat4(mat4 mat) { cout << to_string(mat) << endl; }
 
+// Primary Window dimension
 const float WIDTH = 1200.f, HEIGHT = 700.f;
 
+// Default text projection matrix
 const mat4 textProjection = ortho(0.f, WIDTH, 0.f, HEIGHT);
 
+// Global Projection Matrix
 inline mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
 
-// method used to update the perspective matrix if the camera zoom is modified.
+// Method used to update the perspective matrix if the camera zoom is modified.
 inline void updatePerspective(float zoom) {
       projection = glm::perspective(glm::radians(zoom), (float)WIDTH / (float)HEIGHT, 0.01f, 100.0f);
 }
 
+// Initial max number lights computed in shaders
 inline int max_lights = 4;
-
-const float BLOCK_DIM = 0.1f;
-const float OUTLINE_DIM = 0.001f;
-const float MARGIN_CUBE = -0.01f;
-const float OFFSET_CUBE = 0.000001f;
 
 inline Camera camera = Camera();
 
