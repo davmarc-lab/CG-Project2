@@ -597,7 +597,26 @@ void showObjectPicker() {
                 filePathName = string(res);
             }
 #endif
-            obj_scene.addElement(new Object(filePathName.c_str()), &lightShader);
+            // flip the texture?
+
+            ImGui::OpenPopup("Flip");
+            auto center = ImGui::GetMainViewport()->GetCenter();
+            ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+
+            Flip flip = Flip::KEEP;
+            // OOF
+
+            if (ImGui::BeginPopupModal("Flip Texture")) {
+                ImGui::TextWrapped("Do you want to Flip the texture?");
+                if (ImGui::Button("Yes")) {
+                    flip = Flip::VERTICALLY;
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::EndPopup();
+            }
+
+            obj_scene.addElement(new Object(filePathName.c_str(), flip), &lightShader);
         }
         // close
         ImGuiFileDialog::Instance()->Close();
