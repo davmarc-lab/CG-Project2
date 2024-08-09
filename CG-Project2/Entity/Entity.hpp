@@ -26,7 +26,7 @@ class Entity {
     Material material = material::NONE;
 
     // Define the Light complexity for each Entity.
-    int light_comp = LightComp::PHONG;
+    int light_comp = LightComp::DEFAULT;
 
     // Store Entity's Collider shape.
     Collider* collider;
@@ -132,7 +132,7 @@ class Entity {
     inline void setMaterial(Material material) { this->material = material; }
     
     // Retrieves true if the Entity should be affected by the lights in the Scene.
-    inline bool isAffectedByLight() { return this->light_comp != LightComp::NONE; }
+    inline bool isAffectedByLight() { return this->light_comp != LightComp::DEFAULT; }
 
     inline void setLightComputation(int val) { this->light_comp = val; }
 

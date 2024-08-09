@@ -513,15 +513,19 @@ void PlayState::update(GameEngine *engine) {
                 }
                 break;
             case Action::DEL_CUSTOM_LIGHT:
-                // cout << obj_scene.removeElement(nullptr, nullptr, true, lightsMenu->getLightToDelete()) << endl;
+                // Delete a light from using the light panel
+                obj_scene.removeElement(nullptr, nullptr, true, lightsMenu->getLightToDelete());
+                // Updates the changes in the light panel
                 lightsMenu->refreshLights(obj_scene.getLights());
                 break;
             case Action::REFRESH_PROJ:
+                // updates the projection matrix if zoom is modified
                 planeShader.use();
                 planeShader.setMat4("projection", projection);
 
                 skyboxShader.use();
                 skyboxShader.setMat4("projection", projection);
+                break;
             case Action::START_SIM: {
                 simulation_running = true;
                 break;

@@ -30,11 +30,11 @@ void Scene::draw() {
 
     for (auto e : this->elements) {
         // if the entity is affected by lights, checks if there are lights
+        e.second->use();
+        e.second->setInt("light_comp", e.first->getLightComputation());
         if (e.first->isAffectedByLight()) {
-            e.second->use();
             // send data to shader to compute lights or not
             e.second->setInt("num_lights", this->lights.size());
-            e.second->setInt("light_comp", e.first->getLightComputation());
 
             // If there is a light in the scene sends data
             if (this->lights.size() >= 1) {

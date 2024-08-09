@@ -45,7 +45,7 @@ uniform sampler2D ourTexture;
 // Normal vector
 in vec3 Normal;
 
-// Entity affected by light
+// Light computation
 uniform int light_comp;
 
 // Light parameters
@@ -157,7 +157,7 @@ void main() {
         // interpolative shading
         result = res_int_shading;
     } else {
-        result = texture(ourTexture, TexCoord).rgb;
+        result = vec3(1);
     }
 
     FragColor = vec4(result * texture(ourTexture, TexCoord).rgb, 1.0);

@@ -74,6 +74,8 @@ void CubeEntity::draw(Shader shader) {
     shader.setMat4("projection", projection);
     shader.setMat4("model", this->getModelMatrix());
 
+
+
     // Entity material
     shader.setVec3("material.ambient", this->material.getAmbient());
     shader.setVec3("material.diffuse", this->material.getDiffuse());
