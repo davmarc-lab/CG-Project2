@@ -53,6 +53,7 @@ IGViewport *viep = new IGViewport();
 
 bool show_popup = false;
 bool show_object_picker = false;
+bool wait_for_modal = false;
 bool simulation_running = false;
 
 bool is_light_selected;
@@ -211,7 +212,7 @@ void mouseActiveMotion(GLFWwindow *window, double x, double y) {
 void imGuiMouse2Popup() {
     // If you open moultiple popup it broke
     if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-        mousePopup->openPopup();    
+        mousePopup->openPopup();
     }
 }
 
@@ -559,68 +560,82 @@ void PlayState::update(GameEngine *engine) {
 }
 
 // Online library to open a simple file picker.
+
+std::string filePathName;
+
 void showObjectPicker() {
-    IGFD::FileDialogConfig config;
-    config.path = "./resources/models/";
-    ImGuiFileDialog::Instance()->OpenDialog("ChooseObject", "Choose Object File", ".obj", config);
+    if (wait_for_modal == false) {
+        IGFD::FileDialogConfig config;
+        config.path = "./resources/models/";
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseObject", "Choose Object File", ".obj", config);
 
-    if (ImGuiFileDialog::Instance()->Display("ChooseObject")) {
-        if (ImGuiFileDialog::Instance()->IsOk()) {
-            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+        if (ImGuiFileDialog::Instance()->Display("ChooseObject")) {
+            if (ImGuiFileDialog::Instance()->IsOk()) {
+                filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
 
-            // Windows parser -- TODO resource manager
+                // Windows parser -- TODO resource manager
 #ifdef _WIN32
-            {
-                // make custom path for windows
-                std::vector<std::string> words;
-                std::string word;
-                std::istringstream stream(filePathName);
-                bool start_writing = false, add_sep = true;
-                string res = "./";
+                {
+                    // make custom path for windows
+                    std::vector<std::string> words;
+                    std::string word;
+                    std::istringstream stream(filePathName);
+                    bool start_writing = false, add_sep = true;
+                    string res = "./";
 
-                while (std::getline(stream, word, '\\')) {
-                    std::istringstream subStream(word);
-                    if (!start_writing && word == "resources") {
-                        start_writing = true;
+                    while (std::getline(stream, word, '\\')) {
+                        std::istringstream subStream(word);
+                        if (!start_writing && word == "resources") {
+                            start_writing = true;
+                        }
+
+                        if (start_writing) {
+                            res.append(word);
+                            res.append("/");
+                        }
                     }
 
-                    if (start_writing) {
-                        res.append(word);
-                        res.append("/");
+                    if (!res.empty()) {
+                        res.pop_back();
                     }
+                    filePathName = string(res);
                 }
-
-                if (!res.empty()) {
-                    res.pop_back();
-                }
-                filePathName = string(res);
-            }
 #endif
-            // flip the texture?
+                // flip the texture?
 
-            ImGui::OpenPopup("Flip");
-            auto center = ImGui::GetMainViewport()->GetCenter();
-            ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+                wait_for_modal = true;
+            }
+        }
+    }
 
-            Flip flip = Flip::KEEP;
-            // OOF
+    if (wait_for_modal) {
+        ImGui::OpenPopup("Flip");
 
-            if (ImGui::BeginPopupModal("Flip Texture")) {
-                ImGui::TextWrapped("Do you want to Flip the texture?");
-                if (ImGui::Button("Yes")) {
-                    flip = Flip::VERTICALLY;
-                    ImGui::CloseCurrentPopup();
-                }
-
-                ImGui::EndPopup();
+        if (ImGui::BeginPopupModal("Flip")) {
+            ImGui::TextWrapped("Do you want to Flip the texture?");
+            if (ImGui::Button("Yes")) {
+                ImGui::CloseCurrentPopup();
+                obj_scene.addElement(new Object(filePathName.c_str(), Flip::VERTICALLY), &lightShader);
+                show_object_picker = false;
+                wait_for_modal = false;
+                // close
+                ImGuiFileDialog::Instance()->Close();
             }
 
-            obj_scene.addElement(new Object(filePathName.c_str(), flip), &lightShader);
+            ImGui::SameLine();
+
+            if (ImGui::Button("No")) {
+                ImGui::CloseCurrentPopup();
+                obj_scene.addElement(new Object(filePathName.c_str(), Flip::KEEP), &lightShader);
+                show_object_picker = false;
+                wait_for_modal = false;
+                // close
+                ImGuiFileDialog::Instance()->Close();
+            }
+
+            ImGui::EndPopup();
         }
-        // close
-        ImGuiFileDialog::Instance()->Close();
-        show_object_picker = false;
     }
 }
 
