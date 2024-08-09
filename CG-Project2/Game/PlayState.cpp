@@ -513,15 +513,19 @@ void PlayState::update(GameEngine *engine) {
                 }
                 break;
             case Action::DEL_CUSTOM_LIGHT:
-                // cout << obj_scene.removeElement(nullptr, nullptr, true, lightsMenu->getLightToDelete()) << endl;
+                // Delete a light from using the light panel
+                obj_scene.removeElement(nullptr, nullptr, true, lightsMenu->getLightToDelete());
+                // Updates the changes in the light panel
                 lightsMenu->refreshLights(obj_scene.getLights());
                 break;
             case Action::REFRESH_PROJ:
+                // updates the projection matrix if zoom is modified
                 planeShader.use();
                 planeShader.setMat4("projection", projection);
 
                 skyboxShader.use();
                 skyboxShader.setMat4("projection", projection);
+                break;
             case Action::START_SIM: {
                 simulation_running = true;
                 break;
@@ -593,7 +597,26 @@ void showObjectPicker() {
                 filePathName = string(res);
             }
 #endif
-            obj_scene.addElement(new Object(filePathName.c_str()), &lightShader);
+            // flip the texture?
+
+            ImGui::OpenPopup("Flip");
+            auto center = ImGui::GetMainViewport()->GetCenter();
+            ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+
+            Flip flip = Flip::KEEP;
+            // OOF
+
+            if (ImGui::BeginPopupModal("Flip Texture")) {
+                ImGui::TextWrapped("Do you want to Flip the texture?");
+                if (ImGui::Button("Yes")) {
+                    flip = Flip::VERTICALLY;
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::EndPopup();
+            }
+
+            obj_scene.addElement(new Object(filePathName.c_str(), flip), &lightShader);
         }
         // close
         ImGuiFileDialog::Instance()->Close();

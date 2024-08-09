@@ -19,7 +19,7 @@ enum LightComp {
     BLINN,
     INT_PHONG,
     INT_BLINN,
-    NONE
+    DEFAULT
 };
 
 // Basic Light vectors
