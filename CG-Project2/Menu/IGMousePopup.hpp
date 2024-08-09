@@ -13,6 +13,8 @@ class IGMousePopup : public IGMenu {
   private:
     const char *string_id;
 
+    bool open = false;
+
     const char *actions[1] = {"Add"};
     const char *add_actions[4] = {"Cube", "Sphere", "Object", "Light"};
     const char *light_types[3] = {"Directional", "Point", "Spot"};
@@ -22,7 +24,16 @@ class IGMousePopup : public IGMenu {
 
     inline const char *getPopupStringId() { return this->string_id; }
 
+    inline void openPopup() {
+        this->open = true;
+    }
+
     inline virtual void render() override {
+        if (this->open)
+            ImGui::OpenPopup(this->string_id);
+
+        this->open = false;
+
         if (ImGui::BeginPopup(this->string_id)) {
             ImGui::SeparatorText("Utility Menu");
 

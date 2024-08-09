@@ -211,7 +211,7 @@ void mouseActiveMotion(GLFWwindow *window, double x, double y) {
 void imGuiMouse2Popup() {
     // If you open moultiple popup it broke
     if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-        ImGui::OpenPopup(mousePopup->getPopupStringId());
+        mousePopup->openPopup();    
     }
 }
 
