@@ -74,6 +74,8 @@ void Cubemap::draw(Shader shader) {
     shader.use();
 
     glDepthFunc(GL_LEQUAL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     // skybox cube
     glBindVertexArray(this->buffers.vao);
     glActiveTexture(GL_TEXTURE0);

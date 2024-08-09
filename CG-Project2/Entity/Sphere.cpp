@@ -97,6 +97,8 @@ void Sphere::draw(Shader shader) {
 		glBindTexture(GL_TEXTURE_2D, this->texture.getId());
 	}
 
+    glPolygonMode(GL_FRONT_AND_BACK, this->show_wireframe ? GL_LINE : GL_FILL);
+
     glBindVertexArray(this->buffers.vao);
     glDrawElements(GL_TRIANGLES, (this->index.size() - 1) * sizeof(GLuint), GL_UNSIGNED_INT, 0);
 

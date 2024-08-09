@@ -28,6 +28,8 @@ void Object::draw(Shader shader) {
     shader.setVec3("material.specular", this->material.getSpecular());
     shader.setFloat("material.shininess", this->material.getShininess());
 
+    glPolygonMode(GL_FRONT_AND_BACK, this->show_wireframe ? GL_LINE : GL_FILL);
+
     for (int i = 0; i < this->meshes.size(); i++) {
         this->meshes[i].draw(shader);
     }

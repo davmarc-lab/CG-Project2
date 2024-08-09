@@ -235,6 +235,11 @@ class IGEntity : public IGMenu {
                     ImGui::EndCombo();
                 }
             }
+            
+            auto wr = this->obj_observer->isShowingWireframe();
+            if (ImGui::Checkbox("Wireframe", &wr)) {
+                this->obj_observer->showWireframe(wr);
+            }
         }
 
         ImGui::End();

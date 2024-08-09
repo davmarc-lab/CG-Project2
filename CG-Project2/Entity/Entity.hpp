@@ -35,6 +35,8 @@ class Entity {
     // Flag used to check if the Entity vao is already created.
     bool m_isInstaced = false;
 
+    bool show_wireframe = false;
+
     Entity() {}
 
     // Retrieves the minimum vertex for AABB collisions.
@@ -139,6 +141,10 @@ class Entity {
     inline int getLightComputation() { return this->light_comp; }
 
     inline bool isInstanced() { return this->m_isInstaced; }
+
+    inline bool isShowingWireframe() { return this->show_wireframe; }
+
+    inline void showWireframe(bool val) { this->show_wireframe = val; }
 
     // Instances all the buffer in the gpu pipeline.
     virtual void createVertexArray() = 0;
