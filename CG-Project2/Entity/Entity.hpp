@@ -37,6 +37,8 @@ class Entity {
 
     bool show_wireframe = false;
 
+    Physic m_physic;
+
     Entity() {}
 
     // Retrieves the minimum vertex for AABB collisions.
@@ -145,6 +147,12 @@ class Entity {
     inline bool isShowingWireframe() { return this->show_wireframe; }
 
     inline void showWireframe(bool val) { this->show_wireframe = val; }
+
+    inline void addVelocity(float vel) { this->m_physic.velocity += vel; }
+
+    inline void setvelocity(float vel) { this->m_physic.velocity = vel; }
+
+    inline float getVelocity() { return this->m_physic.velocity; }
 
     // Instances all the buffer in the gpu pipeline.
     virtual void createVertexArray() = 0;

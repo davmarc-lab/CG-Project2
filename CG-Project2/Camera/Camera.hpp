@@ -105,11 +105,15 @@ class Camera {
 
     inline void setCameraTarget(vec3 target) { this->vectors.target = target; }
 
+    void setFromRotation(vec3 rot);
+
     // This method changes the camera position and updates the camera vectors.
     void moveCamera(vec3 position);
 
     // This method can be used to process the mouse input to move the camera in the space, it updates the vectors as well.
     void processMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
+
+    void revertCamera();
 
     ~Camera() = default;
 };

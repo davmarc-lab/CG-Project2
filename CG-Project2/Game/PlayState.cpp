@@ -21,6 +21,8 @@
 #include "../Menu/Logger/LogManager.hpp"
 
 #include "Game.hpp"
+#include <glm/exponential.hpp>
+#include <glm/trigonometric.hpp>
 
 PlayState PlayState::playState;
 string mouse_popup_name = "Menu";
@@ -30,6 +32,7 @@ Sphere *sphere;
 PlaneEntity *plane;
 Cubemap *skybox;
 Shader lightShader, planeShader, skyboxShader, modelShader;
+Object *ship;
 
 DirectionalLight *sun = new DirectionalLight();
 
@@ -102,6 +105,13 @@ void PlayState::init() {
     sphere->setPosition(vec3(2, 0, 0));
     sphere->setScale(vec3(1));
     sphere->attachTexture(sphere_texture);
+
+    ship = new Object("./resources/models/spaceship/Intergalactic_Spaceship-(Wavefront).obj");
+    ship->createVertexArray();
+    ship->setScale(vec3(0.2));
+    ship->setPosition(vec3(1, 1, 0));
+
+    obj_scene.addElement(ship, &lightShader);
 
     // Setting up the shader for the plane
     planeShader = Shader("./resources/shaders/vertexShader.glsl", "./resources/shaders/fragmentShader.glsl");
@@ -437,34 +447,74 @@ void PlayState::handleEvent(GameEngine *engine) {
     vec2 mouse_pos = vec2(x, y);
 
     // Camera input
-    float cameraVelocity = camera.getCameraVelocity() * engine->getDeltaTime();
-    if (glfwGetKey(current_context, GLFW_KEY_W) == GLFW_PRESS) {
-        auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraFront();
-        camera.moveCamera(pos);
+    if (!simulation_running) {
+        float cameraVelocity = camera.getCameraVelocity() * engine->getDeltaTime();
+        if (glfwGetKey(current_context, GLFW_KEY_W) == GLFW_PRESS) {
+            auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraFront();
+            camera.moveCamera(pos);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_S) == GLFW_PRESS) {
+            auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraFront();
+            camera.moveCamera(pos);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_A) == GLFW_PRESS) {
+            auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraRight();
+            camera.moveCamera(pos);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_D) == GLFW_PRESS) {
+            auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraRight();
+            camera.moveCamera(pos);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_SPACE) == GLFW_PRESS) {
+            auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraUp();
+            camera.moveCamera(pos);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+            auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraUp();
+            camera.moveCamera(pos);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_DELETE) == GLFW_PRESS) {
+            am->addAction(Action::DEL_ENTITY);
+        }
+    } else {
+        float vel = 2;
+        // ship->setRotation(vec3(0));
+        if (glfwGetKey(current_context, GLFW_KEY_W) == GLFW_PRESS) {
+            // ship->setPosition(ship->getPosition() + vec3(0, 0, 1) * vel * dt);
+            ship->addVelocity(vel * dt);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_S) == GLFW_PRESS) {
+            // ship->setPosition(ship->getPosition() + vec3(0, 0, 1) * -vel * dt);
+            ship->addVelocity(-vel * dt);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_A) == GLFW_PRESS) {
+            // ship->setPosition(ship->getPosition() + vec3(1, 0, 0) * vel * dt);
+            // ship->addVelocity(vec3(vel * dt, 0, 0));
+            ship->setRotation(ship->getRotation() + vec3(0, 2 * dt, 0));
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_D) == GLFW_PRESS) {
+            // ship->setPosition(ship->getPosition() + vec3(1, 0, 0) * -vel * dt);
+            // ship->addVelocity(vec3(-vel * dt, 0, 0));
+            // ship->setRotation(vec3(0, 0, 0.4));
+            ship->setRotation(ship->getRotation() + vec3(0, -2 * dt, 0));
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_SPACE) == GLFW_PRESS) {
+            // ship->setPosition(ship->getPosition() + vec3(0, 1, 0) * vel * dt);
+            // ship->setRotation(vec3(-0.4, 0, 0));
+            ship->setRotation(ship->getRotation() + vec3(-2 * dt, 0, 0));
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+            // ship->setPosition(ship->getPosition() + vec3(0, 1, 0) * -vel * dt);
+            // ship->setRotation(vec3(0.4, 0, 0));
+            ship->setRotation(ship->getRotation() + vec3(2 * dt, 0, 0));
+        }
     }
-    if (glfwGetKey(current_context, GLFW_KEY_S) == GLFW_PRESS) {
-        auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraFront();
-        camera.moveCamera(pos);
-    }
-    if (glfwGetKey(current_context, GLFW_KEY_A) == GLFW_PRESS) {
-        auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraRight();
-        camera.moveCamera(pos);
-    }
-    if (glfwGetKey(current_context, GLFW_KEY_D) == GLFW_PRESS) {
-        auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraRight();
-        camera.moveCamera(pos);
-    }
-    if (glfwGetKey(current_context, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraUp();
-        camera.moveCamera(pos);
-    }
-    if (glfwGetKey(current_context, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-        auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraUp();
-        camera.moveCamera(pos);
-    }
-    if (glfwGetKey(current_context, GLFW_KEY_DELETE) == GLFW_PRESS) {
-        am->addAction(Action::DEL_ENTITY);
-    }
+}
+
+void setSimCameraSettings() {
+    // ship->setRotation(vec3(45, 45, 0));
+    camera.moveCamera(ship->getPosition() - vec3(0, -1, 4));
+    camera.setFromRotation(ship->getRotation());
 }
 
 void PlayState::update(GameEngine *engine) {
@@ -529,10 +579,15 @@ void PlayState::update(GameEngine *engine) {
                 break;
             case Action::START_SIM: {
                 simulation_running = true;
+                setSimCameraSettings();
+                // prepareInput();
+                // prepareUpdate();
+                // normalRender();
                 break;
             }
             case Action::STOP_SIM: {
                 simulation_running = false;
+                // resetCamera();
                 break;
             }
             default:
@@ -541,6 +596,16 @@ void PlayState::update(GameEngine *engine) {
         }
         // At the end of the computation clears the Action queue
         action_manager->clear();
+    }
+
+    if (simulation_running) {
+        // calc ship position from angle
+        float dx = ship->getVelocity() * glm::sin(ship->getRotation().y);
+        // float dy = ship->getVelocity() * glm::cos(ship->getRotation().x);
+        float dz = ship->getVelocity() * glm::cos(ship->getRotation().y);
+
+        ship->setPosition(ship->getPosition() + vec3(dx, 0, dz));
+        camera.moveCamera(ship->getPosition() - vec3(0, -1, 4));
     }
 
     // Sets for each shader all view information.
@@ -642,18 +707,19 @@ void showObjectPicker() {
 void PlayState::draw(GameEngine *engine) {
     // If is clicked the Play button it opens a little ImGui Window and now it renders in that window.
     // All the inputs are still read from the main viewport (problem).
-    if (simulation_running) {
-        viep->bind();
-    }
+
+    // if (simulation_running) {
+    //     viep->bind();
+    // }
     skybox->draw(skyboxShader);
     plane->draw(planeShader);
 
     // Draw the scene (objects and light casters)
     obj_scene.draw();
-    if (simulation_running) {
-        viep->unbind();
-        viep->render();
-    }
+    // if (simulation_running) {
+    //     viep->unbind();
+    //     viep->render();
+    // }
 
     // Draw all the ImGui Windows
     entityMenu->render();
