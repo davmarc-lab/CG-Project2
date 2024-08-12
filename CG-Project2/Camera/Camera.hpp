@@ -56,8 +56,7 @@ class Camera {
     // Update the camera vector after every movement.
     void updateCameraVectors() {
         this->vectors.cameraFront =
-            normalize(vec3(cos(radians(this->rotation.yaw)) * cos(radians(this->rotation.pitch)),
-                           -sin(radians(this->rotation.pitch)),
+            normalize(vec3(cos(radians(this->rotation.yaw)) * cos(radians(this->rotation.pitch)), -sin(radians(this->rotation.pitch)),
                            sin(radians(this->rotation.yaw)) * cos(radians(this->rotation.pitch))));
         this->vectors.cameraRight = normalize(cross(this->vectors.cameraFront, this->worldUp));
         this->vectors.cameraUp = normalize(cross(this->vectors.cameraRight, this->vectors.cameraFront));

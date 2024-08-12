@@ -600,11 +600,11 @@ void PlayState::update(GameEngine *engine) {
 
     if (simulation_running) {
         // calc ship position from angle
-        float dx = ship->getVelocity() * glm::sin(ship->getRotation().y);
-        // float dy = ship->getVelocity() * glm::cos(ship->getRotation().x);
-        float dz = ship->getVelocity() * glm::cos(ship->getRotation().y);
+        float dx = ship->getVelocity() * (glm::sin(ship->getRotation().y * glm::cos(ship->getRotation().x)));
+        float dy = ship->getVelocity() * -glm::sin(ship->getRotation().x);
+        float dz = ship->getVelocity() * (glm::cos(ship->getRotation().y * glm::cos(ship->getRotation().x)));
 
-        ship->setPosition(ship->getPosition() + vec3(dx, 0, dz));
+        ship->setPosition(ship->getPosition() + vec3(dx, dy, dz));
         camera.moveCamera(ship->getPosition() - vec3(0, -1, 4));
     }
 
