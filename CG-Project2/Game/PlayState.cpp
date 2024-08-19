@@ -22,6 +22,8 @@
 
 #include "Game.hpp"
 #include <glm/exponential.hpp>
+#include <glm/ext/quaternion_geometric.hpp>
+#include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
 
 PlayState PlayState::playState;
@@ -240,7 +242,7 @@ void mouseInputFunc(GLFWwindow *window, int button, int action, int mod) {
 
     imGuiMouse2Popup();
 
-    // Necessary to not lose the ImGui Mouse inputs.
+    // Necessary to not lose normalizethe ImGui Mouse inputs.
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);
 }
 
@@ -491,29 +493,35 @@ void PlayState::handleEvent(GameEngine *engine) {
             // ship->setPosition(ship->getPosition() + vec3(1, 0, 0) * vel * dt);
             // ship->addVelocity(vec3(vel * dt, 0, 0));
             ship->setRotation(ship->getRotation() + vec3(0, 2 * dt, 0));
+            if (glm::degrees(ship->getRotation().y) > 359) ship->setRotation(vec3(ship->getRotation().x, 0, ship->getRotation().z));
         }
         if (glfwGetKey(current_context, GLFW_KEY_D) == GLFW_PRESS) {
             // ship->setPosition(ship->getPosition() + vec3(1, 0, 0) * -vel * dt);
             // ship->addVelocity(vec3(-vel * dt, 0, 0));
             // ship->setRotation(vec3(0, 0, 0.4));
             ship->setRotation(ship->getRotation() + vec3(0, -2 * dt, 0));
+            if (glm::degrees(ship->getRotation().y) < -359) ship->setRotation(vec3(ship->getRotation().x, 0, ship->getRotation().z));
         }
         if (glfwGetKey(current_context, GLFW_KEY_SPACE) == GLFW_PRESS) {
             // ship->setPosition(ship->getPosition() + vec3(0, 1, 0) * vel * dt);
             // ship->setRotation(vec3(-0.4, 0, 0));
             ship->setRotation(ship->getRotation() + vec3(-2 * dt, 0, 0));
+            if (glm::degrees(ship->getRotation().x) < -359) ship->setRotation(vec3(0, ship->getRotation().y, ship->getRotation().z));
         }
         if (glfwGetKey(current_context, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             // ship->setPosition(ship->getPosition() + vec3(0, 1, 0) * -vel * dt);
             // ship->setRotation(vec3(0.4, 0, 0));
             ship->setRotation(ship->getRotation() + vec3(2 * dt, 0, 0));
+            if (glm::degrees(ship->getRotation().x) > 359) ship->setRotation(vec3(0, ship->getRotation().y, ship->getRotation().z));
         }
     }
 }
 
+const vec3 d_cam = vec3(0, -1, 4);
+
 void setSimCameraSettings() {
     // ship->setRotation(vec3(45, 45, 0));
-    camera.moveCamera(ship->getPosition() - vec3(0, -1, 4));
+    camera.moveCamera(ship->getPosition() - d_cam);
     camera.setFromRotation(ship->getRotation());
 }
 
@@ -605,20 +613,20 @@ void PlayState::update(GameEngine *engine) {
         float dz = ship->getVelocity() * (glm::cos(ship->getRotation().y * glm::cos(ship->getRotation().x)));
 
         ship->setPosition(ship->getPosition() + vec3(dx, dy, dz));
-        camera.moveCamera(ship->getPosition() - vec3(0, -1, 4));
+        camera.moveCamera(ship->getPosition() - vec3(cos(ship->getRotation().y - glm::radians(90.f)) * 4, -1, -sin(ship->getRotation().y - glm::radians(90.f)) * 4));
     }
 
     // Sets for each shader all view information.
     lightShader.use();
-    lightShader.setMat4("view", camera.getViewMatrix());
+    lightShader.setMat4("view", simulation_running ? camera.getThirdViewMatrix(ship->getPosition()) : camera.getViewMatrix());
     lightShader.setVec3("viewPos", camera.getCameraPosition());
 
     modelShader.use();
-    modelShader.setMat4("view", camera.getViewMatrix());
+    modelShader.setMat4("view", simulation_running ? camera.getThirdViewMatrix(ship->getPosition()) : camera.getViewMatrix());
     modelShader.setVec3("viewPos", camera.getCameraPosition());
 
     planeShader.use();
-    planeShader.setMat4("view", camera.getViewMatrix());
+    planeShader.setMat4("view", simulation_running ? camera.getThirdViewMatrix(ship->getPosition()) : camera.getViewMatrix());
 
     skyboxShader.use();
     skyboxShader.setMat4("view", mat4(mat3(camera.getViewMatrix())));

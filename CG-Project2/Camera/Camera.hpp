@@ -70,6 +70,10 @@ class Camera {
         return glm::lookAt(this->vectors.cameraPos, this->vectors.cameraPos + this->vectors.cameraFront, this->vectors.cameraUp);
     }
 
+    inline mat4 getThirdViewMatrix(vec3 point) {
+        return glm::lookAt(this->vectors.cameraPos, point, this->vectors.cameraUp);
+    }
+
     inline void setCameraFront(vec3 vec) { this->vectors.cameraFront = vec; }
 
     inline vec3 getCameraFront() { return this->vectors.cameraFront; }
