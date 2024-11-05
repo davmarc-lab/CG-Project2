@@ -42,7 +42,7 @@ int Window::initializeWindow() {
         return -1;
     }
 
-    // focusing the created window and set a callback funciton for updating render when resizing window
+    // focusing the created window and set a callback function for updating render when resizing window
     glfwMakeContextCurrent(this->window);
     glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
 
@@ -64,7 +64,7 @@ int Window::initializeWindow() {
 
 void Window::closeWindow() {
     // delete all vao, vbo, ebo arrays
-    glfwSetWindowShouldClose(this->window, true);
+    glfwSetWindowShouldClose(this->window, GLFW_TRUE);
 }
 
 void Window::terminateWindow() {

@@ -21,10 +21,6 @@
 #include "../Menu/Logger/LogManager.hpp"
 
 #include "Game.hpp"
-#include <glm/exponential.hpp>
-#include <glm/ext/quaternion_geometric.hpp>
-#include <glm/geometric.hpp>
-#include <glm/trigonometric.hpp>
 
 PlayState PlayState::playState;
 string mouse_popup_name = "Menu";
@@ -588,9 +584,6 @@ void PlayState::update(GameEngine *engine) {
             case Action::START_SIM: {
                 simulation_running = true;
                 setSimCameraSettings();
-                // prepareInput();
-                // prepareUpdate();
-                // normalRender();
                 break;
             }
             case Action::STOP_SIM: {
