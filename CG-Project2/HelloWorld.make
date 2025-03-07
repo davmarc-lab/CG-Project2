@@ -11,6 +11,15 @@ endif
 .PHONY: clean prebuild prelink
 
 ifeq ($(config),debug)
+  ifeq ($(origin CC), default)
+    CC = gcc
+  endif
+  ifeq ($(origin CXX), default)
+    CXX = g++
+  endif
+  ifeq ($(origin AR), default)
+    AR = ar
+  endif
   RESCOMP = windres
   TARGETDIR = bin/Debug
   TARGET = $(TARGETDIR)/HelloWorld
@@ -38,6 +47,15 @@ all: prebuild prelink $(TARGET)
 endif
 
 ifeq ($(config),release)
+  ifeq ($(origin CC), default)
+    CC = gcc
+  endif
+  ifeq ($(origin CXX), default)
+    CXX = g++
+  endif
+  ifeq ($(origin AR), default)
+    AR = ar
+  endif
   RESCOMP = windres
   TARGETDIR = bin/Release
   TARGET = $(TARGETDIR)/HelloWorld
@@ -87,6 +105,7 @@ OBJECTS := \
 	$(OBJDIR)/Shader.o \
 	$(OBJDIR)/Text.o \
 	$(OBJDIR)/Window.o \
+	$(OBJDIR)/ImGuiFileDialog.o \
 	$(OBJDIR)/imgui.o \
 	$(OBJDIR)/imgui_demo.o \
 	$(OBJDIR)/imgui_draw.o \
@@ -94,7 +113,6 @@ OBJECTS := \
 	$(OBJDIR)/imgui_impl_opengl3.o \
 	$(OBJDIR)/imgui_tables.o \
 	$(OBJDIR)/imgui_widgets.o \
-	$(OBJDIR)/ImGuiFileDialog.o \
 	$(OBJDIR)/glad.o \
 	$(OBJDIR)/main.o \
 
@@ -143,7 +161,7 @@ endif
 prebuild:
 	$(PREBUILDCMDS)
 
-prelink:
+prelink: $(OBJECTS)
 	$(PRELINKCMDS)
 
 ifneq (,$(PCH))
@@ -221,6 +239,9 @@ $(OBJDIR)/Text.o: Text/Text.cpp
 $(OBJDIR)/Window.o: Window/Window.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/ImGuiFileDialog.o: dependencies/include/imgui-file-dialog/ImGuiFileDialog.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/imgui.o: dependencies/include/imgui/imgui.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
@@ -240,9 +261,6 @@ $(OBJDIR)/imgui_tables.o: dependencies/include/imgui/imgui_tables.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/imgui_widgets.o: dependencies/include/imgui/imgui_widgets.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/ImGuiFileDialog.o: dependencies/include/imgui-file-dialog/ImGuiFileDialog.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/glad.o: glad.c
