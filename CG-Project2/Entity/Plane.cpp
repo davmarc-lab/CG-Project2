@@ -78,6 +78,8 @@ void PlaneEntity::draw(Shader shader) {
     shader.use();
     shader.setMat4("model", this->transform.getModelMatrix());
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     glBindVertexArray(this->buffers.vao);
     glDrawArrays(GL_TRIANGLES, 0, this->coords.vertex.size());
     glBindVertexArray(0);

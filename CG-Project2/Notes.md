@@ -24,3 +24,4 @@
 
  - [ ] In draw methods use a boolean flag to check if the texture is set or not.
  - [X] Continue doing documentation from GameState.
+ - [ ] Need to fix up/down movement, maybe a problem with angles.

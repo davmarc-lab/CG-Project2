@@ -95,6 +95,13 @@ struct Mouse {
     float lastY;
 };
 
+struct Physic {
+    float mass = 1.0f;
+    float velocity = 0.0f;
+    vec3 acceleration = vec3(0);
+    vec3 force = vec3(0);
+};
+
 // PlayState Input modes.
 enum InputMode {
     // in select mode user can select objects

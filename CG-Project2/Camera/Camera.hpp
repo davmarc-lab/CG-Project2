@@ -56,8 +56,7 @@ class Camera {
     // Update the camera vector after every movement.
     void updateCameraVectors() {
         this->vectors.cameraFront =
-            normalize(vec3(cos(radians(this->rotation.yaw)) * cos(radians(this->rotation.pitch)),
-                           -sin(radians(this->rotation.pitch)),
+            normalize(vec3(cos(radians(this->rotation.yaw)) * cos(radians(this->rotation.pitch)), -sin(radians(this->rotation.pitch)),
                            sin(radians(this->rotation.yaw)) * cos(radians(this->rotation.pitch))));
         this->vectors.cameraRight = normalize(cross(this->vectors.cameraFront, this->worldUp));
         this->vectors.cameraUp = normalize(cross(this->vectors.cameraRight, this->vectors.cameraFront));
@@ -69,6 +68,10 @@ class Camera {
     // Retrieves the View matrix.
     inline mat4 getViewMatrix() {
         return glm::lookAt(this->vectors.cameraPos, this->vectors.cameraPos + this->vectors.cameraFront, this->vectors.cameraUp);
+    }
+
+    inline mat4 getThirdViewMatrix(vec3 point) {
+        return glm::lookAt(this->vectors.cameraPos, point, this->vectors.cameraUp);
     }
 
     inline void setCameraFront(vec3 vec) { this->vectors.cameraFront = vec; }
@@ -105,11 +108,15 @@ class Camera {
 
     inline void setCameraTarget(vec3 target) { this->vectors.target = target; }
 
+    void setFromRotation(vec3 rot);
+
     // This method changes the camera position and updates the camera vectors.
     void moveCamera(vec3 position);
 
     // This method can be used to process the mouse input to move the camera in the space, it updates the vectors as well.
     void processMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
+
+    void revertCamera();
 
     ~Camera() = default;
 };

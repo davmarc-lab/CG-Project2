@@ -30,6 +30,7 @@ Sphere *sphere;
 PlaneEntity *plane;
 Cubemap *skybox;
 Shader lightShader, planeShader, skyboxShader, modelShader;
+Object *ship;
 
 DirectionalLight *sun = new DirectionalLight();
 
@@ -53,6 +54,7 @@ IGViewport *viep = new IGViewport();
 
 bool show_popup = false;
 bool show_object_picker = false;
+bool wait_for_modal = false;
 bool simulation_running = false;
 
 bool is_light_selected;
@@ -101,6 +103,13 @@ void PlayState::init() {
     sphere->setPosition(vec3(2, 0, 0));
     sphere->setScale(vec3(1));
     sphere->attachTexture(sphere_texture);
+
+    ship = new Object("./resources/models/spaceship/Intergalactic_Spaceship-(Wavefront).obj");
+    ship->createVertexArray();
+    ship->setScale(vec3(0.2));
+    ship->setPosition(vec3(1, 1, 0));
+
+    obj_scene.addElement(ship, &lightShader);
 
     // Setting up the shader for the plane
     planeShader = Shader("./resources/shaders/vertexShader.glsl", "./resources/shaders/fragmentShader.glsl");
@@ -211,7 +220,7 @@ void mouseActiveMotion(GLFWwindow *window, double x, double y) {
 void imGuiMouse2Popup() {
     // If you open moultiple popup it broke
     if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-        mousePopup->openPopup();    
+        mousePopup->openPopup();
     }
 }
 
@@ -229,7 +238,7 @@ void mouseInputFunc(GLFWwindow *window, int button, int action, int mod) {
 
     imGuiMouse2Popup();
 
-    // Necessary to not lose the ImGui Mouse inputs.
+    // Necessary to not lose normalizethe ImGui Mouse inputs.
     ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mod);
 }
 
@@ -436,34 +445,80 @@ void PlayState::handleEvent(GameEngine *engine) {
     vec2 mouse_pos = vec2(x, y);
 
     // Camera input
-    float cameraVelocity = camera.getCameraVelocity() * engine->getDeltaTime();
-    if (glfwGetKey(current_context, GLFW_KEY_W) == GLFW_PRESS) {
-        auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraFront();
-        camera.moveCamera(pos);
+    if (!simulation_running) {
+        float cameraVelocity = camera.getCameraVelocity() * engine->getDeltaTime();
+        if (glfwGetKey(current_context, GLFW_KEY_W) == GLFW_PRESS) {
+            auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraFront();
+            camera.moveCamera(pos);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_S) == GLFW_PRESS) {
+            auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraFront();
+            camera.moveCamera(pos);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_A) == GLFW_PRESS) {
+            auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraRight();
+            camera.moveCamera(pos);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_D) == GLFW_PRESS) {
+            auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraRight();
+            camera.moveCamera(pos);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_SPACE) == GLFW_PRESS) {
+            auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraUp();
+            camera.moveCamera(pos);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+            auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraUp();
+            camera.moveCamera(pos);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_DELETE) == GLFW_PRESS) {
+            am->addAction(Action::DEL_ENTITY);
+        }
+    } else {
+        float vel = 2;
+        // ship->setRotation(vec3(0));
+        if (glfwGetKey(current_context, GLFW_KEY_W) == GLFW_PRESS) {
+            // ship->setPosition(ship->getPosition() + vec3(0, 0, 1) * vel * dt);
+            ship->addVelocity(vel * dt);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_S) == GLFW_PRESS) {
+            // ship->setPosition(ship->getPosition() + vec3(0, 0, 1) * -vel * dt);
+            ship->addVelocity(-vel * dt);
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_A) == GLFW_PRESS) {
+            // ship->setPosition(ship->getPosition() + vec3(1, 0, 0) * vel * dt);
+            // ship->addVelocity(vec3(vel * dt, 0, 0));
+            ship->setRotation(ship->getRotation() + vec3(0, 2 * dt, 0));
+            if (glm::degrees(ship->getRotation().y) > 359) ship->setRotation(vec3(ship->getRotation().x, 0, ship->getRotation().z));
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_D) == GLFW_PRESS) {
+            // ship->setPosition(ship->getPosition() + vec3(1, 0, 0) * -vel * dt);
+            // ship->addVelocity(vec3(-vel * dt, 0, 0));
+            // ship->setRotation(vec3(0, 0, 0.4));
+            ship->setRotation(ship->getRotation() + vec3(0, -2 * dt, 0));
+            if (glm::degrees(ship->getRotation().y) < -359) ship->setRotation(vec3(ship->getRotation().x, 0, ship->getRotation().z));
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_SPACE) == GLFW_PRESS) {
+            // ship->setPosition(ship->getPosition() + vec3(0, 1, 0) * vel * dt);
+            // ship->setRotation(vec3(-0.4, 0, 0));
+            ship->setRotation(ship->getRotation() + vec3(-2 * dt, 0, 0));
+            if (glm::degrees(ship->getRotation().x) < -359) ship->setRotation(vec3(0, ship->getRotation().y, ship->getRotation().z));
+        }
+        if (glfwGetKey(current_context, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+            // ship->setPosition(ship->getPosition() + vec3(0, 1, 0) * -vel * dt);
+            // ship->setRotation(vec3(0.4, 0, 0));
+            ship->setRotation(ship->getRotation() + vec3(2 * dt, 0, 0));
+            if (glm::degrees(ship->getRotation().x) > 359) ship->setRotation(vec3(0, ship->getRotation().y, ship->getRotation().z));
+        }
     }
-    if (glfwGetKey(current_context, GLFW_KEY_S) == GLFW_PRESS) {
-        auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraFront();
-        camera.moveCamera(pos);
-    }
-    if (glfwGetKey(current_context, GLFW_KEY_A) == GLFW_PRESS) {
-        auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraRight();
-        camera.moveCamera(pos);
-    }
-    if (glfwGetKey(current_context, GLFW_KEY_D) == GLFW_PRESS) {
-        auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraRight();
-        camera.moveCamera(pos);
-    }
-    if (glfwGetKey(current_context, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        auto pos = camera.getCameraPosition() + cameraVelocity * camera.getCameraUp();
-        camera.moveCamera(pos);
-    }
-    if (glfwGetKey(current_context, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-        auto pos = camera.getCameraPosition() - cameraVelocity * camera.getCameraUp();
-        camera.moveCamera(pos);
-    }
-    if (glfwGetKey(current_context, GLFW_KEY_DELETE) == GLFW_PRESS) {
-        am->addAction(Action::DEL_ENTITY);
-    }
+}
+
+const vec3 d_cam = vec3(0, -1, 4);
+
+void setSimCameraSettings() {
+    // ship->setRotation(vec3(45, 45, 0));
+    camera.moveCamera(ship->getPosition() - d_cam);
+    camera.setFromRotation(ship->getRotation());
 }
 
 void PlayState::update(GameEngine *engine) {
@@ -528,10 +583,12 @@ void PlayState::update(GameEngine *engine) {
                 break;
             case Action::START_SIM: {
                 simulation_running = true;
+                setSimCameraSettings();
                 break;
             }
             case Action::STOP_SIM: {
                 simulation_running = false;
+                // resetCamera();
                 break;
             }
             default:
@@ -542,103 +599,128 @@ void PlayState::update(GameEngine *engine) {
         action_manager->clear();
     }
 
+    if (simulation_running) {
+        // calc ship position from angle
+        float dx = ship->getVelocity() * (glm::sin(ship->getRotation().y * glm::cos(ship->getRotation().x)));
+        float dy = ship->getVelocity() * -glm::sin(ship->getRotation().x);
+        float dz = ship->getVelocity() * (glm::cos(ship->getRotation().y * glm::cos(ship->getRotation().x)));
+
+        ship->setPosition(ship->getPosition() + vec3(dx, dy, dz));
+        camera.moveCamera(ship->getPosition() - vec3(cos(ship->getRotation().y - glm::radians(90.f)) * 4, -1, -sin(ship->getRotation().y - glm::radians(90.f)) * 4));
+    }
+
     // Sets for each shader all view information.
     lightShader.use();
-    lightShader.setMat4("view", camera.getViewMatrix());
+    lightShader.setMat4("view", simulation_running ? camera.getThirdViewMatrix(ship->getPosition()) : camera.getViewMatrix());
     lightShader.setVec3("viewPos", camera.getCameraPosition());
 
     modelShader.use();
-    modelShader.setMat4("view", camera.getViewMatrix());
+    modelShader.setMat4("view", simulation_running ? camera.getThirdViewMatrix(ship->getPosition()) : camera.getViewMatrix());
     modelShader.setVec3("viewPos", camera.getCameraPosition());
 
     planeShader.use();
-    planeShader.setMat4("view", camera.getViewMatrix());
+    planeShader.setMat4("view", simulation_running ? camera.getThirdViewMatrix(ship->getPosition()) : camera.getViewMatrix());
 
     skyboxShader.use();
     skyboxShader.setMat4("view", mat4(mat3(camera.getViewMatrix())));
 }
 
 // Online library to open a simple file picker.
+
+std::string filePathName;
+
 void showObjectPicker() {
-    IGFD::FileDialogConfig config;
-    config.path = "./resources/models/";
-    ImGuiFileDialog::Instance()->OpenDialog("ChooseObject", "Choose Object File", ".obj", config);
+    if (wait_for_modal == false) {
+        IGFD::FileDialogConfig config;
+        config.path = "./resources/models/";
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseObject", "Choose Object File", ".obj", config);
 
-    if (ImGuiFileDialog::Instance()->Display("ChooseObject")) {
-        if (ImGuiFileDialog::Instance()->IsOk()) {
-            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+        if (ImGuiFileDialog::Instance()->Display("ChooseObject")) {
+            if (ImGuiFileDialog::Instance()->IsOk()) {
+                filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
 
-            // Windows parser -- TODO resource manager
+                // Windows parser -- TODO resource manager
 #ifdef _WIN32
-            {
-                // make custom path for windows
-                std::vector<std::string> words;
-                std::string word;
-                std::istringstream stream(filePathName);
-                bool start_writing = false, add_sep = true;
-                string res = "./";
+                {
+                    // make custom path for windows
+                    std::vector<std::string> words;
+                    std::string word;
+                    std::istringstream stream(filePathName);
+                    bool start_writing = false, add_sep = true;
+                    string res = "./";
 
-                while (std::getline(stream, word, '\\')) {
-                    std::istringstream subStream(word);
-                    if (!start_writing && word == "resources") {
-                        start_writing = true;
+                    while (std::getline(stream, word, '\\')) {
+                        std::istringstream subStream(word);
+                        if (!start_writing && word == "resources") {
+                            start_writing = true;
+                        }
+
+                        if (start_writing) {
+                            res.append(word);
+                            res.append("/");
+                        }
                     }
 
-                    if (start_writing) {
-                        res.append(word);
-                        res.append("/");
+                    if (!res.empty()) {
+                        res.pop_back();
                     }
+                    filePathName = string(res);
                 }
-
-                if (!res.empty()) {
-                    res.pop_back();
-                }
-                filePathName = string(res);
-            }
 #endif
-            // flip the texture?
+                // flip the texture?
 
-            ImGui::OpenPopup("Flip");
-            auto center = ImGui::GetMainViewport()->GetCenter();
-            ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+                wait_for_modal = true;
+            }
+        }
+    }
 
-            Flip flip = Flip::KEEP;
-            // OOF
+    if (wait_for_modal) {
+        ImGui::OpenPopup("Flip");
 
-            if (ImGui::BeginPopupModal("Flip Texture")) {
-                ImGui::TextWrapped("Do you want to Flip the texture?");
-                if (ImGui::Button("Yes")) {
-                    flip = Flip::VERTICALLY;
-                    ImGui::CloseCurrentPopup();
-                }
-
-                ImGui::EndPopup();
+        if (ImGui::BeginPopupModal("Flip")) {
+            ImGui::TextWrapped("Do you want to Flip the texture?");
+            if (ImGui::Button("Yes")) {
+                ImGui::CloseCurrentPopup();
+                obj_scene.addElement(new Object(filePathName.c_str(), Flip::VERTICALLY), &lightShader);
+                show_object_picker = false;
+                wait_for_modal = false;
+                // close
+                ImGuiFileDialog::Instance()->Close();
             }
 
-            obj_scene.addElement(new Object(filePathName.c_str(), flip), &lightShader);
+            ImGui::SameLine();
+
+            if (ImGui::Button("No")) {
+                ImGui::CloseCurrentPopup();
+                obj_scene.addElement(new Object(filePathName.c_str(), Flip::KEEP), &lightShader);
+                show_object_picker = false;
+                wait_for_modal = false;
+                // close
+                ImGuiFileDialog::Instance()->Close();
+            }
+
+            ImGui::EndPopup();
         }
-        // close
-        ImGuiFileDialog::Instance()->Close();
-        show_object_picker = false;
     }
 }
 
 void PlayState::draw(GameEngine *engine) {
     // If is clicked the Play button it opens a little ImGui Window and now it renders in that window.
     // All the inputs are still read from the main viewport (problem).
-    if (simulation_running) {
-        viep->bind();
-    }
+
+    // if (simulation_running) {
+    //     viep->bind();
+    // }
     skybox->draw(skyboxShader);
     plane->draw(planeShader);
 
     // Draw the scene (objects and light casters)
     obj_scene.draw();
-    if (simulation_running) {
-        viep->unbind();
-        viep->render();
-    }
+    // if (simulation_running) {
+    //     viep->unbind();
+    //     viep->render();
+    // }
 
     // Draw all the ImGui Windows
     entityMenu->render();
