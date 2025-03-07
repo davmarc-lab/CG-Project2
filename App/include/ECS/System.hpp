@@ -1,0 +1,92 @@
+#pragma once
+
+#include <cstddef>
+#include <functional>
+#include <utility>
+#include <vector>
+
+#include "../../../Opengl-Core/include/Core.hpp"
+#include "Component.hpp"
+#include "EcsScene.hpp"
+#include "EntityManager.hpp"
+
+namespace systems {
+	namespace ecs {
+		bool removeEntityFromManager(const unsigned int &id);
+		void removeEntityFromScene(const unsigned int &id);
+		bool removeEntityFromAll(const unsigned int &id);
+	} // namespace ecs
+
+	namespace transform {
+		void updatePosition(const unsigned int &id, const glm::vec3 &position);
+		void updateScale(const unsigned int &id, const glm::vec3 &scale);
+		void updateRotation(const unsigned int &id, const glm::vec3 &rotation);
+
+		void addPosition(const unsigned int &id, const glm::vec3 &offset);
+		void addScale(const unsigned int &id, const glm::vec3 &offset);
+		void addRotation(const unsigned int &id, const glm::vec3 &offset);
+
+		glm::vec3 getPosition(const unsigned int &id);
+		glm::vec3 getScale(const unsigned int &id);
+		glm::vec3 getRotation(const unsigned int &id);
+		glm::mat4 getModelMatrix(const unsigned int &id);
+
+		void updateModelMatrix(const unsigned int &id);
+
+		void updateAllModelMatrix();
+
+	} // namespace transform
+
+	namespace collision {
+		void updateParentCollider(const unsigned int &id);
+		void updateCollider(const unsigned int &id);
+		void updateAllColliders();
+
+		void compressBoundingBox();
+
+		void resolveCollisions();
+
+		float getEnemyLastHit(const unsigned int &id);
+		float getPlayerLastHit(const unsigned int &id);
+
+		Pair<glm::vec3> getCollider(const unsigned int &id);
+
+		void updateEnemyLastHit(const unsigned int &id, const float &time);
+		void updatePlayerLastHit(const unsigned int &id, const float &time);
+
+		std::vector<Pair<unsigned int>> getCollisions();
+	} // namespace collision
+
+	namespace parent {
+		void addChild(const unsigned int &parent, const unsigned int &child);
+		void removeChild(const unsigned int &parent, const unsigned int &child);
+	} // namespace parent
+
+	namespace input {
+		std::vector<std::pair<unsigned int, std::function<void()>>> getKeysCallback(const unsigned int &id);
+
+		void setKeyCallback(const unsigned int &id, const unsigned int &key, std::function<void()> func);
+	} // namespace input
+
+	namespace animation {
+		void executeNextFrame(const float &currentTime);
+		void updateDistanceAnimation();
+	} // namespace animation
+
+	namespace material {
+		Material getMaterial(const unsigned int &id);
+		void updateAmbient(const unsigned int &id, const glm::vec3 &val);
+		void updateDiffuse(const unsigned int &id, const glm::vec3 &val);
+		void updateSpecular(const unsigned int &id, const glm::vec3 &val);
+		void updateShininess(const unsigned int &id, const float &val);
+		void updateMaterial(const unsigned int &id, const Material &material);
+	} // namespace material
+
+	namespace render {
+		void initStencilShader();
+
+		void renderAllMeshes();
+
+		void renderBoundingBox();
+	} // namespace render
+} // namespace systems

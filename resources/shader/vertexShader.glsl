@@ -1,0 +1,25 @@
+#version 420 core
+
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec4 aColor;
+layout(location = 2) in vec3 aNormal;
+layout(location = 3) in vec2 aTexCoord;
+
+out VS_OUT {
+    vec4 vertColor;
+    vec3 normal;
+    vec2 texCoord;
+} vs_out;
+
+uniform mat4 model;
+
+layout(std140, binding = 0) uniform Matrices {
+    mat4 viewProj;
+};
+
+void main() {
+    gl_Position = viewProj * model * vec4(aPos, 1.f);
+    vs_out.vertColor = aColor;
+    vs_out.normal = aNormal;
+    vs_out.texCoord = aTexCoord;
+}
