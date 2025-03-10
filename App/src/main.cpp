@@ -242,16 +242,19 @@ int main(int argc, char *argv[]) {
 		fb.createFrameBuffer();
 	*/
 
-	Shared<ShaderProgram> shader = CreateShared<ShaderProgram>("vertexShader.glsl", "fragmentShader.glsl");
+	Shared<ShaderProgram> shader = CreateShared<ShaderProgram>("vertexShader.glsl", "lightFragShader.glsl");
 	shader->createShaderProgram();
 	Shared<ShaderProgram> normalShader = CreateShared<ShaderProgram>("normalVertShader.glsl", "normalFragShader.glsl", "normalGeomShader.glsl");
 	normalShader->createShaderProgram();
 
 	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(shader, shape);
+	em->addComponent<LightComponent>(shape);
+    em->addComponent<MaterialComponent>(shape);
 
 	auto pyr = factory::factoryPyramid(BasicInfo{{-1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(shader, pyr);
+    em->addComponent<MaterialComponent>(pyr);
 
 	UniformBuffer ub("Matrices");
 	ub.onAttach();

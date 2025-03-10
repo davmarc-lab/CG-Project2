@@ -1,11 +1,14 @@
 #include "../../include/ECS/System.hpp"
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <functional>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/glm.hpp>
+#include <memory>
 #include <set>
+#include <string>
 #include <vector>
 #include "../../include/ECS/Component.hpp"
 #include "../../include/ECS/EcsScene.hpp"
@@ -427,16 +430,104 @@ namespace systems {
 			stencil.createShaderProgram();
 		}
 
-		void sendLightData(const Shared<ogl::ShaderProgram> &shader) {
+		void getOtherLightData(LightShaderBlock &block, const Shared<LightComponent> &light) {
+			switch (light->type) {
+				case LIGHT_DIRECTIONAL: {
+					block.direction = light->direction;
+					break;
+				}
+				case LIGHT_POINT: {
+					block.position = light->position;
+					block.constant = light->attenuation.constant;
+					block.linear = light->attenuation.linear;
+					block.quadratic = light->attenuation.quadratic;
+					break;
+				}
+				case LIGHT_SPOT: {
+					block.position = light->position;
+					block.direction = light->direction;
+					block.constant = light->attenuation.constant;
+					block.linear = light->attenuation.linear;
+					block.quadratic = light->attenuation.quadratic;
+					block.cutoff = light->cutOff;
+					block.outerCutoff = light->outerCutoff;
+					break;
+				}
+				default:
+					break;
+			}
+		}
+
+		std::array<LightShaderBlock, SHADER_MAX_LIGHTS> prepareLightData() {
 			size_t index = 0;
-            // TODO prepare the light shader block and send data
+			// TODO prepare the light shader block and send data
+
+			std::array<LightShaderBlock, SHADER_MAX_LIGHTS> block{};
+			for (auto light : em->getEntitiesFromComponent<LightComponent>()) {
+				auto l = em->getComponentFromId<LightComponent>(light);
+				block[index].type = l->type;
+				block[index].intensity = l->intensity;
+				block[index].ambient = l->vectors.ambient;
+				block[index].diffuse = l->vectors.diffuse;
+				block[index].specular = l->vectors.specular;
+				block[index].color = l->color;
+				getOtherLightData(block[index], l);
+				index++;
+			}
+			return std::move(block);
+		}
+
+		void sendOtherLightData(const Shared<ogl::ShaderProgram> &shader, LightShaderBlock &data, size_t &index) {
+			switch (data.type) {
+				case LIGHT_DIRECTIONAL: {
+					shader->setVec3("lights[" + std::to_string(index) + "].direction", data.direction);
+					break;
+				}
+				case LIGHT_POINT: {
+					shader->setVec3("lights[" + std::to_string(index) + "].position", data.position);
+					shader->setFloat("lights[" + std::to_string(index) + "].constant", data.constant);
+					shader->setFloat("lights[" + std::to_string(index) + "].linear", data.linear);
+					shader->setFloat("lights[" + std::to_string(index) + "].quadratic", data.quadratic);
+					break;
+				}
+				case LIGHT_SPOT: {
+					shader->setVec3("lights[" + std::to_string(index) + "].position", data.position);
+					shader->setVec3("lights[" + std::to_string(index) + "].direction", data.direction);
+					shader->setFloat("lights[" + std::to_string(index) + "].constant", data.constant);
+					shader->setFloat("lights[" + std::to_string(index) + "].linear", data.linear);
+					shader->setFloat("lights[" + std::to_string(index) + "].quadratic", data.quadratic);
+					shader->setFloat("lights[" + std::to_string(index) + "].cutOff", data.cutoff);
+					shader->setFloat("lights[" + std::to_string(index) + "].outerCutOff", data.outerCutoff);
+					break;
+				}
+				default:
+					break;
+			}
+		}
+
+		void sendLightDataShader(const Shared<ogl::ShaderProgram> &shader, std::array<LightShaderBlock, SHADER_MAX_LIGHTS> data) {
+			size_t index = 0;
+			for (auto l : data) {
+				shader->setInt("lights[" + std::to_string(index) + "].type", l.type);
+				shader->setFloat("lights[" + std::to_string(index) + "].intensity", l.intensity);
+				shader->setVec3("lights[" + std::to_string(index) + "].ambient", l.ambient);
+				shader->setVec3("lights[" + std::to_string(index) + "].diffuse", l.diffuse);
+				shader->setVec3("lights[" + std::to_string(index) + "].specular", l.specular);
+				shader->setVec3("lights[" + std::to_string(index) + "].color", l.color);
+
+				sendOtherLightData(shader, l, index);
+				index++;
+			}
+			shader->setInt("lightsCount", em->getEntitiesFromComponent<LightComponent>().size());
+			shader->setVec3("viewPos", ogl::camera.getCameraPosition());
 		}
 
 		void renderAllMeshes() {
+			auto lightsData = prepareLightData();
 			for (auto [shader, etts] : scene->getShaderEntityMap()) {
 				shader->use();
 				// send light data
-				sendLightData(shader);
+				sendLightDataShader(shader, lightsData);
 				for (auto id : etts) {
 					auto mc = em->getComponentFromId<MaterialComponent>(id);
 					if (mc != nullptr) {

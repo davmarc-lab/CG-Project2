@@ -6,6 +6,8 @@
 #include <glm/geometric.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include "../Utils.hpp"
+
 #include <functional>
 #include <glm/trigonometric.hpp>
 #include <utility>
@@ -252,12 +254,6 @@ public:
 	Material material{};
 };
 
-enum LightType {
-	LIGHT_DIRECTIONAL,
-	LIGHT_POINT,
-	LIGHT_SPOT,
-};
-
 struct LightVectors {
 	glm::vec3 ambient{.1f, .1f, .1f};
 	glm::vec3 diffuse{.8f, .8f, .8f};
@@ -277,41 +273,17 @@ public:
 
 	glm::vec3 color{1, 1, 1};
 	float intensity = 1.f;
-	LightType type;
+	LightType type = LightType::LIGHT_DIRECTIONAL;
 	LightVectors vectors{};
-	bool caster = true;
-};
 
-class DirectionalLight : public LightComponent {
-public:
-	DirectionalLight() :
-		LightComponent() {}
-
-	virtual ~DirectionalLight() = default;
-
-	glm::vec3 direction{};
-};
-
-class PointLight : public LightComponent {
-public:
-	PointLight() :
-		LightComponent() {}
-
-	virtual ~PointLight() = default;
+	glm::vec3 direction{1, -1, -1};
 
 	glm::vec3 position{};
 	LightConstraint attenuation{};
-};
 
-class SpotLight : public LightComponent {
-public:
-	SpotLight() :
-		LightComponent() {}
+	float cutOff = 12.5f, outerCutoff = 17.5f;
 
-	virtual ~SpotLight() = default;
-
-	glm::vec3 position{}, direction{};
-	LightConstraint attenuation{};
+	bool caster = true;
 };
 
 class InputComponent : public Component {
