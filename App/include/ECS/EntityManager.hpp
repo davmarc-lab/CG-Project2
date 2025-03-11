@@ -24,6 +24,14 @@ public:
 		return id;
 	}
 
+	inline std::vector<Index> getEntities() const {
+		std::vector<Index> res{};
+		for (auto [id, _] : this->m_ettComponent) {
+			res.push_back(id);
+		}
+		return res;
+	}
+
 	inline std::string getEntityName(const Index &id) const { return this->m_entities.at(id); }
 
 	inline void setEntityName(const Index &id, const std::string &name) { this->m_entities.at(id) = std::move(name); }

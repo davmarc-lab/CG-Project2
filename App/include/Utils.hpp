@@ -14,6 +14,12 @@ struct LightConstraint {
 	float constant = 1.f, linear = .09f, quadratic = .032f;
 };
 
+struct LightVectors {
+	glm::vec3 ambient{.1f, .1f, .1f};
+	glm::vec3 diffuse{.8f, .8f, .8f};
+	glm::vec3 specular{1, 1, 1};
+};
+
 struct LightShaderBlock {
 	int type = LightType::LIGHT_DIRECTIONAL;
 	float intensity = 1;

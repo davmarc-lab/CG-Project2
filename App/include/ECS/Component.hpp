@@ -255,12 +255,6 @@ public:
 	Material material{};
 };
 
-struct LightVectors {
-	glm::vec3 ambient{.1f, .1f, .1f};
-	glm::vec3 diffuse{.8f, .8f, .8f};
-	glm::vec3 specular{1, 1, 1};
-};
-
 class LightComponent : public Component {
 public:
 	LightComponent() = delete;

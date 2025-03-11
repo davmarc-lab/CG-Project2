@@ -9,27 +9,121 @@ const auto em = EntityManager::instance();
 
 void ImGuiEntityTree::onRender() {
 	ImGui::Begin("Entities", NULL, ImGuiWindowFlags_NoFocusOnAppearing);
-	for (auto id : em->getEntitiesFromComponent<Transform>()) {
+	for (auto id : em->getEntities()) {
 		if (ImGui::TreeNode(systems::ecs::getEntityName(id).c_str())) {
-			auto comp = em->getComponentFromId<Transform>(id);
-
 			ImGui::PushID(&id);
 			ImGui::Text("Ett: %s", std::to_string(id).c_str());
 
-			if (comp != nullptr) {
-				auto pos = systems::transform::getPosition(id);
-				if (ImGui::DragFloat3("Position", &pos.x, 0.2f)) {
-					systems::transform::updatePosition(id, pos);
-				}
+			if (em->entityHasComponent<Transform>(id)) {
+				if (ImGui::CollapsingHeader("Transform##0")) {
+					auto pos = systems::transform::getPosition(id);
+					if (ImGui::DragFloat3("Position##0", &pos.x, 0.2f)) {
+						systems::transform::updatePosition(id, pos);
+					}
 
-				auto scale = systems::transform::getScale(id);
-				if (ImGui::DragFloat3("Scale", &scale.x, 0.2f)) {
-					systems::transform::updateScale(id, scale);
-				}
+					auto scale = systems::transform::getScale(id);
+					if (ImGui::DragFloat3("Scale##0", &scale.x, 0.2f)) {
+						systems::transform::updateScale(id, scale);
+					}
 
-				auto rot = glm::degrees(systems::transform::getRotation(id));
-				if (ImGui::DragFloat3("Rotation", &rot.x)) {
-					systems::transform::updateRotation(id, rot);
+					auto rot = glm::degrees(systems::transform::getRotation(id));
+					if (ImGui::DragFloat3("Rotation##0", &rot.x)) {
+						systems::transform::updateRotation(id, rot);
+					}
+				}
+			}
+
+			if (em->entityHasComponent<MaterialComponent>(id)) {
+				if (ImGui::CollapsingHeader("Material##1")) {
+					auto m = systems::material::getMaterial(id);
+					if (ImGui::SliderFloat3("Ambient##1", &m.ambient.x, 0.f, 1.f)) {
+						systems::material::updateAmbient(id, m.ambient);
+					}
+					if (ImGui::SliderFloat3("Diffuse##1", &m.diffuse.x, 0.f, 1.f)) {
+						systems::material::updateDiffuse(id, m.diffuse);
+					}
+					if (ImGui::SliderFloat3("Specular##1", &m.specular.x, 0.f, 1.f)) {
+						systems::material::updateSpecular(id, m.specular);
+					}
+					if (ImGui::DragFloat("Shininess##1", &m.shininess, 0.5f)) {
+						systems::material::updateShininess(id, m.shininess);
+					}
+				}
+			}
+
+			if (em->entityHasComponent<LightComponent>(id)) {
+				if (ImGui::CollapsingHeader("Light##2")) {
+					auto data = systems::light::getLightInfo(id);
+					ImGui::SeparatorText("General Info##2");
+					if (ImGui::ColorEdit3("Color##2", &data.color.x)) {
+						systems::light::updateColor(id, data.color);
+					}
+					if (ImGui::SliderFloat("Intensity##2", &data.intensity, 0.f, 1.f)) {
+						systems::light::updateIntensity(id, data.intensity);
+					}
+					if (ImGui::SliderFloat3("Ambient##2", &data.ambient.x, 0.f, 1.f)) {
+						systems::light::updateAmbient(id, data.ambient);
+					}
+					if (ImGui::SliderFloat3("Diffuse##2", &data.diffuse.x, 0.f, 1.f)) {
+						systems::light::updateDiffuse(id, data.diffuse);
+					}
+					if (ImGui::SliderFloat3("Specular##2", &data.specular.x, 0.f, 1.f)) {
+						systems::light::updateSpecular(id, data.specular);
+					}
+					ImGui::SeparatorText("Specific Info##2");
+					switch (data.type) {
+						case LightType::LIGHT_DIRECTIONAL: {
+							ImGui::TextColored({1, 1, 0, 1}, "Directional Light");
+							if (ImGui::SliderFloat3("Direction##2", &data.direction.x, -1.f, 1.f)) {
+								systems::light::updateDirection(id, data.direction);
+							}
+							break;
+						}
+						case LightType::LIGHT_POINT: {
+							ImGui::TextColored({1, 1, 0, 1}, "Point Light");
+							if (ImGui::DragFloat3("Position##2", &data.position.x, 0.2f)) {
+								systems::light::updatePosition(id, data.position);
+							}
+							if (ImGui::SliderFloat("Constant##2", &data.constant, 0.f, 1.f)) {
+								systems::light::updateConstant(id, data.constant);
+							}
+							if (ImGui::SliderFloat("Linear##2", &data.linear, 0.f, 1.f)) {
+								systems::light::updateLinear(id, data.linear);
+							}
+							if (ImGui::SliderFloat("Quadratic##2", &data.quadratic, 0.f, 1.f)) {
+								systems::light::updateQuadratic(id, data.quadratic);
+							}
+							break;
+						}
+						case LightType::LIGHT_SPOT: {
+							ImGui::TextColored({1, 1, 0, 1}, "Spot Light");
+							if (ImGui::DragFloat3("Position##2", &data.position.x, 0.2f)) {
+								systems::light::updatePosition(id, data.position);
+							}
+							if (ImGui::SliderFloat3("Direction##2", &data.direction.x, -1.f, 1.f)) {
+								systems::light::updateDirection(id, data.direction);
+							}
+							if (ImGui::SliderFloat("Constant##2", &data.constant, 0.f, 1.f)) {
+								systems::light::updateConstant(id, data.constant);
+							}
+							if (ImGui::SliderFloat("Linear##2", &data.linear, 0.f, 1.f)) {
+								systems::light::updateLinear(id, data.linear);
+							}
+							if (ImGui::SliderFloat("Quadratic##2", &data.quadratic, 0.f, 1.f)) {
+								systems::light::updateQuadratic(id, data.quadratic);
+							}
+							if (ImGui::DragFloat("Cut Off##2", &data.cutoff, 0.2f, 0.f)) {
+								systems::light::updateCutoff(id, data.cutoff);
+							}
+							if (ImGui::DragFloat("Outer Cut Off##2", &data.outerCutoff, 0.2f, 0.1f)) {
+								systems::light::updateOuterCutoff(id, data.outerCutoff);
+							}
+
+							break;
+						}
+						default:
+							break;
+					}
 				}
 			}
 

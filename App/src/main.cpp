@@ -250,13 +250,14 @@ int main(int argc, char *argv[]) {
 	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(shader, shape);
 	em->addComponent<MaterialComponent>(shape);
+    em->addComponent<LightComponent>(shape, glm::vec3{1, 1, 0});
 	systems::ecs::updateEntityName(shape, "Cube");
 
 	auto pyr = factory::factoryThorus(BasicInfo{{-1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(shader, pyr);
 	em->addComponent<MaterialComponent>(pyr);
 
-	auto l = factory::light::factoryPoint({3, 3, 1}, {});
+	auto l = factory::light::factorySpot({0, 0, 1}, {0, 0, -1}, {});
 
 	UniformBuffer ub("Matrices");
 	ub.onAttach();

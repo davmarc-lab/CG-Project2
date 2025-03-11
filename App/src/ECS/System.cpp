@@ -61,8 +61,8 @@ namespace systems {
 		}
 
 		void updateEntityName(const unsigned int &id, const std::string &name) {
-            ASSERT(em->isEntityValid(id));
-            em->setEntityName(id, name);
+			ASSERT(em->isEntityValid(id));
+			em->setEntityName(id, name);
 		}
 	} // namespace ecs
 	namespace transform {
@@ -433,6 +433,87 @@ namespace systems {
 		}
 
 	} // namespace material
+
+	namespace light {
+		LightShaderBlock getLightInfo(const unsigned int &id) {
+			auto c = em->getComponentFromId<LightComponent>(id);
+			ASSERT(c != nullptr);
+			return {
+				c->type,
+				c->intensity,
+				c->color,
+				c->position,
+				c->direction,
+				c->vectors.ambient,
+				c->vectors.diffuse,
+				c->vectors.specular,
+				c->attenuation.constant,
+				c->attenuation.linear,
+				c->attenuation.quadratic,
+				c->cutOff,
+				c->outerCutoff};
+		}
+		void updateColor(const unsigned int &id, const glm::vec3 &color) {
+			auto c = em->getComponentFromId<LightComponent>(id);
+			ASSERT(c != nullptr);
+			c->color = color;
+		}
+		void updateIntensity(const unsigned int &id, const float &intensity) {
+			auto c = em->getComponentFromId<LightComponent>(id);
+			ASSERT(c != nullptr);
+			c->intensity = intensity;
+		}
+		void updateAmbient(const unsigned int &id, const glm::vec3 &ambient) {
+			auto c = em->getComponentFromId<LightComponent>(id);
+			ASSERT(c != nullptr);
+			c->vectors.ambient = ambient;
+		}
+		void updateDiffuse(const unsigned int &id, const glm::vec3 &diffuse) {
+			auto c = em->getComponentFromId<LightComponent>(id);
+			ASSERT(c != nullptr);
+			c->vectors.diffuse = diffuse;
+		}
+		void updateSpecular(const unsigned int &id, const glm::vec3 &specular) {
+			auto c = em->getComponentFromId<LightComponent>(id);
+			ASSERT(c != nullptr);
+			c->vectors.specular = specular;
+		}
+		void updateDirection(const unsigned int &id, const glm::vec3 &direction) {
+			auto c = em->getComponentFromId<LightComponent>(id);
+			ASSERT(c != nullptr);
+			c->direction = direction;
+		}
+		void updatePosition(const unsigned int &id, const glm::vec3 &position) {
+			auto c = em->getComponentFromId<LightComponent>(id);
+			ASSERT(c != nullptr);
+			c->position = position;
+		}
+		void updateConstant(const unsigned int &id, const float &constant) {
+			auto c = em->getComponentFromId<LightComponent>(id);
+			ASSERT(c != nullptr);
+			c->attenuation.constant = constant;
+		}
+		void updateLinear(const unsigned int &id, const float &linear) {
+			auto c = em->getComponentFromId<LightComponent>(id);
+			ASSERT(c != nullptr);
+			c->attenuation.linear = linear;
+		}
+		void updateQuadratic(const unsigned int &id, const float &quadratic) {
+			auto c = em->getComponentFromId<LightComponent>(id);
+			ASSERT(c != nullptr);
+			c->attenuation.quadratic = quadratic;
+		}
+		void updateCutoff(const unsigned int &id, const float &cutoff) {
+			auto c = em->getComponentFromId<LightComponent>(id);
+			ASSERT(c != nullptr);
+			c->cutOff = cutoff;
+		}
+		void updateOuterCutoff(const unsigned int &id, const float &outerCutoff) {
+			auto c = em->getComponentFromId<LightComponent>(id);
+			ASSERT(c != nullptr);
+			c->outerCutoff = outerCutoff;
+		}
+	} // namespace light
 
 	namespace render {
 		void initStencilShader() {

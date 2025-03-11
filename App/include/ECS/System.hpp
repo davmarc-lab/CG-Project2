@@ -83,6 +83,22 @@ namespace systems {
 		void updateMaterial(const unsigned int &id, const Material &material);
 	} // namespace material
 
+	namespace light {
+		LightShaderBlock getLightInfo(const unsigned int &id);
+		void updateColor(const unsigned int &id, const glm::vec3 &color);
+		void updateIntensity(const unsigned int &id, const float &intensity);
+		void updateAmbient(const unsigned int &id, const glm::vec3 &ambient);
+		void updateDiffuse(const unsigned int &id, const glm::vec3 &diffuse);
+		void updateSpecular(const unsigned int &id, const glm::vec3 &specular);
+		void updateDirection(const unsigned int &id, const glm::vec3 &direction);
+		void updatePosition(const unsigned int &id, const glm::vec3 &position);
+		void updateConstant(const unsigned int &id, const float &constant);
+		void updateLinear(const unsigned int &id, const float &linear);
+		void updateQuadratic(const unsigned int &id, const float &quadratic);
+		void updateCutoff(const unsigned int &id, const float &cutoff);
+		void updateOuterCutoff(const unsigned int &id, const float &outerCutoff);
+	} // namespace light
+
 	namespace render {
 		void initStencilShader();
 
