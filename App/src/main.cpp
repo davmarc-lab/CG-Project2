@@ -25,23 +25,18 @@ void enableDefaultCameraMovement() {
 		if (im->isKeyPressed(GLFW_KEY_W)) {
 			camera.moveCamera(camera.getCameraVelocity() * camera.getCameraFront());
 		}
-
 		if (im->isKeyPressed(GLFW_KEY_S)) {
 			camera.moveCamera(camera.getCameraVelocity() * -camera.getCameraFront());
 		}
-
 		if (im->isKeyPressed(GLFW_KEY_D)) {
 			camera.moveCamera(camera.getCameraVelocity() * camera.getCameraRight());
 		}
-
 		if (im->isKeyPressed(GLFW_KEY_A)) {
 			camera.moveCamera(camera.getCameraVelocity() * -camera.getCameraRight());
 		}
-
 		if (im->isKeyPressed(GLFW_KEY_SPACE)) {
 			camera.moveCamera(camera.getCameraVelocity() * camera.getCameraUp());
 		}
-
 		if (im->isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
 			camera.moveCamera(camera.getCameraVelocity() * -camera.getCameraUp());
 		}
@@ -242,22 +237,24 @@ int main(int argc, char *argv[]) {
 		fb.createFrameBuffer();
 	*/
 
+	Shared<ShaderProgram> skyboxShader = CreateShared<ShaderProgram>("skyboxVertShader.glsl", "skyboxFragShader.glsl");
+	skyboxShader->createShaderProgram();
 	Shared<ShaderProgram> shader = CreateShared<ShaderProgram>("vertexShader.glsl", "lightFragShader.glsl");
 	shader->createShaderProgram();
 	Shared<ShaderProgram> normalShader = CreateShared<ShaderProgram>("normalVertShader.glsl", "normalFragShader.glsl", "normalGeomShader.glsl");
 	normalShader->createShaderProgram();
 
+	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
+
 	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(shader, shape);
 	em->addComponent<MaterialComponent>(shape);
-    em->addComponent<LightComponent>(shape, glm::vec3{1, 1, 0});
+	em->addComponent<LightComponent>(shape, glm::vec3{1, 1, 0});
 	systems::ecs::updateEntityName(shape, "Cube");
 
 	auto pyr = factory::factoryThorus(BasicInfo{{-1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(shader, pyr);
 	em->addComponent<MaterialComponent>(pyr);
-
-	auto l = factory::light::factorySpot({0, 0, 1}, {0, 0, -1}, {});
 
 	UniformBuffer ub("Matrices");
 	ub.onAttach();
@@ -277,7 +274,10 @@ int main(int argc, char *argv[]) {
 		igEttModel->setSelectedEntity(ettSelected);
 	});
 
-	ed->subscribe(event::loop::LOOP_RENDER, [&normalShader, &shape]() {
+	ed->subscribe(event::loop::LOOP_RENDER, [&normalShader, &skyboxShader, &shape, &skybox]() {
+		// render skybox
+		systems::render::renderSkybox(skybox, skyboxShader);
+		// render other meshes
 		systems::render::renderAllMeshes();
 		normalShader->use();
 		auto p = camera.getProjMatrix();

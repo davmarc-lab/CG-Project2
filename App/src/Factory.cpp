@@ -5,6 +5,9 @@
 
 #include "../../Opengl-Core/include/Core.hpp"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "../include/stb_image.hpp"
+
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/geometric.hpp>
 #include <vector>
@@ -160,6 +163,62 @@ namespace factory {
 		auto vaoid = bc->vao.getId();
 		rc->setRenderCall([vc, vaoid]() {
 			rd->drawElements(vaoid, GL_TRIANGLES, vc->getIndexCoords().size(), GL_UNSIGNED_INT);
+		});
+		return id;
+	}
+
+	std::vector<std::string> faces{"right", "left", "top", "bottom", "front", "back"};
+
+	unsigned int factorySkyBox(const std::string &path, const std::string &format) {
+		auto id = em->createEntity();
+		auto vc = em->addComponent<VertexComponent>(id, skyboxGeometry, std::vector<glm::vec4>{}, std::vector<unsigned int>{});
+		auto bc = em->addComponent<BufferComponent>(id);
+
+		// Buffers
+		bc->vao.onAttach();
+		bc->vao.bind();
+
+		bc->vbo_g.onAttach();
+		bc->vbo_g.setup(vc->getVertexCoords().data(), vc->getVertexCoords().size(), GL_STATIC_DRAW);
+		bc->vao.linkAttribFast(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+
+		// Texture
+		auto tc = em->addComponent<TextureComponent>(id);
+		TextureParams params{};
+		params.target = GL_TEXTURE_CUBE_MAP;
+		ogl::Texture t{params, 0, 0};
+		t.onAttach();
+		t.bind();
+		int width, height, nrChannels;
+		for (size_t i = 0; i < faces.size(); i++) {
+			auto dataRead = stbi_load((path + faces[i] + "." + format).c_str(), &width, &height, &nrChannels, 0);
+			if (dataRead)
+				t.fastCreateCustomTexture2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, dataRead);
+			else
+				std::cerr << "Failed to read data from the file: " << path + faces[i] + "." + format << "\n";
+			stbi_image_free(dataRead);
+		}
+		t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		t.setTexParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		t.setTexParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		t.setTexParameteri(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		auto rc = em->addComponent<RenderComponent>(id);
+		auto vaoid = bc->vao.getId();
+		auto tid = t.getId();
+		rc->setRenderCall([vc, vaoid, tid]() {
+			int pCull;
+			glGetIntegerv(GL_CULL_FACE, &pCull);
+			glDisable(GL_CULL_FACE);
+			glDepthFunc(GL_LEQUAL);
+			glBindVertexArray(vaoid);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, tid);
+			rd->drawArrays(vaoid, GL_TRIANGLES, 0, vc->getVertexCoords().size());
+			glDepthFunc(GL_LESS);
+			if (pCull)
+				glEnable(GL_CULL_FACE);
 		});
 		return id;
 	}

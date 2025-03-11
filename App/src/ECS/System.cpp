@@ -394,6 +394,14 @@ namespace systems {
 		}
 	} // namespace animation
 
+	namespace texture {
+		std::vector<ogl::Texture> getTextures(const unsigned int &id) {
+			auto c = em->getComponentFromId<TextureComponent>(id);
+			ASSERT(c != nullptr);
+			return c->textures;
+		}
+	} // namespace texture
+
 	namespace material {
 		Material getMaterial(const unsigned int &id) {
 			auto c = em->getComponentFromId<MaterialComponent>(id);
@@ -612,6 +620,14 @@ namespace systems {
 			shader->setVec3("viewPos", ogl::camera.getCameraPosition());
 		}
 
+		void renderSkybox(const unsigned int &id, const Shared<ogl::ShaderProgram> &shader) {
+			shader->use();
+			auto rc = em->getComponentFromId<RenderComponent>(id);
+			shader->setMat4("view", glm::mat4(glm::mat3(ogl::camera.getViewMatrix())));
+			shader->setMat4("proj", ogl::camera.getProjMatrix());
+			rc->call();
+		}
+
 		void renderAllMeshes() {
 			auto lightsData = prepareLightData();
 			for (auto [shader, etts] : scene->getShaderEntityMap()) {
@@ -627,7 +643,9 @@ namespace systems {
 						shader->setFloat("material.shininess", mc->material.shininess);
 					}
 					auto rc = em->getComponentFromId<RenderComponent>(id);
-					shader->setMat4("model", ::systems::transform::getModelMatrix(id));
+					if (em->entityHasComponent<Transform>(id)) {
+						shader->setMat4("model", ::systems::transform::getModelMatrix(id));
+					}
 					rc->call();
 				}
 			}

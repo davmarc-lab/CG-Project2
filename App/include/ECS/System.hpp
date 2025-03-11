@@ -74,6 +74,10 @@ namespace systems {
 		void updateDistanceAnimation();
 	} // namespace animation
 
+	namespace texture {
+		std::vector<ogl::Texture> getTextures(const unsigned int &id);
+	}
+
 	namespace material {
 		Material getMaterial(const unsigned int &id);
 		void updateAmbient(const unsigned int &id, const glm::vec3 &val);
@@ -102,6 +106,7 @@ namespace systems {
 	namespace render {
 		void initStencilShader();
 
+		void renderSkybox(const unsigned int &id, const Shared<ogl::ShaderProgram> &shader);
 		void renderAllMeshes();
 
 		void renderBoundingBox();

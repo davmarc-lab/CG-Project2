@@ -189,6 +189,16 @@ private:
 	std::vector<glm::vec3> m_normals{};
 };
 
+class TextureComponent : public Component {
+public:
+	TextureComponent() :
+		Component() {};
+
+    virtual ~TextureComponent() = default;
+
+    std::vector<ogl::Texture> textures{};
+};
+
 class ParentComponent : public Component {
 public:
 	ParentComponent() :
