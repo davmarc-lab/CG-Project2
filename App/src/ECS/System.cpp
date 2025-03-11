@@ -55,6 +55,15 @@ namespace systems {
 			removeEntityFromScene(id);
 			return em->removeEntity(id);
 		}
+
+		std::string getEntityName(const unsigned int &id) {
+			return em->isEntityValid(id) ? em->getEntityName(id) : "INVALID";
+		}
+
+		void updateEntityName(const unsigned int &id, const std::string &name) {
+            ASSERT(em->isEntityValid(id));
+            em->setEntityName(id, name);
+		}
 	} // namespace ecs
 	namespace transform {
 		void updatePosition(const unsigned int &id, const glm::vec3 &position) {

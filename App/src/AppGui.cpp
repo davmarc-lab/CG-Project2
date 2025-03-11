@@ -8,9 +8,9 @@
 const auto em = EntityManager::instance();
 
 void ImGuiEntityTree::onRender() {
-	ImGui::Begin("Entities");
+	ImGui::Begin("Entities", NULL, ImGuiWindowFlags_NoFocusOnAppearing);
 	for (auto id : em->getEntitiesFromComponent<Transform>()) {
-		if (ImGui::TreeNode(std::to_string(id).c_str())) {
+		if (ImGui::TreeNode(systems::ecs::getEntityName(id).c_str())) {
 			auto comp = em->getComponentFromId<Transform>(id);
 
 			ImGui::PushID(&id);
@@ -42,7 +42,7 @@ void ImGuiEntityTree::onRender() {
 
 void ImGuiEntityModel::onRender() {
 	if (this->m_ett >= 0) {
-		ImGui::Begin("Model");
+		ImGui::Begin("Model", NULL, ImGuiWindowFlags_NoFocusOnAppearing);
 		ImGui::PushID(&this->m_ett);
 		ImGui::Text("Ett: %s", std::to_string(this->m_ett).c_str());
 		auto pos = systems::transform::getPosition(this->m_ett);

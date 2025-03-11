@@ -3,6 +3,7 @@
 #include "../../../Opengl-Core/include/Core.hpp"
 
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/vector_float3.hpp>
 #include <glm/geometric.hpp>
 #include <glm/gtx/quaternion.hpp>
 
@@ -260,14 +261,21 @@ struct LightVectors {
 	glm::vec3 specular{1, 1, 1};
 };
 
-struct LightConstraint {
-	float constant = 1.f, linear = .09f, quadratic = .032f;
-};
-
 class LightComponent : public Component {
 public:
-	LightComponent() :
-		Component() {}
+	LightComponent() = delete;
+
+	// Directional Light
+	LightComponent(const glm::vec3 &direction) :
+		type(LightType::LIGHT_DIRECTIONAL), direction(direction), Component() {}
+
+	// Point Light
+	LightComponent(const glm::vec3 &position, const LightConstraint &constraint) :
+		type(LightType::LIGHT_POINT), position(position), attenuation(constraint), Component() {}
+
+	// Spot Light
+	LightComponent(const glm::vec3 &position, const glm::vec3 &direction, const LightConstraint &constraint, const float &cutOff = 12.5f, const float &outerCutoff = 17.5f) :
+		type(LightType::LIGHT_SPOT), position(position), direction(direction), attenuation(constraint), cutOff(cutOff), outerCutoff(outerCutoff), Component() {}
 
 	virtual ~LightComponent() override = default;
 

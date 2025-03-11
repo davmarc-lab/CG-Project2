@@ -18,15 +18,18 @@ public:
 		auto id = this->m_currentId;
 		this->m_currentId++;
 
-		this->m_entities.push_back(id);
+		this->m_entities.emplace(id, "Entity " + std::to_string(id));
 		this->m_ettComponent.emplace(id, std::vector<Shared<Component>>{});
 
 		return id;
 	}
 
+	inline std::string getEntityName(const Index &id) const { return this->m_entities.at(id); }
+
+	inline void setEntityName(const Index &id, const std::string &name) { this->m_entities.at(id) = std::move(name); }
+
 	bool removeEntity(const Index &id) {
-		// AAAAAAAAAAA
-		this->m_entities.erase(std::find(ALL(this->m_entities), id));
+		this->m_entities.erase(id);
 		this->m_ettComponent.erase(id);
 		for (auto it = this->m_compEntity.begin(); it != this->m_compEntity.end();) {
 			auto &ids = it->second;
@@ -64,7 +67,7 @@ public:
 	}
 
 	template <typename T>
-	inline bool removeComponent(const unsigned int &id) {
+	inline bool removeComponent(const Index &id) {
 		if (!this->entityHasComponent<T>(id))
 			return false;
 
@@ -76,7 +79,7 @@ public:
 	}
 
 	template <typename T>
-	inline bool entityHasComponent(const unsigned int &id) {
+	inline bool entityHasComponent(const Index &id) {
 		return this->m_compEntity.count(CLASSNAME(T)) > 0 &&
 			std::find(ALL(this->m_compEntity.at(CLASSNAME(T))), id) != this->m_compEntity.at(CLASSNAME(T)).end();
 	}
@@ -121,7 +124,7 @@ public:
 private:
 	Index m_currentId = 0;
 
-	std::vector<Index> m_entities{};
+	std::map<Index, std::string> m_entities{};
 	std::map<Index, std::vector<Shared<Component>>> m_ettComponent{};
 	std::map<std::string, std::vector<Index>> m_compEntity{};
 

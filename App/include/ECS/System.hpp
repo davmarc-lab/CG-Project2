@@ -1,20 +1,21 @@
 #pragma once
 
-#include <cstddef>
 #include <functional>
+#include <string>
 #include <utility>
 #include <vector>
 
 #include "../../../Opengl-Core/include/Core.hpp"
 #include "Component.hpp"
-#include "EcsScene.hpp"
-#include "EntityManager.hpp"
 
 namespace systems {
 	namespace ecs {
 		bool removeEntityFromManager(const unsigned int &id);
 		void removeEntityFromScene(const unsigned int &id);
 		bool removeEntityFromAll(const unsigned int &id);
+
+		std::string getEntityName(const unsigned int &id);
+		void updateEntityName(const unsigned int &id, const std::string &name);
 	} // namespace ecs
 
 	namespace transform {

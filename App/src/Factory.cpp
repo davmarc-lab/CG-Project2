@@ -163,4 +163,25 @@ namespace factory {
 		});
 		return id;
 	}
+
+	namespace light {
+		unsigned int factoryDirectional(const glm::vec3 &direction) {
+			auto id = em->createEntity();
+			em->addComponent<LightComponent>(id, direction);
+			return id;
+		}
+
+		unsigned int factoryPoint(const glm::vec3 &position, const LightConstraint &constraint) {
+			auto id = em->createEntity();
+			em->addComponent<LightComponent>(id, position, constraint);
+			return id;
+		}
+
+		unsigned int factorySpot(const glm::vec3 &position, const glm::vec3 &direction, const LightConstraint &constraint, const float &cutOff, const float &outerCutOff) {
+			auto id = em->createEntity();
+			em->addComponent<LightComponent>(id, position, direction, constraint, cutOff, outerCutOff);
+			return id;
+		}
+	} // namespace light
+
 } // namespace factory

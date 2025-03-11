@@ -10,6 +10,10 @@ enum LightType {
 
 #define SHADER_MAX_LIGHTS 32
 
+struct LightConstraint {
+	float constant = 1.f, linear = .09f, quadratic = .032f;
+};
+
 struct LightShaderBlock {
 	int type = LightType::LIGHT_DIRECTIONAL;
 	float intensity = 1;

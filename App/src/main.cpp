@@ -249,12 +249,14 @@ int main(int argc, char *argv[]) {
 
 	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(shader, shape);
-	em->addComponent<LightComponent>(shape);
-    em->addComponent<MaterialComponent>(shape);
+	em->addComponent<MaterialComponent>(shape);
+	systems::ecs::updateEntityName(shape, "Cube");
 
 	auto pyr = factory::factoryThorus(BasicInfo{{-1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(shader, pyr);
-    em->addComponent<MaterialComponent>(pyr);
+	em->addComponent<MaterialComponent>(pyr);
+
+	auto l = factory::light::factoryPoint({3, 3, 1}, {});
 
 	UniformBuffer ub("Matrices");
 	ub.onAttach();
