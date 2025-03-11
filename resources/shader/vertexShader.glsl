@@ -23,6 +23,6 @@ void main() {
     FragPos = vec3(model * vec4(aPos, 1.f));
     gl_Position = viewProj * model * vec4(aPos, 1.f);
     vs_out.vertColor = aColor;
-    vs_out.normal = aNormal;
+    vs_out.normal = mat3(transpose(inverse(model))) * aNormal;
     vs_out.texCoord = aTexCoord;
 }

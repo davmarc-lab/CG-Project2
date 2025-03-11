@@ -252,7 +252,7 @@ int main(int argc, char *argv[]) {
 	em->addComponent<LightComponent>(shape);
     em->addComponent<MaterialComponent>(shape);
 
-	auto pyr = factory::factoryPyramid(BasicInfo{{-1, 1, -3}, {1, 1, 1}, {}});
+	auto pyr = factory::factoryThorus(BasicInfo{{-1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(shader, pyr);
     em->addComponent<MaterialComponent>(pyr);
 
@@ -266,8 +266,8 @@ int main(int argc, char *argv[]) {
 		ub.update(0, sizeof(glm::mat4), glm::value_ptr(vp));
 	});
 
-	ed->subscribe(event::loop::LOOP_UPDATE, [&shape]() {
-		// systems::transform::addRotation(shape, {2, 0, 0});
+	ed->subscribe(event::loop::LOOP_UPDATE, [&pyr]() {
+		systems::transform::addRotation(pyr, {2, 1, 0});
 	});
 
 	ed->subscribe(ENTITY_ELECTED_CHANGED, [&igEttModel]() {
