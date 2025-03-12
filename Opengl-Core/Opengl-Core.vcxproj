@@ -110,9 +110,13 @@
     <ClInclude Include="include\Buffer\VertexArray.hpp" />
     <ClInclude Include="include\Buffer\VertexBuffer.hpp" />
     <ClInclude Include="include\Core.hpp" />
+    <ClInclude Include="include\Core\Camera.hpp" />
     <ClInclude Include="include\Core\Event.hpp" />
     <ClInclude Include="include\Core\ImGui.hpp" />
+    <ClInclude Include="include\Core\InputManager.hpp" />
     <ClInclude Include="include\Core\Layer.hpp" />
+    <ClInclude Include="include\Core\MeshVertices.hpp" />
+    <ClInclude Include="include\Core\Renderer.hpp" />
     <ClInclude Include="include\Core\Resource.hpp" />
     <ClInclude Include="include\Core\Structs.hpp" />
     <ClInclude Include="include\Core\Utils.hpp" />
@@ -120,6 +124,7 @@
     <ClInclude Include="include\Graphic.hpp" />
     <ClInclude Include="include\Shader\Shader.hpp" />
     <ClInclude Include="include\Texture\Texture.hpp" />
+    <ClInclude Include="include\Text\TextManager.hpp" />
     <ClInclude Include="vendor\include\glad\glad.h" />
     <ClInclude Include="vendor\include\imgui\imconfig.h" />
     <ClInclude Include="vendor\include\imgui\imgui.h" />
@@ -139,12 +144,16 @@
     <ClCompile Include="src\Buffer\UniformBuffer.cpp" />
     <ClCompile Include="src\Buffer\VertexArray.cpp" />
     <ClCompile Include="src\Buffer\VertexBuffer.cpp" />
+    <ClCompile Include="src\Core\Camera.cpp" />
     <ClCompile Include="src\Core\Event.cpp" />
     <ClCompile Include="src\Core\ImGuiManager.cpp" />
+    <ClCompile Include="src\Core\InputManager.cpp" />
+    <ClCompile Include="src\Core\Renderer.cpp" />
     <ClCompile Include="src\Core\Resource.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
     <ClCompile Include="src\Shader\Shader.cpp" />
     <ClCompile Include="src\Texture\Texture.cpp" />
+    <ClCompile Include="src\Text\TextManager.cpp" />
     <ClCompile Include="vendor\src\glad\src\glad.c" />
     <ClCompile Include="vendor\src\imgui\imgui.cpp" />
     <ClCompile Include="vendor\src\imgui\imgui_demo.cpp" />
@@ -154,7 +163,17 @@
     <ClCompile Include="vendor\src\imgui\imgui_tables.cpp" />
     <ClCompile Include="vendor\src\imgui\imgui_widgets.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\freetype2.2.6.0.1\build\native\freetype2.targets" Condition="Exists('..\packages\freetype2.2.6.0.1\build\native\freetype2.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\freetype2.2.6.0.1\build\native\freetype2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freetype2.2.6.0.1\build\native\freetype2.targets'))" />
+  </Target>
 </Project>
