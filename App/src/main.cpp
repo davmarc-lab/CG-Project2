@@ -173,6 +173,9 @@ int main(int argc, char *argv[]) {
 	s.decorated = false;
 	s.size = {1366, 768};
 	s.position = {400, 12};
+	#ifdef _WIN32
+		s.position = {470, 50};
+	#endif
 	s.focused = true;
 
 	Window w{s};
@@ -279,14 +282,14 @@ int main(int argc, char *argv[]) {
 		systems::render::renderSkybox(skybox, skyboxShader);
 		// render other meshes
 		systems::render::renderAllMeshes();
-		normalShader->use();
-		auto p = camera.getProjMatrix();
-		auto v = camera.getViewMatrix();
-		normalShader->setMat4("view", v);
-		normalShader->setMat4("proj", p);
-		normalShader->setMat4("model", systems::transform::getModelMatrix(shape));
-		auto rc = em->getComponentFromId<RenderComponent>(shape);
-		rc->call();
+		// normalShader->use();
+		// auto p = camera.getProjMatrix();
+		// auto v = camera.getViewMatrix();
+		// normalShader->setMat4("view", v);
+		// normalShader->setMat4("proj", p);
+		// normalShader->setMat4("model", systems::transform::getModelMatrix(shape));
+		// auto rc = em->getComponentFromId<RenderComponent>(shape);
+		// rc->call();
 	});
 
 	while (!glfwWindowShouldClose(w.getContext())) {

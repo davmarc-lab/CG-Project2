@@ -65,13 +65,32 @@ public:
 
 	inline glm::vec3 getRotation() const { return this->rotation; }
 
-	inline void setRotation(const glm::vec3 &rotation) {
-		this->rotation = glm::radians(rotation);
+	inline void setRotation(glm::vec3 rot) {
+		if (rot.x >= MAX_DEGREE_ANGLE || rot.x <= -MAX_DEGREE_ANGLE) {
+			rot.x -= 2 * MAX_DEGREE_ANGLE * (rot.x > 0 ? 1.f : -1.f);
+		}
+		if (rot.y >= MAX_DEGREE_ANGLE || rot.y <= -MAX_DEGREE_ANGLE) {
+			rot.y -= 2 * MAX_DEGREE_ANGLE * (rot.y > 0 ? 1.f : -1.f);
+		}
+		if (rot.z >= MAX_DEGREE_ANGLE || rot.z <= -MAX_DEGREE_ANGLE) {
+			rot.z -= 2 * MAX_DEGREE_ANGLE * (rot.z > 0 ? 1.f : -1.f);
+		}
+		this->rotation = glm::radians(rot);
 		this->dirty = true;
 	}
 
 	inline void addRotation(const glm::vec3 &offset) {
-		this->rotation += glm::radians(offset);
+		auto rot = glm::degrees(this->rotation + glm::radians(offset));
+		if (rot.x >= MAX_DEGREE_ANGLE || rot.x <= -MAX_DEGREE_ANGLE) {
+			rot.x -= 2 * MAX_DEGREE_ANGLE * (rot.x > 0 ? 1.f : -1.f);
+		}
+		if (rot.y >= MAX_DEGREE_ANGLE || rot.y <= -MAX_DEGREE_ANGLE) {
+			rot.y -= 2 * MAX_DEGREE_ANGLE * (rot.y > 0 ? 1.f : -1.f);
+		}
+		if (rot.z >= MAX_DEGREE_ANGLE || rot.z <= -MAX_DEGREE_ANGLE) {
+			rot.z -= 2 * MAX_DEGREE_ANGLE * (rot.z > 0 ? 1.f : -1.f);
+		}
+		this->rotation = glm::radians(rot);
 		this->dirty = true;
 	}
 
@@ -112,12 +131,15 @@ public:
 	glm::mat4 model{1};
 	bool dirty = true;
 	bool enableModel = true;
+
+	const float MAX_DEGREE_ANGLE = 180;
 };
 
 class MultiMesh : public Component {
 public:
 	MultiMesh() :
-		Component() {}
+		Component() {
+	}
 
 	virtual ~MultiMesh() override = default;
 
@@ -192,17 +214,19 @@ private:
 class TextureComponent : public Component {
 public:
 	TextureComponent() :
-		Component() {};
+		Component() {
+	};
 
-    virtual ~TextureComponent() = default;
+	virtual ~TextureComponent() = default;
 
-    std::vector<ogl::Texture> textures{};
+	std::vector<ogl::Texture> textures{};
 };
 
 class ParentComponent : public Component {
 public:
 	ParentComponent() :
-		Component() {}
+		Component() {
+	}
 
 	virtual ~ParentComponent() = default;
 
@@ -243,7 +267,8 @@ private:
 class Outlined : public Component {
 public:
 	Outlined() :
-		Component() {}
+		Component() {
+	}
 
 	virtual ~Outlined() = default;
 };
@@ -258,7 +283,8 @@ struct Material {
 class MaterialComponent : public Component {
 public:
 	MaterialComponent() :
-		Component() {}
+		Component() {
+	}
 
 	virtual ~MaterialComponent() = default;
 
@@ -271,15 +297,18 @@ public:
 
 	// Directional Light
 	LightComponent(const glm::vec3 &direction) :
-		type(LightType::LIGHT_DIRECTIONAL), direction(direction), Component() {}
+		type(LightType::LIGHT_DIRECTIONAL), direction(direction), Component() {
+	}
 
 	// Point Light
 	LightComponent(const glm::vec3 &position, const LightConstraint &constraint) :
-		type(LightType::LIGHT_POINT), position(position), attenuation(constraint), Component() {}
+		type(LightType::LIGHT_POINT), position(position), attenuation(constraint), Component() {
+	}
 
 	// Spot Light
 	LightComponent(const glm::vec3 &position, const glm::vec3 &direction, const LightConstraint &constraint, const float &cutOff = 12.5f, const float &outerCutoff = 17.5f) :
-		type(LightType::LIGHT_SPOT), position(position), direction(direction), attenuation(constraint), cutOff(cutOff), outerCutoff(outerCutoff), Component() {}
+		type(LightType::LIGHT_SPOT), position(position), direction(direction), attenuation(constraint), cutOff(cutOff), outerCutoff(outerCutoff), Component() {
+	}
 
 	virtual ~LightComponent() override = default;
 
@@ -338,7 +367,8 @@ public:
 	TimeAnimation() = delete;
 
 	TimeAnimation(const float &startTime, const float &timeToLive, std::function<void()> &&func) :
-		startTime(startTime), timeToLive(timeToLive), func(func), Component() {}
+		startTime(startTime), timeToLive(timeToLive), func(func), Component() {
+	}
 
 	virtual ~TimeAnimation() override = default;
 
@@ -351,7 +381,8 @@ public:
 class BehaviourComponent : public Component {
 public:
 	BehaviourComponent() :
-		Component() {}
+		Component() {
+	}
 
 	virtual ~BehaviourComponent() = default;
 
