@@ -5,12 +5,11 @@
 
 #include "../../Opengl-Core/include/Core.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "../include/stb_image.hpp"
-
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/geometric.hpp>
 #include <vector>
+
+#include "../include/Utils.hpp"
 
 const auto em = EntityManager::instance();
 const auto rd = ogl::Renderer::instance();
@@ -24,6 +23,7 @@ namespace factory {
 		systems::transform::updateRotation(id, info.rotation);
 		auto vc = em->addComponent<VertexComponent>(id, cubeGeometry, getColorVector(color, cubeGeometry.size()), cubeIndices);
 		vc->setNormalsCoords(cubeNormals);
+		vc->setTexCoords(cubeTexCoord);
 		auto bc = em->addComponent<BufferComponent>(id);
 		bc->vao.onAttach();
 		bc->vao.bind();
@@ -39,6 +39,10 @@ namespace factory {
 		bc->vbo_n.onAttach();
 		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
 		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		
+		bc->vbo_t.onAttach();
+		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
+		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
 		bc->ebo.onAttach();
 		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
@@ -63,6 +67,7 @@ namespace factory {
 		auto coords = getSphereVertices();
 		auto vc = em->addComponent<VertexComponent>(id, coords.vertex, getColorVector(color, coords.vertex.size()), coords.indices);
 		vc->setNormalsCoords(coords.normals);
+		vc->setTexCoords(coords.texCoords);
 		auto bc = em->addComponent<BufferComponent>(id);
 		bc->vao.onAttach();
 		bc->vao.bind();
@@ -78,6 +83,10 @@ namespace factory {
 		bc->vbo_n.onAttach();
 		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
 		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		
+		bc->vbo_t.onAttach();
+		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
+		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
 		bc->ebo.onAttach();
 		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
@@ -100,6 +109,7 @@ namespace factory {
 		systems::transform::updateRotation(id, info.rotation);
 		auto vc = em->addComponent<VertexComponent>(id, pyramidGeometry, getColorVector(color, pyramidGeometry.size()), pyramidIndices);
 		vc->setNormalsCoords(pyramidNormals);
+		vc->setTexCoords(pyramidTexCoords);
 		auto bc = em->addComponent<BufferComponent>(id);
 		bc->vao.onAttach();
 		bc->vao.bind();
@@ -115,6 +125,10 @@ namespace factory {
 		bc->vbo_n.onAttach();
 		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
 		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		
+		bc->vbo_t.onAttach();
+		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
+		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
 		bc->ebo.onAttach();
 		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
@@ -138,6 +152,7 @@ namespace factory {
 		auto coords = getThorusVertices();
 		auto vc = em->addComponent<VertexComponent>(id, coords.vertex, getColorVector(color, coords.vertex.size()), coords.indices);
 		vc->setNormalsCoords(coords.normals);
+		vc->setTexCoords(coords.texCoords);
 		auto bc = em->addComponent<BufferComponent>(id);
 		bc->vao.onAttach();
 		bc->vao.bind();
@@ -153,6 +168,10 @@ namespace factory {
 		bc->vbo_n.onAttach();
 		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
 		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		
+		bc->vbo_t.onAttach();
+		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
+		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
 		bc->ebo.onAttach();
 		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
@@ -164,6 +183,12 @@ namespace factory {
 		rc->setRenderCall([vc, vaoid]() {
 			rd->drawElements(vaoid, GL_TRIANGLES, vc->getIndexCoords().size(), GL_UNSIGNED_INT);
 		});
+		return id;
+	}
+
+	unsigned int factoryPlane(const glm::vec4 &color) {
+		auto id = factoryCube(BasicInfo{{0, -2, 0}, {100, 0, 100}}, color);
+		em->removeComponent<MaterialComponent>(id);
 		return id;
 	}
 
@@ -191,12 +216,12 @@ namespace factory {
 		t.bind();
 		int width, height, nrChannels;
 		for (size_t i = 0; i < faces.size(); i++) {
-			auto dataRead = stbi_load((path + faces[i] + "." + format).c_str(), &width, &height, &nrChannels, 0);
+			auto dataRead = readImageData(path + faces[i] + "." + format, width, height, nrChannels, 0);
 			if (dataRead)
 				t.fastCreateCustomTexture2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, dataRead);
 			else
 				std::cerr << "Failed to read data from the file: " << path + faces[i] + "." + format << "\n";
-			stbi_image_free(dataRead);
+			freeImageData(dataRead);
 		}
 		t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);

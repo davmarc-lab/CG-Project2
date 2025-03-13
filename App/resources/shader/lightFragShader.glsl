@@ -20,6 +20,7 @@ struct Material {
 
 uniform Material material;
 uniform vec3 viewPos;
+uniform sampler2D texture1;
 
 struct Light {
     int type;
@@ -142,7 +143,7 @@ void main() {
                 }
             }
         }
-        fragColor = vec4(result, 1);
+        fragColor = texture(texture1, fs_out.texCoord);
     } else {
         fragColor = fs_out.vertColor;
     }

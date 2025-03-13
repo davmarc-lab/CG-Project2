@@ -75,7 +75,9 @@ namespace systems {
 	} // namespace animation
 
 	namespace texture {
-		std::vector<ogl::Texture> getTextures(const unsigned int &id);
+		ogl::Texture getTexture(const unsigned int &id);
+
+		void setTexture(const unsigned int &id, const ogl::Texture &texture);
 	}
 
 	namespace material {
@@ -111,4 +113,4 @@ namespace systems {
 
 		void renderBoundingBox();
 	} // namespace render
-} // namespace systems
+}     // namespace systems

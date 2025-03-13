@@ -20,10 +20,8 @@ namespace ogl {
 
 		/*
 		 * Bind the current texture id.
-		 *
-		 * @returns texture id.
 		 */
-		unsigned int bind() const;
+		void bind() const;
 
 		/*
 		 * Unbind the current texture id.
@@ -51,7 +49,7 @@ namespace ogl {
 		 *
 		 * @param *data Pointer to texture's data.
 		 */
-		inline void createTexture2D(void *data) {
+		inline void createTexture2D(unsigned char *data) {
 			this->bind();
 			this->fastCreateTexture2D(data);
 		}
@@ -117,6 +115,7 @@ namespace ogl {
 		 * @returns texture size.
 		 */
 		inline Pair<unsigned int> getSize() const { return this->m_size; }
+
 		inline void setSize(const Pair<unsigned int> &size) {
 			this->m_size = size;
 			this->rescaleTexture();
@@ -125,9 +124,12 @@ namespace ogl {
 		Texture() = default;
 
 		Texture(const TextureParams &params, const Pair<unsigned int> &size) :
-			m_params(params), m_size(size) {}
+			m_params(params), m_size(size) {
+		}
+
 		Texture(const TextureParams &params, const unsigned int &width, const unsigned int &height) :
-			m_params(params), m_size({width, height}) {}
+			m_params(params), m_size({width, height}) {
+		}
 
 		~Texture() = default;
 

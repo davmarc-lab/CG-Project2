@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <glm/glm.hpp>
 
 enum LightType {
@@ -41,3 +42,7 @@ struct LightShaderBlock {
 
 	bool isSmooth = false;
 };
+
+unsigned char *readImageData(const std::string &path, int &width, int &height, int &nrChannels, int desiredChannels = 0);
+
+void freeImageData(void *data);

@@ -187,6 +187,14 @@ public:
 			this->m_colors.push_back(e);
 	}
 
+	inline std::vector<glm::vec2> getTexCoords() const { return this->m_texCoords; }
+	inline void setTexCoords(const std::vector<glm::vec2> &texCoords) { this->m_texCoords = texCoords; }
+
+	inline void appendTexCoords(const std::vector<glm::vec2> &coords) {
+		for (auto e : coords)
+			this->m_texCoords.push_back(e);
+	}
+
 	inline std::vector<unsigned int> getIndexCoords() const { return this->m_index; }
 	inline void setIndexCoords(const std::vector<unsigned int> &index) { this->m_index = index; }
 
@@ -207,6 +215,7 @@ public:
 private:
 	std::vector<glm::vec3> m_vertex{};
 	std::vector<glm::vec4> m_colors{};
+	std::vector<glm::vec2> m_texCoords{};
 	std::vector<unsigned int> m_index{};
 	std::vector<glm::vec3> m_normals{};
 };
@@ -219,7 +228,7 @@ public:
 
 	virtual ~TextureComponent() = default;
 
-	std::vector<ogl::Texture> textures{};
+	ogl::Texture texture{};
 };
 
 class ParentComponent : public Component {

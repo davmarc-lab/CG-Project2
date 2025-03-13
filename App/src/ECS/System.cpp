@@ -42,6 +42,7 @@ namespace systems {
 			}
 			return em->removeEntity(id);
 		}
+
 		void removeEntityFromScene(const unsigned int &id) {
 			auto c = em->getComponentFromId<ParentComponent>(id);
 			if (c != nullptr) {
@@ -51,6 +52,7 @@ namespace systems {
 			}
 			scene->removeEntity(id);
 		}
+
 		bool removeEntityFromAll(const unsigned int &id) {
 			removeEntityFromScene(id);
 			return em->removeEntity(id);
@@ -395,11 +397,19 @@ namespace systems {
 	} // namespace animation
 
 	namespace texture {
-		std::vector<ogl::Texture> getTextures(const unsigned int &id) {
+		ogl::Texture getTexture(const unsigned int &id) {
 			auto c = em->getComponentFromId<TextureComponent>(id);
 			ASSERT(c != nullptr);
-			return c->textures;
+			return c->texture;
 		}
+
+		void setTexture(const unsigned int &id, const ogl::Texture &texture) {
+			auto c = em->getComponentFromId<TextureComponent>(id);
+			ASSERT(c != nullptr);
+
+			c->texture = texture;
+		}
+
 	} // namespace texture
 
 	namespace material {
@@ -409,30 +419,35 @@ namespace systems {
 
 			return c->material;
 		}
+
 		void updateAmbient(const unsigned int &id, const glm::vec3 &val) {
 			auto c = em->getComponentFromId<MaterialComponent>(id);
 			ASSERT(c != nullptr);
 
 			c->material.ambient = val;
 		}
+
 		void updateDiffuse(const unsigned int &id, const glm::vec3 &val) {
 			auto c = em->getComponentFromId<MaterialComponent>(id);
 			ASSERT(c != nullptr);
 
 			c->material.diffuse = val;
 		}
+
 		void updateSpecular(const unsigned int &id, const glm::vec3 &val) {
 			auto c = em->getComponentFromId<MaterialComponent>(id);
 			ASSERT(c != nullptr);
 
 			c->material.specular = val;
 		}
+
 		void updateShininess(const unsigned int &id, const float &val) {
 			auto c = em->getComponentFromId<MaterialComponent>(id);
 			ASSERT(c != nullptr);
 
 			c->material.shininess = val;
 		}
+
 		void updateMaterial(const unsigned int &id, const Material &material) {
 			auto c = em->getComponentFromId<MaterialComponent>(id);
 			ASSERT(c != nullptr);
@@ -461,61 +476,73 @@ namespace systems {
 				c->cutOff,
 				c->outerCutoff};
 		}
+
 		void updateColor(const unsigned int &id, const glm::vec3 &color) {
 			auto c = em->getComponentFromId<LightComponent>(id);
 			ASSERT(c != nullptr);
 			c->color = color;
 		}
+
 		void updateIntensity(const unsigned int &id, const float &intensity) {
 			auto c = em->getComponentFromId<LightComponent>(id);
 			ASSERT(c != nullptr);
 			c->intensity = intensity;
 		}
+
 		void updateAmbient(const unsigned int &id, const glm::vec3 &ambient) {
 			auto c = em->getComponentFromId<LightComponent>(id);
 			ASSERT(c != nullptr);
 			c->vectors.ambient = ambient;
 		}
+
 		void updateDiffuse(const unsigned int &id, const glm::vec3 &diffuse) {
 			auto c = em->getComponentFromId<LightComponent>(id);
 			ASSERT(c != nullptr);
 			c->vectors.diffuse = diffuse;
 		}
+
 		void updateSpecular(const unsigned int &id, const glm::vec3 &specular) {
 			auto c = em->getComponentFromId<LightComponent>(id);
 			ASSERT(c != nullptr);
 			c->vectors.specular = specular;
 		}
+
 		void updateDirection(const unsigned int &id, const glm::vec3 &direction) {
 			auto c = em->getComponentFromId<LightComponent>(id);
 			ASSERT(c != nullptr);
 			c->direction = direction;
 		}
+
 		void updatePosition(const unsigned int &id, const glm::vec3 &position) {
 			auto c = em->getComponentFromId<LightComponent>(id);
 			ASSERT(c != nullptr);
 			c->position = position;
 		}
+
 		void updateConstant(const unsigned int &id, const float &constant) {
 			auto c = em->getComponentFromId<LightComponent>(id);
 			ASSERT(c != nullptr);
 			c->attenuation.constant = constant;
 		}
+
 		void updateLinear(const unsigned int &id, const float &linear) {
 			auto c = em->getComponentFromId<LightComponent>(id);
 			ASSERT(c != nullptr);
 			c->attenuation.linear = linear;
 		}
+
 		void updateQuadratic(const unsigned int &id, const float &quadratic) {
 			auto c = em->getComponentFromId<LightComponent>(id);
 			ASSERT(c != nullptr);
 			c->attenuation.quadratic = quadratic;
 		}
+
 		void updateCutoff(const unsigned int &id, const float &cutoff) {
 			auto c = em->getComponentFromId<LightComponent>(id);
 			ASSERT(c != nullptr);
 			c->cutOff = cutoff;
 		}
+
 		void updateOuterCutoff(const unsigned int &id, const float &outerCutoff) {
 			auto c = em->getComponentFromId<LightComponent>(id);
 			ASSERT(c != nullptr);
@@ -642,11 +669,21 @@ namespace systems {
 						shader->setVec3("material.specular", mc->material.specular);
 						shader->setFloat("material.shininess", mc->material.shininess);
 					}
+					auto tc = em->getComponentFromId<TextureComponent>(id);
+					if (tc != nullptr) {
+						glActiveTexture(GL_TEXTURE0);
+						tc->texture.bind();
+					} else {
+						shader->setInt("texture1", 0);
+					}
 					auto rc = em->getComponentFromId<RenderComponent>(id);
 					if (em->entityHasComponent<Transform>(id)) {
 						shader->setMat4("model", ::systems::transform::getModelMatrix(id));
 					}
 					rc->call();
+					if (tc != nullptr) {
+						tc->texture.unbind();
+					}
 				}
 			}
 		}

@@ -22,15 +22,15 @@ namespace ogl {
 		this->m_id = 0;
 	}
 
-	unsigned int Texture::bind() const {
+	void Texture::bind() const {
 		ASSERT(this->m_id);
-
 		glBindTexture(this->m_params.target, this->m_id);
-
-		return this->m_id;
 	}
 
-	void Texture::unbind() const {}
+	void Texture::unbind() const {
+		ASSERT(this->m_id);
+		glBindTexture(this->m_params.target, 0);
+	}
 
 	void Texture::setTexParameteri(const unsigned int &pname, const int &pval) { glTexParameteri(this->m_params.target, pname, pval); }
 

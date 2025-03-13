@@ -17,6 +17,8 @@ namespace factory {
 	unsigned int factoryPyramid(const BasicInfo &info, const glm::vec4 &color = {1, 0, 0, 1});
 	unsigned int factoryThorus(const BasicInfo &info, const glm::vec4 &color = {1, 0, 0, 1});
 
+	unsigned int factoryPlane(const glm::vec4& color);
+
     unsigned int factorySkyBox(const std::string& path, const std::string& format);
 
 	namespace light {

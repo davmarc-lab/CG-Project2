@@ -87,7 +87,8 @@ bool isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const floa
 			return false;
 
 		return true;
-	} else { // delta == 0.0f
+	} else {
+		// delta == 0.0f
 		float t = -b + sqrt(delta);
 		if (t < 0)
 			return false;
@@ -105,7 +106,8 @@ void changeInputState(Window &w, const InputState &state) {
 			if (glfwRawMouseMotionSupported())
 				glfwSetInputMode(w.getContext(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 			glfwSetInputMode(w.getContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-			w.setMouseButtonCallback([](GLFWwindow *, int, int, int) {});
+			w.setMouseButtonCallback([](GLFWwindow *, int, int, int) {
+			});
 			w.setCursorPosCallback([](GLFWwindow *window, double x, double y) {
 				if (mouse.first) {
 					mouse.first = false;
@@ -160,7 +162,8 @@ void changeInputState(Window &w, const InputState &state) {
 					}
 				}
 			});
-			w.setCursorPosCallback([](GLFWwindow *window, double x, double y) {});
+			w.setCursorPosCallback([](GLFWwindow *window, double x, double y) {
+			});
 			break;
 		}
 		default:
@@ -174,7 +177,7 @@ int main(int argc, char *argv[]) {
 	s.size = {1366, 768};
 	s.position = {400, 12};
 	#ifdef _WIN32
-		s.position = {470, 50};
+	s.position = {470, 50};
 	#endif
 	s.focused = true;
 
@@ -242,21 +245,48 @@ int main(int argc, char *argv[]) {
 
 	Shared<ShaderProgram> skyboxShader = CreateShared<ShaderProgram>("skyboxVertShader.glsl", "skyboxFragShader.glsl");
 	skyboxShader->createShaderProgram();
-	Shared<ShaderProgram> shader = CreateShared<ShaderProgram>("vertexShader.glsl", "lightFragShader.glsl");
+	Shared<ShaderProgram> shader = CreateShared<ShaderProgram>("vertexShader.glsl", "fragmentShader.glsl");
 	shader->createShaderProgram();
+	Shared<ShaderProgram> lightShader = CreateShared<ShaderProgram>("vertexShader.glsl", "lightFragShader.glsl");
+	lightShader->createShaderProgram();
 	Shared<ShaderProgram> normalShader = CreateShared<ShaderProgram>("normalVertShader.glsl", "normalFragShader.glsl", "normalGeomShader.glsl");
 	normalShader->createShaderProgram();
+
+	auto plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
+	systems::ecs::updateEntityName(plane, "Basic Plane");
+	scene->addEntity(shader, plane);
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
 	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
-	scene->addEntity(shader, shape);
+	scene->addEntity(lightShader, shape);
 	em->addComponent<MaterialComponent>(shape);
 	em->addComponent<LightComponent>(shape, glm::vec3{1, 1, 0});
 	systems::ecs::updateEntityName(shape, "Cube");
 
+	TextureParams params{};
+	params.target = GL_TEXTURE_2D;
+	params.internalFormat = GL_RGB;
+	params.format = GL_RGB;
+	params.dataType = GL_UNSIGNED_BYTE;
+	int width, height, nrChannels;
+	auto data = readImageData("./resources/texture/dirt.jpg", width, height, nrChannels, 0);
+	ogl::Texture t{params, {(unsigned int)width, (unsigned int)height}};
+	t.onAttach();
+	t.bind();
+	t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	t.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	t.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	t.createTexture2D(data);
+	t.generateMipmap();
+	em->addComponent<TextureComponent>(shape);
+	systems::texture::setTexture(shape, t);
+	freeImageData(data);
+	t.unbind();
+
 	auto pyr = factory::factoryThorus(BasicInfo{{-1, 1, -3}, {1, 1, 1}, {}});
-	scene->addEntity(shader, pyr);
+	scene->addEntity(lightShader, pyr);
 	em->addComponent<MaterialComponent>(pyr);
 
 	UniformBuffer ub("Matrices");
