@@ -180,7 +180,7 @@ namespace factory {
 		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
 
 		em->addComponent<MaterialComponent>(id);
-		em->addComponent<ShaderComponent>(id, LightComputation::INT_PHONG);
+		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();
@@ -233,6 +233,10 @@ namespace factory {
 		t.setTexParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		t.setTexParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		t.setTexParameteri(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		systems::texture::setTexture(id, t);
+
+		em->addComponent<SkyboxComponent>(id, t.getId());
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();

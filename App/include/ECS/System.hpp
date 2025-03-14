@@ -80,8 +80,11 @@ namespace systems {
 		void setTexture(const unsigned int &id, const ogl::Texture &texture);
 
 		std::string getTexturePath(const unsigned int &id);
-		void updateTexturePath(const unsigned int& id, const std::string& path);
-	}
+		void updateTexturePath(const unsigned int &id, const std::string &path);
+
+		bool isMeshReflective(const unsigned int &id);
+		void setMeshReflective(const unsigned int &id, const bool &val);
+	} // namespace texture
 
 	namespace material {
 		Material getMaterial(const unsigned int &id);
@@ -107,7 +110,7 @@ namespace systems {
 		void updateCutoff(const unsigned int &id, const float &cutoff);
 		void updateOuterCutoff(const unsigned int &id, const float &outerCutoff);
 
-        LightComputation getLightComputation(const unsigned int& id);
+		LightComputation getLightComputation(const unsigned int &id);
 	} // namespace light
 
 	namespace render {
@@ -118,4 +121,4 @@ namespace systems {
 
 		void renderBoundingBox();
 	} // namespace render
-}     // namespace systems
+} // namespace systems

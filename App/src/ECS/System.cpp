@@ -428,6 +428,18 @@ namespace systems {
 			c->texture.unbind();
 		}
 
+		bool isMeshReflective(const unsigned int &id) {
+			auto c = em->getComponentFromId<ShaderComponent>(id);
+			ASSERT(c != nullptr);
+			return c->reflective;
+		}
+
+		void setMeshReflective(const unsigned int &id, const bool &val) {
+			auto c = em->getComponentFromId<ShaderComponent>(id);
+			ASSERT(c != nullptr);
+			c->reflective = val;
+		}
+
 	} // namespace texture
 
 	namespace material {
@@ -681,12 +693,19 @@ namespace systems {
 
 		void renderAllMeshes() {
 			auto lightsData = prepareLightData();
+			auto sid = em->getEntitiesFromComponent<SkyboxComponent>();
+			if (sid.empty())
+				return;
+			auto skybox = em->getComponentFromId<SkyboxComponent>(sid[0]);
+			auto skyboxTexture = em->getComponentFromId<TextureComponent>(sid[0]);
 			for (auto [shader, etts] : scene->getShaderEntityMap()) {
 				shader->use();
 				// send light data
 				sendLightDataShader(shader, lightsData);
 				for (auto id : etts) {
 					shader->setInt("lightComp", ::systems::light::getLightComputation(id));
+					shader->setInt("skybox", 1);
+					glActiveTexture(GL_TEXTURE1);
 					auto mc = em->getComponentFromId<MaterialComponent>(id);
 					if (mc != nullptr) {
 						shader->setVec3("material.ambient", mc->material.ambient);
@@ -694,18 +713,29 @@ namespace systems {
 						shader->setVec3("material.specular", mc->material.specular);
 						shader->setFloat("material.shininess", mc->material.shininess);
 					}
+					auto sc = em->getComponentFromId<ShaderComponent>(id);
+					if (sc != nullptr) {
+						if (sc->reflective) {
+							skyboxTexture->texture.bind();
+							shader->setInt("reflective", 1);
+						} else {
+							shader->setInt("reflective", 0);
+						}
+					}
 					auto tc = em->getComponentFromId<TextureComponent>(id);
 					if (tc != nullptr) {
 						glActiveTexture(GL_TEXTURE0);
-						tc->texture.bind();
-					} else {
 						shader->setInt("texture1", 0);
+						tc->texture.bind();
 					}
 					auto rc = em->getComponentFromId<RenderComponent>(id);
 					if (em->entityHasComponent<Transform>(id)) {
 						shader->setMat4("model", ::systems::transform::getModelMatrix(id));
 					}
 					rc->call();
+					if (sc != nullptr && sc->reflective) {
+						skyboxTexture->texture.unbind();
+					}
 					if (tc != nullptr) {
 						tc->texture.unbind();
 					}

@@ -23,6 +23,7 @@ uniform Material material;
 uniform vec3 viewPos;
 uniform int lightComp;
 uniform sampler2D texture1;
+uniform samplerCube skybox;
 
 struct Light {
     int type;
@@ -48,6 +49,7 @@ struct Light {
 
 uniform Light lights[MAX_LIGHTS];
 uniform int lightsCount;
+uniform int reflective;
 
 vec3 norm = vec3(0);
 vec3 lightDir = vec3(0);
@@ -119,12 +121,20 @@ vec3 spotLight(Light light) {
 
 
 void main() {
+    if (reflective != 0) {
+        vec3 I = normalize(FragPos - viewPos);
+        vec3 R = reflect(I, normalize(fs_out.normal));
+        fragColor = vec4(texture(skybox, R).rgb, 1.0);
+        return;
+    }
+
     if (lightsCount > 0) {
         vec3 result = vec3(0);
 
         if (lightComp == 0) {
             fragColor = fs_out.vertColor;
         } else if (lightComp > 0 && lightComp < 3) {
+
             norm = normalize(fs_out.normal);
             viewDir = normalize(viewPos - FragPos);
 

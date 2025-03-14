@@ -251,12 +251,13 @@ class ShaderComponent : public Component {
 public:
 	ShaderComponent() = delete;
 
-	ShaderComponent(const LightComputation &comp) :
-		computation(comp), Component() {}
+	ShaderComponent(const LightComputation &comp, const bool &reflective = false) :
+		computation(comp), reflective(reflective), Component() {}
 
 	virtual ~ShaderComponent() override = default;
 
 	LightComputation computation = LightComputation::PHONG;
+	bool reflective = false;
 };
 
 class RenderComponent : public Component {
@@ -448,4 +449,16 @@ public:
 	AABB() = default;
 
 	virtual ~AABB() override = default;
+};
+
+class SkyboxComponent : public Component {
+public:
+	SkyboxComponent() = delete;
+
+	SkyboxComponent(const unsigned int &textureId) :
+		textureId(textureId), Component() {}
+
+	virtual ~SkyboxComponent() override = default;
+
+	unsigned int textureId;
 };

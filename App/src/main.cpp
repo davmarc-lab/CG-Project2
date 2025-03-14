@@ -176,9 +176,9 @@ int main(int argc, char *argv[]) {
 	s.decorated = false;
 	s.size = {1366, 768};
 	s.position = {400, 12};
-	#ifdef _WIN32
+#ifdef _WIN32
 	s.position = {470, 50};
-	#endif
+#endif
 	s.focused = true;
 
 	Window w{s};
@@ -261,7 +261,6 @@ int main(int argc, char *argv[]) {
 	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
 	em->addComponent<MaterialComponent>(shape);
-	em->addComponent<LightComponent>(shape, glm::vec3{1, 1, 0});
 	systems::ecs::updateEntityName(shape, "Cube");
 
 	TextureParams params{};
@@ -298,11 +297,14 @@ int main(int argc, char *argv[]) {
 	pt.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
 	pt.createTexture2D(data);
 	pt.generateMipmap();
-	em->addComponent<TextureComponent>(pyr, "./resources/texture/woddenContainer.jpg");
+	em->addComponent<TextureComponent>(pyr, "./resources/texture/dirt.jpg");
 	systems::texture::setTexture(pyr, pt);
 	freeImageData(data);
 	scene->addEntity(lightShader, pyr);
 	pt.unbind();
+	systems::texture::setMeshReflective(pyr, true);
+
+    auto id = factory::light::factoryDirectional({1, 0, 0});
 
 	UniformBuffer ub("Matrices");
 	ub.onAttach();
