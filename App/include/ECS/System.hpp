@@ -106,6 +106,8 @@ namespace systems {
 		void updateQuadratic(const unsigned int &id, const float &quadratic);
 		void updateCutoff(const unsigned int &id, const float &cutoff);
 		void updateOuterCutoff(const unsigned int &id, const float &outerCutoff);
+
+        LightComputation getLightComputation(const unsigned int& id);
 	} // namespace light
 
 	namespace render {

@@ -39,7 +39,7 @@ namespace factory {
 		bc->vbo_n.onAttach();
 		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
 		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-		
+
 		bc->vbo_t.onAttach();
 		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
 		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
@@ -48,6 +48,7 @@ namespace factory {
 		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
 
 		em->addComponent<MaterialComponent>(id);
+		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();
@@ -83,7 +84,7 @@ namespace factory {
 		bc->vbo_n.onAttach();
 		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
 		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-		
+
 		bc->vbo_t.onAttach();
 		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
 		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
@@ -92,6 +93,7 @@ namespace factory {
 		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
 
 		em->addComponent<MaterialComponent>(id);
+		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();
@@ -125,7 +127,7 @@ namespace factory {
 		bc->vbo_n.onAttach();
 		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
 		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-		
+
 		bc->vbo_t.onAttach();
 		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
 		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
@@ -134,6 +136,7 @@ namespace factory {
 		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
 
 		em->addComponent<MaterialComponent>(id);
+		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();
@@ -168,7 +171,7 @@ namespace factory {
 		bc->vbo_n.onAttach();
 		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
 		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-		
+
 		bc->vbo_t.onAttach();
 		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
 		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
@@ -177,6 +180,7 @@ namespace factory {
 		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
 
 		em->addComponent<MaterialComponent>(id);
+		em->addComponent<ShaderComponent>(id, LightComputation::INT_PHONG);
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();

@@ -249,14 +249,14 @@ public:
 
 class ShaderComponent : public Component {
 public:
-	ShaderComponent() :
-		Component() {
-	}
+	ShaderComponent() = delete;
+
+	ShaderComponent(const LightComputation &comp) :
+		computation(comp), Component() {}
 
 	virtual ~ShaderComponent() override = default;
 
-private:
-	Shared<ogl::ShaderProgram> m_shader{};
+	LightComputation computation = LightComputation::PHONG;
 };
 
 class RenderComponent : public Component {

@@ -247,7 +247,7 @@ int main(int argc, char *argv[]) {
 	skyboxShader->createShaderProgram();
 	Shared<ShaderProgram> shader = CreateShared<ShaderProgram>("vertexShader.glsl", "fragmentShader.glsl");
 	shader->createShaderProgram();
-	Shared<ShaderProgram> lightShader = CreateShared<ShaderProgram>("vertexShader.glsl", "lightFragShader.glsl");
+	Shared<ShaderProgram> lightShader = CreateShared<ShaderProgram>("lightVertShader.glsl", "lightFragShader.glsl");
 	lightShader->createShaderProgram();
 	Shared<ShaderProgram> normalShader = CreateShared<ShaderProgram>("normalVertShader.glsl", "normalFragShader.glsl", "normalGeomShader.glsl");
 	normalShader->createShaderProgram();

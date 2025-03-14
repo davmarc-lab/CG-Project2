@@ -87,6 +87,7 @@ OBJECTS := \
 	$(OBJDIR)/EcsScene.o \
 	$(OBJDIR)/System.o \
 	$(OBJDIR)/Factory.o \
+	$(OBJDIR)/Utils.o \
 	$(OBJDIR)/main.o \
 
 RESOURCES := \
@@ -156,6 +157,9 @@ $(OBJDIR)/System.o: src/ECS/System.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Factory.o: src/Factory.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/Utils.o: src/Utils.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: src/main.cpp

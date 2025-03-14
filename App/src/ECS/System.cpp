@@ -428,7 +428,6 @@ namespace systems {
 			c->texture.unbind();
 		}
 
-
 	} // namespace texture
 
 	namespace material {
@@ -567,6 +566,12 @@ namespace systems {
 			ASSERT(c != nullptr);
 			c->outerCutoff = outerCutoff;
 		}
+
+		LightComputation getLightComputation(const unsigned int &id) {
+			auto c = em->getComponentFromId<ShaderComponent>(id);
+			ASSERT(c != nullptr);
+			return c->computation;
+		}
 	} // namespace light
 
 	namespace render {
@@ -681,6 +686,7 @@ namespace systems {
 				// send light data
 				sendLightDataShader(shader, lightsData);
 				for (auto id : etts) {
+					shader->setInt("lightComp", ::systems::light::getLightComputation(id));
 					auto mc = em->getComponentFromId<MaterialComponent>(id);
 					if (mc != nullptr) {
 						shader->setVec3("material.ambient", mc->material.ambient);

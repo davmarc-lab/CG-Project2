@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <glm/glm.hpp>
+#include <string>
 
 enum LightType {
 	LIGHT_DIRECTIONAL,
@@ -41,6 +41,14 @@ struct LightShaderBlock {
 	float outerCutoff = 17.5f;
 
 	bool isSmooth = false;
+};
+
+enum LightComputation {
+	NONE,
+	PHONG,
+	BLINN_PHONG,
+	INT_PHONG,
+	INT_BLINN_PHONG,
 };
 
 unsigned char *readImageData(const std::string &path, int &width, int &height, int &nrChannels, int desiredChannels = 0);

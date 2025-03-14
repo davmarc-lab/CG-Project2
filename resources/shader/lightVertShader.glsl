@@ -1,17 +1,19 @@
 #version 420 core
 
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec4 aColor;
+layout(location = 2) in vec3 aNormal;
+layout(location = 3) in vec2 aTexCoord;
+
 #define MAX_LIGHTS 32
 
-in VS_OUT {
+out VS_OUT {
     vec4 vertColor;
     vec3 normal;
     vec2 texCoord;
-} fs_out;
+} vs_out;
 
-out vec4 fragColor;
-in vec3 FragPos;
-in vec3 resIntShading;
-
+// Materials structure
 struct Material {
     vec3 ambient;
     vec3 diffuse;
@@ -19,11 +21,7 @@ struct Material {
     float shininess;
 };
 
-uniform Material material;
-uniform vec3 viewPos;
-uniform int lightComp;
-uniform sampler2D texture1;
-
+// Light structure
 struct Light {
     int type;
     float intensity;
@@ -46,8 +44,20 @@ struct Light {
     bool isSmooth;
 };
 
-uniform Light lights[MAX_LIGHTS];
+uniform Material material;
+uniform vec3 viewPos;
+uniform sampler2D texture1;
+
+uniform int lightComp;
+
+// Light parameters
 uniform int lightsCount;
+uniform Light lights[MAX_LIGHTS];
+
+uniform mat4 model;
+
+out vec3 FragPos;
+out vec3 resIntShading;
 
 vec3 norm = vec3(0);
 vec3 lightDir = vec3(0);
@@ -56,10 +66,11 @@ vec3 viewDir = vec3(0);
 vec3 reflectDir = vec3(0);
 float spec = 0.f;
 
-// type = 0
-vec3 directionalLight(Light light) {
-    vec3 norm = normalize(fs_out.normal);
+layout(std140, binding = 0) uniform Matrices {
+    mat4 viewProj;
+};
 
+vec3 calcDirectionalLight(Light light) {
     // ambient
     vec3 ambient = light.intensity * light.color * light.ambient * material.ambient;
 
@@ -77,8 +88,8 @@ vec3 directionalLight(Light light) {
     return (ambient + diffuse + specular);
 }
 
-// type = 1
-vec3 pointLight(Light light) {
+vec3 calcPointLight(Light light) {
+    // attenuation
     float distance = length(light.position - FragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
@@ -94,8 +105,7 @@ vec3 pointLight(Light light) {
     return (ambient + diffuse + specular);
 }
 
-// type = 2
-vec3 spotLight(Light light) {
+vec3 calcSpotLight(Light light) {
     // attenuation
     float distance = length(light.position - FragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
@@ -117,46 +127,39 @@ vec3 spotLight(Light light) {
     return (ambient + diffuse + specular);
 }
 
-
 void main() {
-    if (lightsCount > 0) {
-        vec3 result = vec3(0);
+    FragPos = vec3(model * vec4(aPos, 1.f));
+    gl_Position = viewProj * model * vec4(aPos, 1.f);
+    vs_out.vertColor = aColor;
+    vs_out.normal = mat3(transpose(inverse(model))) * aNormal;
+    vs_out.texCoord = aTexCoord;
 
-        if (lightComp == 0) {
-            fragColor = fs_out.vertColor;
-        } else if (lightComp > 0 && lightComp < 3) {
-            norm = normalize(fs_out.normal);
+    resIntShading = vec3(0);
+    if (lightsCount >= 1) {
+        // interpolative shader
+        if (lightComp >= 3) {
+            norm = normalize(vs_out.normal);
             viewDir = normalize(viewPos - FragPos);
 
-            for (int i = 0; i < lightsCount; i++) {
+            // calc multiple lights
+            for (int i = 0; i < lightsCount && i < MAX_LIGHTS; i++) {
                 lightDir = normalize(lights[i].position - FragPos);
-                diff = max(dot(norm, lightDir), 0.);
-                reflectDir = lightComp == 2 ? normalize(lightDir + viewDir) : reflect(-lightDir, norm);
-                spec = pow(max(lightComp == 2 ? dot(norm, reflectDir) : dot(viewDir, reflectDir), 0.0), material.shininess);
+                diff = max(dot(norm, lightDir), 0.0);
+                reflectDir = lightComp == 4 ? normalize(lightDir + viewDir) : reflect(-lightDir, norm);
+                spec = pow(max(lightComp == 4 ? dot(norm, reflectDir) : dot(viewDir, reflectDir), 0.0), material.shininess);
 
                 switch (lights[i].type) {
-                    case 0: {
-                        result += directionalLight(lights[i]);
-                        break;
-                    }
-                    case 1: {
-                        result += pointLight(lights[i]);
-                        break;
-                    }
-                    case 2: {
-                        result += spotLight(lights[i]);
-                        break;
-                    }
+                    case 0:
+                    resIntShading += calcDirectionalLight(lights[i]);
+                    break;
+                    case 1:
+                    resIntShading += calcPointLight(lights[i]);
+                    break;
+                    case 2:
+                    resIntShading += calcSpotLight(lights[i]);
+                    break;
                 }
             }
-            fragColor = vec4(result * texture(texture1, fs_out.texCoord).rgb, 1);
-        } else {
-            // interpolative result
-            fragColor = vec4(resIntShading * texture(texture1, fs_out.texCoord).rgb, 1);
         }
-    } else {
-        fragColor = fs_out.vertColor;
     }
-
 }
-
