@@ -32,15 +32,20 @@ namespace ogl {
 		glBindTexture(this->m_params.target, 0);
 	}
 
-	void Texture::setTexParameteri(const unsigned int &pname, const int &pval) { glTexParameteri(this->m_params.target, pname, pval); }
+	void Texture::setTexParameteri(const unsigned int &pname, const int &pval) {
+		glTexParameteri(this->m_params.target, pname, pval);
+	}
 
-	void Texture::setTexParameterf(const unsigned int &pname, const float &pval) { glTexParameterf(this->m_params.target, pname, pval); }
+	void Texture::setTexParameterf(const unsigned int &pname, const float &pval) {
+		glTexParameterf(this->m_params.target, pname, pval);
+	}
 
 	void Texture::fastCreateTexture2D(void *data) {
 		glTexImage2D(this->m_params.target, this->m_params.level, this->m_params.internalFormat, this->m_size.x, this->m_size.y, this->m_params.border,
-					 this->m_params.format, this->m_params.dataType, data);
+		             this->m_params.format, this->m_params.dataType, data);
 		this->m_created = true;
 	}
+
 	void Texture::fastCreateCustomTexture2D(const unsigned int &target, const unsigned int &level, const unsigned int &internalFormat, const unsigned int &width, const unsigned int &height, const unsigned int &border, const unsigned int &format, const unsigned int &type, void *data) {
 		glTexImage2D(target, level, internalFormat, width, height, border, format, type, data);
 		this->m_created = true;

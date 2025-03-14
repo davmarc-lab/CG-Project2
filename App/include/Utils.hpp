@@ -45,4 +45,6 @@ struct LightShaderBlock {
 
 unsigned char *readImageData(const std::string &path, int &width, int &height, int &nrChannels, int desiredChannels = 0);
 
+void flipImagesVertically(const bool &val);
+
 void freeImageData(void *data);

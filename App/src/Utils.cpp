@@ -9,6 +9,10 @@ unsigned char *readImageData(const std::string &path, int &width, int &height, i
 	return stbi_load(path.c_str(), &width, &height, &nrChannels, desiredChannels);
 }
 
+void flipImagesVertically(const bool &val) {
+	stbi_set_flip_vertically_on_load(val);
+}
+
 void freeImageData(void *data) {
 	stbi_image_free(data);
 }

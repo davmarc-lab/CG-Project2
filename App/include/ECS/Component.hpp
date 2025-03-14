@@ -224,11 +224,16 @@ class TextureComponent : public Component {
 public:
 	TextureComponent() :
 		Component() {
-	};
+	}
 
-	virtual ~TextureComponent() = default;
+	TextureComponent(std::string path) :
+		Component(), path(std::move(path)) {
+	}
+
+	virtual ~TextureComponent() override = default;
 
 	ogl::Texture texture{};
+	std::string path{};
 };
 
 class ParentComponent : public Component {

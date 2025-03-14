@@ -127,6 +127,16 @@ void ImGuiEntityTree::onRender() {
 				}
 			}
 
+			if (em->entityHasComponent<TextureComponent>(id)) {
+				if (ImGui::CollapsingHeader("Texture##3")) {
+					ImGui::Text("%s", systems::texture::getTexturePath(id).c_str());
+					ImGui::SameLine();
+					if (ImGui::Button("Change")) {
+						std::cout << "CHANGE TEXTURE\n";
+					}
+				}
+			}
+
 			ImGui::PopID();
 			ImGui::TreePop();
 		}

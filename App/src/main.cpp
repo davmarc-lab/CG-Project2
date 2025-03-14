@@ -270,7 +270,8 @@ int main(int argc, char *argv[]) {
 	params.format = GL_RGB;
 	params.dataType = GL_UNSIGNED_BYTE;
 	int width, height, nrChannels;
-	auto data = readImageData("./resources/texture/dirt.jpg", width, height, nrChannels, 0);
+	flipImagesVertically(true);
+	auto data = readImageData("./resources/texture/woddenContainer.jpg", width, height, nrChannels);
 	ogl::Texture t{params, {(unsigned int)width, (unsigned int)height}};
 	t.onAttach();
 	t.bind();
@@ -280,14 +281,28 @@ int main(int argc, char *argv[]) {
 	t.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
 	t.createTexture2D(data);
 	t.generateMipmap();
-	em->addComponent<TextureComponent>(shape);
+	em->addComponent<TextureComponent>(shape, "./resources/texture/woddenContainer.jpg");
 	systems::texture::setTexture(shape, t);
 	freeImageData(data);
 	t.unbind();
 
 	auto pyr = factory::factoryThorus(BasicInfo{{-1, 1, -3}, {1, 1, 1}, {}});
-	scene->addEntity(lightShader, pyr);
 	em->addComponent<MaterialComponent>(pyr);
+	data = readImageData("./resources/texture/dirt.jpg", width, height, nrChannels);
+	ogl::Texture pt{params, {(unsigned int)width, (unsigned int)height}};
+	pt.onAttach();
+	pt.bind();
+	pt.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	pt.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	pt.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	pt.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	pt.createTexture2D(data);
+	pt.generateMipmap();
+	em->addComponent<TextureComponent>(pyr, "./resources/texture/woddenContainer.jpg");
+	systems::texture::setTexture(pyr, pt);
+	freeImageData(data);
+	scene->addEntity(lightShader, pyr);
+	pt.unbind();
 
 	UniformBuffer ub("Matrices");
 	ub.onAttach();

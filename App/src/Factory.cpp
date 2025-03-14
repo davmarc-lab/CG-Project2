@@ -196,6 +196,7 @@ namespace factory {
 
 	unsigned int factorySkyBox(const std::string &path, const std::string &format) {
 		auto id = em->createEntity();
+		::systems::ecs::updateEntityName(id, "Skybox");
 		auto vc = em->addComponent<VertexComponent>(id, skyboxGeometry, std::vector<glm::vec4>{}, std::vector<unsigned int>{});
 		auto bc = em->addComponent<BufferComponent>(id);
 

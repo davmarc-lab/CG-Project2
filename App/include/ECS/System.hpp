@@ -78,6 +78,9 @@ namespace systems {
 		ogl::Texture getTexture(const unsigned int &id);
 
 		void setTexture(const unsigned int &id, const ogl::Texture &texture);
+
+		std::string getTexturePath(const unsigned int &id);
+		void updateTexturePath(const unsigned int& id, const std::string& path);
 	}
 
 	namespace material {

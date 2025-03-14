@@ -410,6 +410,25 @@ namespace systems {
 			c->texture = texture;
 		}
 
+		std::string getTexturePath(const unsigned int &id) {
+			auto c = em->getComponentFromId<TextureComponent>(id);
+			ASSERT(c != nullptr);
+			return c->path;
+		}
+
+		void updateTexturePath(const unsigned int &id, const std::string &path) {
+			auto c = em->getComponentFromId<TextureComponent>(id);
+			ASSERT(c != nullptr);
+			c->path = path;
+
+			int width, height, nrChannels;
+			auto data = readImageData(path, width, height, nrChannels);
+			c->texture.setSize({(unsigned int)width, (unsigned int)height});
+			c->texture.createTexture2D(data);
+			c->texture.unbind();
+		}
+
+
 	} // namespace texture
 
 	namespace material {
