@@ -23,22 +23,22 @@ const auto ENTITY_ELECTED_CHANGED = Event("Entity Selected Changed");
 void enableDefaultCameraMovement() {
 	ed->subscribe(event::loop::LOOP_INPUT, []() {
 		if (im->isKeyPressed(GLFW_KEY_W)) {
-			camera.moveCamera(camera.getCameraVelocity() * camera.getCameraFront());
+			camera.moveCamera(camera.getCameraFront());
 		}
 		if (im->isKeyPressed(GLFW_KEY_S)) {
-			camera.moveCamera(camera.getCameraVelocity() * -camera.getCameraFront());
+			camera.moveCamera(-camera.getCameraFront());
 		}
 		if (im->isKeyPressed(GLFW_KEY_D)) {
-			camera.moveCamera(camera.getCameraVelocity() * camera.getCameraRight());
+			camera.moveCamera(camera.getCameraRight());
 		}
 		if (im->isKeyPressed(GLFW_KEY_A)) {
-			camera.moveCamera(camera.getCameraVelocity() * -camera.getCameraRight());
+			camera.moveCamera(-camera.getCameraRight());
 		}
 		if (im->isKeyPressed(GLFW_KEY_SPACE)) {
-			camera.moveCamera(camera.getCameraVelocity() * camera.getCameraUp());
+			camera.moveCamera(camera.getCameraUp());
 		}
 		if (im->isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
-			camera.moveCamera(camera.getCameraVelocity() * -camera.getCameraUp());
+			camera.moveCamera(-camera.getCameraUp());
 		}
 	});
 }
@@ -176,9 +176,9 @@ int main(int argc, char *argv[]) {
 	s.decorated = false;
 	s.size = {1366, 768};
 	s.position = {400, 12};
-#ifdef _WIN32
+	#ifdef _WIN32
 	s.position = {470, 50};
-#endif
+	#endif
 	s.focused = true;
 
 	Window w{s};
@@ -213,7 +213,7 @@ int main(int argc, char *argv[]) {
 	ed->subscribe(event::loop::LOOP_RENDER, [&w]() { w.onRender(); });
 
 	enableDefaultCameraMovement();
-	camera.updatePerspProjection(45.f, w.getWidth(), w.getHeight(), 0.1f, 100.f);
+	camera.updatePerspProjection(camera.getCameraZoom(), w.getWidth(), w.getHeight(), 0.1f, 100.f);
 
 	Renderer::instance()->init();
 
@@ -225,6 +225,7 @@ int main(int argc, char *argv[]) {
 	ed->subscribe(event::loop::LOOP_END_RENDER, [&im]() { im.end(); });
 
 	im.addPanel<ImGuiEntityTree>();
+	im.addPanel<ImGuiCamera>();
 	auto igEttModel = im.addPanel<ImGuiEntityModel>();
 
 	/*
@@ -302,9 +303,9 @@ int main(int argc, char *argv[]) {
 	freeImageData(data);
 	scene->addEntity(lightShader, pyr);
 	pt.unbind();
-	systems::texture::setMeshReflective(pyr, true);
+	systems::texture::setMeshReflective(shape, true);
 
-    auto id = factory::light::factoryDirectional({1, 0, 0});
+	auto id = factory::light::factoryDirectional({1, 0, 0});
 
 	UniformBuffer ub("Matrices");
 	ub.onAttach();

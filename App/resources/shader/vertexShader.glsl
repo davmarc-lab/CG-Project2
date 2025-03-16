@@ -12,6 +12,7 @@ out VS_OUT {
 } vs_out;
 
 out vec3 FragPos;
+out vec3 resIntShader;
 
 uniform mat4 model;
 
@@ -25,4 +26,5 @@ void main() {
     vs_out.vertColor = aColor;
     vs_out.normal = mat3(transpose(inverse(model))) * aNormal;
     vs_out.texCoord = aTexCoord;
+    resIntShader = vec3(0);
 }

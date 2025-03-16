@@ -5,6 +5,8 @@
 #include "../include/ECS/EntityManager.hpp"
 #include "../include/ECS/System.hpp"
 
+#include "../../Opengl-Core/include/Core.hpp"
+
 const auto em = EntityManager::instance();
 
 void ImGuiEntityTree::onRender() {
@@ -167,4 +169,39 @@ void ImGuiEntityModel::onRender() {
 
 		ImGui::End();
 	}
+}
+
+void ImGuiCamera::onRender() {
+	ImGui::Begin("Camera");
+	if (ImGui::CollapsingHeader("World Info")) {
+		auto pos = camera.getCameraPosition();
+		if (ImGui::DragFloat3("Position", &pos.x)) {
+			camera.setCameraPosition(pos);
+		}
+	}
+	if (ImGui::CollapsingHeader("Camera Info")) {
+		auto speed = camera.getCameraVelocity();
+		if (ImGui::SliderFloat("Velocity", &speed, 0.01f, 1.f)) {
+			camera.setCameraVelocity(speed);
+		}
+		auto sens = camera.getMouseSensitivity();
+		if (ImGui::SliderFloat("Sensitivity", &sens, 0.01f, 1.f)) {
+			camera.setMouseSensitivity(sens);
+		}
+		auto zoom = camera.getCameraZoom();
+		if (ImGui::SliderFloat("Zoom", &zoom, 20.f, 100.f)) {
+			camera.setCameraZoom(zoom);
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Camera Rotation")) {
+		auto rot = camera.getCameraRotation();
+		if (ImGui::DragFloat("Yaw", &rot.yaw)) {
+			camera.setCameraYaw(rot.yaw);
+		}
+		if (ImGui::DragFloat("Pitch", &rot.pitch)) {
+			camera.setCameraPitch(rot.pitch);
+		}
+	}
+	ImGui::End();
 }

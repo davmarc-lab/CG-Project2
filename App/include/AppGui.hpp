@@ -10,7 +10,8 @@ public:
 	virtual void onRender() override;
 
 	ImGuiEntityTree() :
-		ImGuiPanel("Entity Tree") {}
+		ImGuiPanel("Entity Tree") {
+	}
 
 	virtual ~ImGuiEntityTree() override = default;
 };
@@ -22,10 +23,22 @@ public:
 	virtual void onRender() override;
 
 	ImGuiEntityModel() :
-		ImGuiPanel("Entity Tree") {}
+		ImGuiPanel("Entity Tree") {
+	}
 
 	virtual ~ImGuiEntityModel() override = default;
 
 private:
 	int m_ett = -1;
+};
+
+class ImGuiCamera : public ImGuiPanel {
+public:
+	virtual void onRender() override;
+
+	ImGuiCamera() :
+		ImGuiPanel("Camera Settings") {
+	}
+
+	virtual ~ImGuiCamera() override = default;
 };
