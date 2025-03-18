@@ -185,7 +185,7 @@ namespace systems {
 
 	namespace collision {
 		void updateParentCollider(const unsigned int &id) {
-			auto box = em->getComponentFromId<AABB>(id);
+			auto box = em->getComponentFromId<ColliderComponent>(id);
 			auto tc = em->getComponentFromId<Transform>(id);
 			auto offset = tc->position - box->position;
 			box->position = tc->position;
@@ -194,7 +194,7 @@ namespace systems {
 		}
 
 		void updateCollider(const unsigned int &id) {
-			auto bc = em->getComponentFromId<AABB>(id);
+			auto bc = em->getComponentFromId<ColliderComponent>(id);
 			if (bc == nullptr)
 				return;
 
@@ -211,8 +211,8 @@ namespace systems {
 		}
 
 		void updateAllColliders() {
-			auto ids = em->getEntitiesFromComponent<AABB>();
-			for (auto id : em->getEntitiesFromComponent<AABB>()) {
+			auto ids = em->getEntitiesFromComponent<ColliderComponent>();
+			for (auto id : em->getEntitiesFromComponent<ColliderComponent>()) {
 				updateCollider(id);
 			}
 		}
@@ -220,14 +220,14 @@ namespace systems {
 		bool isColliding(const unsigned int &first, const unsigned int &second) {
 			if (first == second)
 				return false;
-			auto fc = em->getComponentFromId<AABB>(first);
-			auto sc = em->getComponentFromId<AABB>(second);
+			auto fc = em->getComponentFromId<ColliderComponent>(first);
+			auto sc = em->getComponentFromId<ColliderComponent>(second);
 
 			return fc->isColliding(*sc);
 		}
 
 		Pair<glm::vec3> getCollider(const unsigned int &id) {
-			auto c = em->getComponentFromId<AABB>(id);
+			auto c = em->getComponentFromId<ColliderComponent>(id);
 			ASSERT(c != nullptr);
 
 			return {c->botLeft, c->topRight};
@@ -237,10 +237,10 @@ namespace systems {
 			for (auto id : em->getEntitiesFromComponent<ParentComponent>()) {
 				auto c = em->getComponentFromId<ParentComponent>(id);
 				auto pv = em->getComponentFromId<VertexComponent>(id);
-				auto box = em->getComponentFromId<AABB>(id);
-				// remove AABB component from each children and update the parent
+				auto box = em->getComponentFromId<ColliderComponent>(id);
+				// remove ColliderComponent component from each children and update the parent
 				for (auto child : c->children) {
-					if (em->entityHasComponent<AABB>(child)) {
+					if (em->entityHasComponent<ColliderComponent>(child)) {
 						auto cv = em->getComponentFromId<VertexComponent>(child);
 						auto model = ::systems::transform::getModelMatrix(child);
 						auto bot = glm::vec3(1, 1, 0);
@@ -271,7 +271,7 @@ namespace systems {
 						box->botLeft.y = box->botLeft.y < bot.y ? box->botLeft.y : bot.y;
 						box->topRight.x = box->topRight.x > top.x ? box->topRight.x : top.x;
 						box->topRight.y = box->topRight.y > top.y ? box->topRight.y : top.y;
-						em->removeComponent<AABB>(child);
+						em->removeComponent<ColliderComponent>(child);
 					}
 				}
 			}
@@ -290,8 +290,8 @@ namespace systems {
 
 		std::vector<Pair<unsigned int>> getCollisions() {
 			std::vector<Pair<unsigned int>> coll{};
-			for (auto first : em->getEntitiesFromComponent<AABB>()) {
-				for (auto other : em->getEntitiesFromComponent<AABB>()) {
+			for (auto first : em->getEntitiesFromComponent<ColliderComponent>()) {
+				for (auto other : em->getEntitiesFromComponent<ColliderComponent>()) {
 					if (first == other)
 						continue;
 					{
@@ -749,23 +749,46 @@ namespace systems {
 				defaultShader.vao.onAttach();
 				defaultShader.vbog.onAttach();
 				defaultShader.vboc.onAttach();
-				for (int i = 0; i < 8; i++)
+				for (int i = 0; i < 24; i++)
 					defaultShader.colors.push_back(BOUNDING_BOX_COLOR);
 				defaultShader.init = true;
 			}
 
 			defaultShader.program.use();
-			for (auto ett : em->getEntitiesFromComponent<AABB>()) {
-				auto box = em->getComponentFromId<AABB>(ett);
+			for (auto ett : em->getEntitiesFromComponent<ColliderComponent>()) {
+				auto box = em->getComponentFromId<ColliderComponent>(ett);
 				defaultShader.coords.clear();
-				defaultShader.coords.push_back(box->botLeft);
-				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, 0});
-				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, 0});
+				// "FRONT" face
 				defaultShader.coords.push_back(box->topRight);
+				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, box->topRight.z});
+				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, box->topRight.z});
+				defaultShader.coords.push_back({box->botLeft.x, box->botLeft.y, box->topRight.z});
+				defaultShader.coords.push_back({box->botLeft.x, box->botLeft.y, box->topRight.z});
+				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, box->topRight.z});
+				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, box->topRight.z});
 				defaultShader.coords.push_back(box->topRight);
-				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, 0});
-				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, 0});
+
+				// "BACK" face
+				defaultShader.coords.push_back({box->topRight.x, box->topRight.y, box->botLeft.z});
+				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, box->botLeft.z});
+				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, box->botLeft.z});
+				defaultShader.coords.push_back({box->botLeft.x, box->botLeft.y, box->botLeft.z});
+				defaultShader.coords.push_back({box->botLeft.x, box->botLeft.y, box->botLeft.z});
+				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, box->botLeft.z});
+				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, box->botLeft.z});
+				defaultShader.coords.push_back({box->topRight.x, box->topRight.y, box->botLeft.z});
+
+				// "TOP" face
+				defaultShader.coords.push_back(box->topRight);
+				defaultShader.coords.push_back({box->topRight.x, box->topRight.y, box->botLeft.z});
+				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, box->botLeft.z});
+				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, box->topRight.z});
+
+                // "BOT" face
 				defaultShader.coords.push_back(box->botLeft);
+				defaultShader.coords.push_back({box->botLeft.x, box->botLeft.y, box->topRight.z});
+				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, box->topRight.z});
+				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, box->botLeft.z});
 
 				defaultShader.vao.bind();
 				defaultShader.vbog.setup(defaultShader.coords.data(), defaultShader.coords.size(), GL_STATIC_DRAW);

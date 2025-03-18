@@ -20,25 +20,30 @@ const auto scene = BasicScene::instance();
 
 const auto ENTITY_ELECTED_CHANGED = Event("Entity Selected Changed");
 
+struct WorldCamera {
+	Camera &cam = camera;
+	glm::vec3 size = glm::vec3(1);
+} world;
+
 void enableDefaultCameraMovement() {
 	ed->subscribe(event::loop::LOOP_INPUT, []() {
 		if (im->isKeyPressed(GLFW_KEY_W)) {
-			camera.moveCamera(camera.getCameraFront());
+			world.cam.moveCamera(world.cam.getCameraFront());
 		}
 		if (im->isKeyPressed(GLFW_KEY_S)) {
-			camera.moveCamera(-camera.getCameraFront());
+			world.cam.moveCamera(-world.cam.getCameraFront());
 		}
 		if (im->isKeyPressed(GLFW_KEY_D)) {
-			camera.moveCamera(camera.getCameraRight());
+			world.cam.moveCamera(world.cam.getCameraRight());
 		}
 		if (im->isKeyPressed(GLFW_KEY_A)) {
-			camera.moveCamera(-camera.getCameraRight());
+			world.cam.moveCamera(-world.cam.getCameraRight());
 		}
 		if (im->isKeyPressed(GLFW_KEY_SPACE)) {
-			camera.moveCamera(camera.getCameraUp());
+			world.cam.moveCamera(world.cam.getCameraUp());
 		}
 		if (im->isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
-			camera.moveCamera(-camera.getCameraUp());
+			world.cam.moveCamera(-world.cam.getCameraUp());
 		}
 	});
 }
@@ -62,16 +67,16 @@ glm::vec3 getRayFromMouse(const Pair<float> &size, int mouse_x, int mouse_y) {
 
 	auto clip = glm::vec4(ndc_x, ndc_y, ndc_z, 1.0f);
 
-	auto view_model_p = glm::inverse(camera.getProjMatrix()) * clip;
+	auto view_model_p = glm::inverse(world.cam.getProjMatrix()) * clip;
 	view_model_p.w = 1;
 
-	auto pw = glm::inverse(camera.getViewMatrix()) * view_model_p;
+	auto pw = glm::inverse(world.cam.getViewMatrix()) * view_model_p;
 
-	return glm::normalize(glm::vec3(pw) - glm::vec3(camera.getCameraPosition()));
+	return glm::normalize(glm::vec3(pw) - glm::vec3(world.cam.getCameraPosition()));
 }
 
 bool isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const float &sphere_radius, float *id) {
-	glm::vec3 d = camera.getCameraPosition() - sphere_pos;
+	glm::vec3 d = world.cam.getCameraPosition() - sphere_pos;
 	float b = dot(d, ray);
 	float cc = dot(d, d) - sphere_radius * sphere_radius;
 	float delta = b * b - cc;
@@ -120,7 +125,7 @@ void changeInputState(Window &w, const InputState &state) {
 
 				mouse.pos = {x, y};
 
-				camera.processMouseMovement(xoffset, yoffset);
+				world.cam.processMouseMovement(xoffset, yoffset);
 			});
 			break;
 		}
@@ -176,9 +181,9 @@ int main(int argc, char *argv[]) {
 	s.decorated = false;
 	s.size = {1366, 768};
 	s.position = {400, 12};
-	#ifdef _WIN32
+#ifdef _WIN32
 	s.position = {470, 50};
-	#endif
+#endif
 	s.focused = true;
 
 	Window w{s};
@@ -213,7 +218,7 @@ int main(int argc, char *argv[]) {
 	ed->subscribe(event::loop::LOOP_RENDER, [&w]() { w.onRender(); });
 
 	enableDefaultCameraMovement();
-	camera.updatePerspProjection(camera.getCameraZoom(), w.getWidth(), w.getHeight(), 0.1f, 100.f);
+	world.cam.updatePerspProjection(world.cam.getCameraZoom(), w.getWidth(), w.getHeight(), 0.1f, 100.f);
 
 	Renderer::instance()->init();
 
@@ -262,6 +267,7 @@ int main(int argc, char *argv[]) {
 	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
 	em->addComponent<MaterialComponent>(shape);
+	em->addComponent<ColliderComponent>(shape);
 	systems::ecs::updateEntityName(shape, "Cube");
 
 	TextureParams params{};
@@ -288,6 +294,8 @@ int main(int argc, char *argv[]) {
 
 	auto pyr = factory::factoryThorus(BasicInfo{{-1, 1, -3}, {1, 1, 1}, {}});
 	em->addComponent<MaterialComponent>(pyr);
+	em->addComponent<ColliderComponent>(pyr);
+
 	data = readImageData("./resources/texture/dirt.jpg", width, height, nrChannels);
 	ogl::Texture pt{params, {(unsigned int)width, (unsigned int)height}};
 	pt.onAttach();
@@ -310,16 +318,18 @@ int main(int argc, char *argv[]) {
 	UniformBuffer ub("Matrices");
 	ub.onAttach();
 	ub.setup(sizeof(glm::mat4), 0, 0, 0);
-	auto viewProj = camera.getViewProjMatrix();
+	auto viewProj = world.cam.getViewProjMatrix();
 	ub.update(0, sizeof(glm::mat4), glm::value_ptr(viewProj));
 	ed->subscribe(event::shader::SHADER_PROJECTION_CHANGED, [&ub]() {
-		auto vp = camera.getViewProjMatrix();
+		auto vp = world.cam.getViewProjMatrix();
 		ub.update(0, sizeof(glm::mat4), glm::value_ptr(vp));
 	});
 
 	ed->subscribe(event::loop::LOOP_UPDATE, [&pyr]() {
 		systems::transform::addRotation(pyr, {2, 1, 0});
 	});
+
+	ed->subscribe(event::loop::LOOP_UPDATE, []() { auto coll = systems::collision::getCollisions(); });
 
 	ed->subscribe(ENTITY_ELECTED_CHANGED, [&igEttModel]() {
 		igEttModel->setSelectedEntity(ettSelected);
@@ -330,9 +340,10 @@ int main(int argc, char *argv[]) {
 		systems::render::renderSkybox(skybox, skyboxShader);
 		// render other meshes
 		systems::render::renderAllMeshes();
+		systems::render::renderBoundingBox();
 		// normalShader->use();
-		// auto p = camera.getProjMatrix();
-		// auto v = camera.getViewMatrix();
+		// auto p = world.cam.getProjMatrix();
+		// auto v = world.cam.getViewMatrix();
 		// normalShader->setMat4("view", v);
 		// normalShader->setMat4("proj", p);
 		// normalShader->setMat4("model", systems::transform::getModelMatrix(shape));

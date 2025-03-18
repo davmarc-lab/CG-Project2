@@ -404,14 +404,14 @@ public:
 	std::function<void()> func = nullptr;
 };
 
-class AABB : public Component {
+class ColliderComponent : public Component {
 public:
 	glm::vec3 position{};
 	glm::vec3 botLeft{};
 	glm::vec3 topRight{};
 
 	void updateCollider(const std::vector<glm::vec3> &coords, const glm::mat4 &model) {
-		auto bot = glm::vec3(1, 1, 0);
+		auto bot = glm::vec3(0);
 		bool first = true;
 
 		for (auto i = 0; i < coords.size(); i++) {
@@ -422,9 +422,10 @@ public:
 			}
 			bot.x = bot.x >= elem.x ? elem.x : bot.x;
 			bot.y = bot.y >= elem.y ? elem.y : bot.y;
+			bot.z = bot.z >= elem.z ? elem.z : bot.z;
 		}
 
-		auto top = glm::vec3(1, 1, 0);
+		auto top = glm::vec3(1);
 		first = true;
 		for (auto i = 0; i < coords.size(); i++) {
 			auto elem = model * glm::vec4(coords[i], 1);
@@ -434,6 +435,7 @@ public:
 			}
 			top.x = top.x <= elem.x ? elem.x : top.x;
 			top.y = top.y <= elem.y ? elem.y : top.y;
+			top.z = top.z <= elem.z ? elem.z : top.z;
 		}
 
 		this->botLeft = bot;
@@ -441,14 +443,15 @@ public:
 		this->position = model[3];
 	}
 
-	bool isColliding(const AABB &other) const {
+	bool isColliding(const ColliderComponent &other) const {
 		return (this->botLeft.x <= other.topRight.x && this->topRight.x >= other.botLeft.x) &&
-			(this->botLeft.y <= other.topRight.y && this->topRight.y >= other.botLeft.y);
+			(this->botLeft.y <= other.topRight.y && this->topRight.y >= other.botLeft.y) &&
+			(this->botLeft.z <= other.topRight.z && this->topRight.z >= other.botLeft.z);
 	}
 
-	AABB() = default;
+	ColliderComponent() = default;
 
-	virtual ~AABB() override = default;
+	virtual ~ColliderComponent() override = default;
 };
 
 class SkyboxComponent : public Component {

@@ -124,7 +124,7 @@ void main() {
     if (reflective != 0) {
         vec3 I = normalize(FragPos - viewPos);
         vec3 R = reflect(I, normalize(fs_out.normal));
-        fragColor = vec4(texture(skybox, R).rgb, 1.0);
+        fragColor = vec4(texture(skybox, R).rgb, 1);
         return;
     }
 
