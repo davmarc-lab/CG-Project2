@@ -133,5 +133,5 @@ namespace ogl {
 		void updateCameraVectors();
 	};
 
-	inline Camera camera{};
+	inline Camera standardCamera{};
 } // namespace ogl

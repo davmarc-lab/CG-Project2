@@ -207,7 +207,9 @@ namespace systems {
 
 			// default collider update
 			auto cc = em->getComponentFromId<VertexComponent>(id);
-			bc->updateCollider(cc->getVertexCoords(), ::systems::transform::getModelMatrix(id));
+			if (cc != nullptr) {
+				bc->updateCollider(cc->getVertexCoords(), ::systems::transform::getModelMatrix(id));
+			}
 		}
 
 		void updateAllColliders() {
@@ -290,8 +292,9 @@ namespace systems {
 
 		std::vector<Pair<unsigned int>> getCollisions() {
 			std::vector<Pair<unsigned int>> coll{};
-			for (auto first : em->getEntitiesFromComponent<ColliderComponent>()) {
-				for (auto other : em->getEntitiesFromComponent<ColliderComponent>()) {
+			auto collidable = em->getEntitiesFromComponent<ColliderComponent>();
+			for (auto first : collidable) {
+				for (auto other : collidable) {
 					if (first == other)
 						continue;
 					{
@@ -318,6 +321,14 @@ namespace systems {
 		}
 
 	} // namespace collision
+
+	namespace camera {
+		void updateCameraCollider(const unsigned int &id, const glm::vec3 &position, const glm::vec3 &size) {
+			auto c = em->getComponentFromId<ColliderComponent>(id);
+			ASSERT(c != nullptr);
+			c->updateCollider(position, size);
+		}
+	} // namespace camera
 
 	namespace parent {
 		void addChild(const unsigned int &parent, const unsigned int &child) {
@@ -680,14 +691,14 @@ namespace systems {
 				index++;
 			}
 			shader->setInt("lightsCount", em->getEntitiesFromComponent<LightComponent>().size());
-			shader->setVec3("viewPos", ogl::camera.getCameraPosition());
+			shader->setVec3("viewPos", ogl::standardCamera.getCameraPosition());
 		}
 
 		void renderSkybox(const unsigned int &id, const Shared<ogl::ShaderProgram> &shader) {
 			shader->use();
 			auto rc = em->getComponentFromId<RenderComponent>(id);
-			shader->setMat4("view", glm::mat4(glm::mat3(ogl::camera.getViewMatrix())));
-			shader->setMat4("proj", ogl::camera.getProjMatrix());
+			shader->setMat4("view", glm::mat4(glm::mat3(ogl::standardCamera.getViewMatrix())));
+			shader->setMat4("proj", ogl::standardCamera.getProjMatrix());
 			rc->call();
 		}
 
@@ -743,14 +754,47 @@ namespace systems {
 			}
 		}
 
+		std::vector<glm::vec3> getBoxLines(glm::vec3 &botLeft, glm::vec3 &topRight) {
+			std::vector<glm::vec3> lines{};
+			lines.push_back(topRight);
+			lines.push_back({botLeft.x, topRight.y, topRight.z});
+			lines.push_back({botLeft.x, topRight.y, topRight.z});
+			lines.push_back({botLeft.x, botLeft.y, topRight.z});
+			lines.push_back({botLeft.x, botLeft.y, topRight.z});
+			lines.push_back({topRight.x, botLeft.y, topRight.z});
+			lines.push_back({topRight.x, botLeft.y, topRight.z});
+			lines.push_back(topRight);
+
+			// "BACK" face
+			lines.push_back({topRight.x, topRight.y, botLeft.z});
+			lines.push_back({botLeft.x, topRight.y, botLeft.z});
+			lines.push_back({botLeft.x, topRight.y, botLeft.z});
+			lines.push_back({botLeft.x, botLeft.y, botLeft.z});
+			lines.push_back({botLeft.x, botLeft.y, botLeft.z});
+			lines.push_back({topRight.x, botLeft.y, botLeft.z});
+			lines.push_back({topRight.x, botLeft.y, botLeft.z});
+			lines.push_back({topRight.x, topRight.y, botLeft.z});
+
+			// "TOP" face
+			lines.push_back(topRight);
+			lines.push_back({topRight.x, topRight.y, botLeft.z});
+			lines.push_back({botLeft.x, topRight.y, botLeft.z});
+			lines.push_back({botLeft.x, topRight.y, topRight.z});
+
+			// "BOT" face
+			lines.push_back(botLeft);
+			lines.push_back({botLeft.x, botLeft.y, topRight.z});
+			lines.push_back({topRight.x, botLeft.y, topRight.z});
+			lines.push_back({topRight.x, botLeft.y, botLeft.z});
+			return lines;
+		}
+
 		void renderBoundingBox() {
 			if (!defaultShader.init) {
 				defaultShader.program.createShaderProgram();
 				defaultShader.vao.onAttach();
 				defaultShader.vbog.onAttach();
 				defaultShader.vboc.onAttach();
-				for (int i = 0; i < 24; i++)
-					defaultShader.colors.push_back(BOUNDING_BOX_COLOR);
 				defaultShader.init = true;
 			}
 
@@ -758,37 +802,13 @@ namespace systems {
 			for (auto ett : em->getEntitiesFromComponent<ColliderComponent>()) {
 				auto box = em->getComponentFromId<ColliderComponent>(ett);
 				defaultShader.coords.clear();
-				// "FRONT" face
-				defaultShader.coords.push_back(box->topRight);
-				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, box->topRight.z});
-				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, box->topRight.z});
-				defaultShader.coords.push_back({box->botLeft.x, box->botLeft.y, box->topRight.z});
-				defaultShader.coords.push_back({box->botLeft.x, box->botLeft.y, box->topRight.z});
-				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, box->topRight.z});
-				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, box->topRight.z});
-				defaultShader.coords.push_back(box->topRight);
 
-				// "BACK" face
-				defaultShader.coords.push_back({box->topRight.x, box->topRight.y, box->botLeft.z});
-				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, box->botLeft.z});
-				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, box->botLeft.z});
-				defaultShader.coords.push_back({box->botLeft.x, box->botLeft.y, box->botLeft.z});
-				defaultShader.coords.push_back({box->botLeft.x, box->botLeft.y, box->botLeft.z});
-				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, box->botLeft.z});
-				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, box->botLeft.z});
-				defaultShader.coords.push_back({box->topRight.x, box->topRight.y, box->botLeft.z});
+				for (auto points : getBoxLines(box->botLeft, box->topRight)) {
+					defaultShader.coords.push_back(points);
+				}
 
-				// "TOP" face
-				defaultShader.coords.push_back(box->topRight);
-				defaultShader.coords.push_back({box->topRight.x, box->topRight.y, box->botLeft.z});
-				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, box->botLeft.z});
-				defaultShader.coords.push_back({box->botLeft.x, box->topRight.y, box->topRight.z});
-
-                // "BOT" face
-				defaultShader.coords.push_back(box->botLeft);
-				defaultShader.coords.push_back({box->botLeft.x, box->botLeft.y, box->topRight.z});
-				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, box->topRight.z});
-				defaultShader.coords.push_back({box->topRight.x, box->botLeft.y, box->botLeft.z});
+				for (auto i = 0; i < defaultShader.coords.size(); i++)
+					defaultShader.colors.push_back(BOUNDING_BOX_COLOR);
 
 				defaultShader.vao.bind();
 				defaultShader.vbog.setup(defaultShader.coords.data(), defaultShader.coords.size(), GL_STATIC_DRAW);

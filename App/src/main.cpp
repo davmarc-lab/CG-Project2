@@ -21,29 +21,36 @@ const auto scene = BasicScene::instance();
 const auto ENTITY_ELECTED_CHANGED = Event("Entity Selected Changed");
 
 struct WorldCamera {
-	Camera &cam = camera;
-	glm::vec3 size = glm::vec3(1);
+	unsigned int cameraId;
+	Camera &camera = standardCamera;
+	glm::vec3 cameraSize = glm::vec3(1);
 } world;
 
 void enableDefaultCameraMovement() {
 	ed->subscribe(event::loop::LOOP_INPUT, []() {
 		if (im->isKeyPressed(GLFW_KEY_W)) {
-			world.cam.moveCamera(world.cam.getCameraFront());
+			world.camera.moveCamera(world.camera.getCameraFront());
+			systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
 		}
 		if (im->isKeyPressed(GLFW_KEY_S)) {
-			world.cam.moveCamera(-world.cam.getCameraFront());
+			world.camera.moveCamera(-world.camera.getCameraFront());
+			systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
 		}
 		if (im->isKeyPressed(GLFW_KEY_D)) {
-			world.cam.moveCamera(world.cam.getCameraRight());
+			world.camera.moveCamera(world.camera.getCameraRight());
+			systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
 		}
 		if (im->isKeyPressed(GLFW_KEY_A)) {
-			world.cam.moveCamera(-world.cam.getCameraRight());
+			world.camera.moveCamera(-world.camera.getCameraRight());
+			systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
 		}
 		if (im->isKeyPressed(GLFW_KEY_SPACE)) {
-			world.cam.moveCamera(world.cam.getCameraUp());
+			world.camera.moveCamera(world.camera.getCameraUp());
+			systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
 		}
 		if (im->isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
-			world.cam.moveCamera(-world.cam.getCameraUp());
+			world.camera.moveCamera(-world.camera.getCameraUp());
+			systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
 		}
 	});
 }
@@ -67,16 +74,16 @@ glm::vec3 getRayFromMouse(const Pair<float> &size, int mouse_x, int mouse_y) {
 
 	auto clip = glm::vec4(ndc_x, ndc_y, ndc_z, 1.0f);
 
-	auto view_model_p = glm::inverse(world.cam.getProjMatrix()) * clip;
+	auto view_model_p = glm::inverse(world.camera.getProjMatrix()) * clip;
 	view_model_p.w = 1;
 
-	auto pw = glm::inverse(world.cam.getViewMatrix()) * view_model_p;
+	auto pw = glm::inverse(world.camera.getViewMatrix()) * view_model_p;
 
-	return glm::normalize(glm::vec3(pw) - glm::vec3(world.cam.getCameraPosition()));
+	return glm::normalize(glm::vec3(pw) - glm::vec3(world.camera.getCameraPosition()));
 }
 
 bool isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const float &sphere_radius, float *id) {
-	glm::vec3 d = world.cam.getCameraPosition() - sphere_pos;
+	glm::vec3 d = world.camera.getCameraPosition() - sphere_pos;
 	float b = dot(d, ray);
 	float cc = dot(d, d) - sphere_radius * sphere_radius;
 	float delta = b * b - cc;
@@ -125,7 +132,7 @@ void changeInputState(Window &w, const InputState &state) {
 
 				mouse.pos = {x, y};
 
-				world.cam.processMouseMovement(xoffset, yoffset);
+				world.camera.processMouseMovement(xoffset, yoffset);
 			});
 			break;
 		}
@@ -217,9 +224,6 @@ int main(int argc, char *argv[]) {
 	ed->subscribe(event::loop::LOOP_UPDATE, [&w]() { w.onUpdate(); });
 	ed->subscribe(event::loop::LOOP_RENDER, [&w]() { w.onRender(); });
 
-	enableDefaultCameraMovement();
-	world.cam.updatePerspProjection(world.cam.getCameraZoom(), w.getWidth(), w.getHeight(), 0.1f, 100.f);
-
 	Renderer::instance()->init();
 
 	ImGuiManager im{"ImGui Manager", w, DEFAULT_IMGUI_CONFIGS | ImGuiConfigFlags_ViewportsEnable};
@@ -233,21 +237,12 @@ int main(int argc, char *argv[]) {
 	im.addPanel<ImGuiCamera>();
 	auto igEttModel = im.addPanel<ImGuiEntityModel>();
 
-	/*
-		FrameBuffer fb{{GL_FRAMEBUFFER, 100, 100}};
-		fb.onAttach();
-
-		fb.setRenderBuffer({GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, 100, 100});
-
-		Texture t = Texture({GL_TEXTURE_2D, 0, GL_RGB, 0, GL_RGB, GL_UNSIGNED_BYTE}, 100, 100);
-		t.onAttach();
-		t.createTexture2D(NULL);
-		t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		fb.setColorTexture(t);
-		fb.createFrameBuffer();
-	*/
+	// Setting up the camera
+	world.cameraId = em->createEntity();
+	em->addComponent<ColliderComponent>(world.cameraId, glm::vec3{4, 4, 4}, world.cameraSize);
+	systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
+	enableDefaultCameraMovement();
+	world.camera.updatePerspProjection(world.camera.getCameraZoom(), w.getWidth(), w.getHeight(), 0.1f, 100.f);
 
 	Shared<ShaderProgram> skyboxShader = CreateShared<ShaderProgram>("skyboxVertShader.glsl", "skyboxFragShader.glsl");
 	skyboxShader->createShaderProgram();
@@ -318,10 +313,10 @@ int main(int argc, char *argv[]) {
 	UniformBuffer ub("Matrices");
 	ub.onAttach();
 	ub.setup(sizeof(glm::mat4), 0, 0, 0);
-	auto viewProj = world.cam.getViewProjMatrix();
+	auto viewProj = world.camera.getViewProjMatrix();
 	ub.update(0, sizeof(glm::mat4), glm::value_ptr(viewProj));
 	ed->subscribe(event::shader::SHADER_PROJECTION_CHANGED, [&ub]() {
-		auto vp = world.cam.getViewProjMatrix();
+		auto vp = world.camera.getViewProjMatrix();
 		ub.update(0, sizeof(glm::mat4), glm::value_ptr(vp));
 	});
 

@@ -143,6 +143,9 @@ void ImGuiEntityTree::onRender() {
 			ImGui::TreePop();
 		}
 	}
+
+    ImGui::Separator();
+    ImGui::Text("Collisions -> %zu", systems::collision::getCollisions().size());
 	ImGui::End();
 }
 
@@ -174,33 +177,33 @@ void ImGuiEntityModel::onRender() {
 void ImGuiCamera::onRender() {
 	ImGui::Begin("Camera");
 	if (ImGui::CollapsingHeader("World Info")) {
-		auto pos = camera.getCameraPosition();
+		auto pos = standardCamera.getCameraPosition();
 		if (ImGui::DragFloat3("Position", &pos.x)) {
-			camera.setCameraPosition(pos);
+			standardCamera.setCameraPosition(pos);
 		}
 	}
 	if (ImGui::CollapsingHeader("Camera Info")) {
-		auto speed = camera.getCameraVelocity();
+		auto speed = standardCamera.getCameraVelocity();
 		if (ImGui::SliderFloat("Velocity", &speed, 0.01f, 1.f)) {
-			camera.setCameraVelocity(speed);
+			standardCamera.setCameraVelocity(speed);
 		}
-		auto sens = camera.getMouseSensitivity();
+		auto sens = standardCamera.getMouseSensitivity();
 		if (ImGui::SliderFloat("Sensitivity", &sens, 0.01f, 1.f)) {
-			camera.setMouseSensitivity(sens);
+			standardCamera.setMouseSensitivity(sens);
 		}
-		auto zoom = camera.getCameraZoom();
+		auto zoom = standardCamera.getCameraZoom();
 		if (ImGui::SliderFloat("Zoom", &zoom, 20.f, 100.f)) {
-			camera.setCameraZoom(zoom);
+			standardCamera.setCameraZoom(zoom);
 		}
 	}
 
 	if (ImGui::CollapsingHeader("Camera Rotation")) {
-		auto rot = camera.getCameraRotation();
+		auto rot = standardCamera.getCameraRotation();
 		if (ImGui::DragFloat("Yaw", &rot.yaw)) {
-			camera.setCameraYaw(rot.yaw);
+			standardCamera.setCameraYaw(rot.yaw);
 		}
 		if (ImGui::DragFloat("Pitch", &rot.pitch)) {
-			camera.setCameraPitch(rot.pitch);
+			standardCamera.setCameraPitch(rot.pitch);
 		}
 	}
 	ImGui::End();

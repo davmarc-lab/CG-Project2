@@ -410,6 +410,7 @@ public:
 	glm::vec3 botLeft{};
 	glm::vec3 topRight{};
 
+	// optimized bounding box
 	void updateCollider(const std::vector<glm::vec3> &coords, const glm::mat4 &model) {
 		auto bot = glm::vec3(0);
 		bool first = true;
@@ -443,6 +444,12 @@ public:
 		this->position = model[3];
 	}
 
+	// not optimized bounding box
+	void updateCollider(const glm::vec3 &position, const glm::vec3 &size) {
+		this->botLeft = position - size;
+		this->topRight = position + size;
+	}
+
 	bool isColliding(const ColliderComponent &other) const {
 		return (this->botLeft.x <= other.topRight.x && this->topRight.x >= other.botLeft.x) &&
 			(this->botLeft.y <= other.topRight.y && this->topRight.y >= other.botLeft.y) &&
@@ -450,6 +457,11 @@ public:
 	}
 
 	ColliderComponent() = default;
+
+	ColliderComponent(const glm::vec3 &position, const glm::vec3 &size) {
+		this->botLeft = position - size;
+		this->topRight = position + size;
+	}
 
 	virtual ~ColliderComponent() override = default;
 };

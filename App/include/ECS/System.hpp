@@ -58,6 +58,10 @@ namespace systems {
 		std::vector<Pair<unsigned int>> getCollisions();
 	} // namespace collision
 
+	namespace camera {
+		void updateCameraCollider(const unsigned int &id, const glm::vec3 &position, const glm::vec3 &size);
+	}
+
 	namespace parent {
 		void addChild(const unsigned int &parent, const unsigned int &child);
 		void removeChild(const unsigned int &parent, const unsigned int &child);

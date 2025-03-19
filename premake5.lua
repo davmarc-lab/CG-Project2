@@ -1,7 +1,7 @@
 workspace "opengl-wrapper"
     architecture "x64"
     configurations { "Debug", "Release" }
-    startproject "Opengl-Sandbox"
+    startproject "App"
 
     OutputDir = "%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"
 
