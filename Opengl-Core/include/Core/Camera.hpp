@@ -1,8 +1,8 @@
 #pragma once
 
-#include <iostream>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/glm.hpp>
+#include <iostream>
 
 namespace ogl {
 	inline const float YAW = -90.f;
@@ -132,6 +132,4 @@ namespace ogl {
 
 		void updateCameraVectors();
 	};
-
-	inline Camera standardCamera{};
 } // namespace ogl

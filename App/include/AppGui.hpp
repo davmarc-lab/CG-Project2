@@ -5,6 +5,8 @@
 
 using namespace ogl;
 
+const auto CAMERA_UPDATE_DATA = Event("Camera Update Data");
+
 class ImGuiEntityTree : public ImGuiPanel {
 public:
 	virtual void onRender() override;
@@ -32,13 +34,3 @@ private:
 	int m_ett = -1;
 };
 
-class ImGuiCamera : public ImGuiPanel {
-public:
-	virtual void onRender() override;
-
-	ImGuiCamera() :
-		ImGuiPanel("Camera Settings") {
-	}
-
-	virtual ~ImGuiCamera() override = default;
-};

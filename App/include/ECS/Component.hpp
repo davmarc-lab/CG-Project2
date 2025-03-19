@@ -404,9 +404,18 @@ public:
 	std::function<void()> func = nullptr;
 };
 
+class CameraComponent : public Component {
+public:
+	Shared<ogl::Camera> camera{};
+
+	CameraComponent() = default;
+	virtual ~CameraComponent() override = default;
+};
+
 class ColliderComponent : public Component {
 public:
 	glm::vec3 position{};
+	glm::vec3 size{};
 	glm::vec3 botLeft{};
 	glm::vec3 topRight{};
 
@@ -461,6 +470,8 @@ public:
 	ColliderComponent(const glm::vec3 &position, const glm::vec3 &size) {
 		this->botLeft = position - size;
 		this->topRight = position + size;
+		this->position = position;
+		this->size = size;
 	}
 
 	virtual ~ColliderComponent() override = default;

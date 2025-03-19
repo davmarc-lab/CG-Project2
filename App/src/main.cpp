@@ -22,35 +22,35 @@ const auto ENTITY_ELECTED_CHANGED = Event("Entity Selected Changed");
 
 struct WorldCamera {
 	unsigned int cameraId;
-	Camera &camera = standardCamera;
+	Shared<Camera> camera;
 	glm::vec3 cameraSize = glm::vec3(1);
 } world;
 
 void enableDefaultCameraMovement() {
 	ed->subscribe(event::loop::LOOP_INPUT, []() {
 		if (im->isKeyPressed(GLFW_KEY_W)) {
-			world.camera.moveCamera(world.camera.getCameraFront());
-			systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
+			world.camera->moveCamera(world.camera->getCameraFront());
+			ed->post(CAMERA_UPDATE_DATA);
 		}
 		if (im->isKeyPressed(GLFW_KEY_S)) {
-			world.camera.moveCamera(-world.camera.getCameraFront());
-			systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
+			world.camera->moveCamera(-world.camera->getCameraFront());
+			ed->post(CAMERA_UPDATE_DATA);
 		}
 		if (im->isKeyPressed(GLFW_KEY_D)) {
-			world.camera.moveCamera(world.camera.getCameraRight());
-			systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
+			world.camera->moveCamera(world.camera->getCameraRight());
+			ed->post(CAMERA_UPDATE_DATA);
 		}
 		if (im->isKeyPressed(GLFW_KEY_A)) {
-			world.camera.moveCamera(-world.camera.getCameraRight());
-			systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
+			world.camera->moveCamera(-world.camera->getCameraRight());
+			ed->post(CAMERA_UPDATE_DATA);
 		}
 		if (im->isKeyPressed(GLFW_KEY_SPACE)) {
-			world.camera.moveCamera(world.camera.getCameraUp());
-			systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
+			world.camera->moveCamera(world.camera->getCameraUp());
+			ed->post(CAMERA_UPDATE_DATA);
 		}
 		if (im->isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
-			world.camera.moveCamera(-world.camera.getCameraUp());
-			systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
+			world.camera->moveCamera(-world.camera->getCameraUp());
+			ed->post(CAMERA_UPDATE_DATA);
 		}
 	});
 }
@@ -74,16 +74,16 @@ glm::vec3 getRayFromMouse(const Pair<float> &size, int mouse_x, int mouse_y) {
 
 	auto clip = glm::vec4(ndc_x, ndc_y, ndc_z, 1.0f);
 
-	auto view_model_p = glm::inverse(world.camera.getProjMatrix()) * clip;
+	auto view_model_p = glm::inverse(world.camera->getProjMatrix()) * clip;
 	view_model_p.w = 1;
 
-	auto pw = glm::inverse(world.camera.getViewMatrix()) * view_model_p;
+	auto pw = glm::inverse(world.camera->getViewMatrix()) * view_model_p;
 
-	return glm::normalize(glm::vec3(pw) - glm::vec3(world.camera.getCameraPosition()));
+	return glm::normalize(glm::vec3(pw) - glm::vec3(world.camera->getCameraPosition()));
 }
 
 bool isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const float &sphere_radius, float *id) {
-	glm::vec3 d = world.camera.getCameraPosition() - sphere_pos;
+	glm::vec3 d = world.camera->getCameraPosition() - sphere_pos;
 	float b = dot(d, ray);
 	float cc = dot(d, d) - sphere_radius * sphere_radius;
 	float delta = b * b - cc;
@@ -132,7 +132,7 @@ void changeInputState(Window &w, const InputState &state) {
 
 				mouse.pos = {x, y};
 
-				world.camera.processMouseMovement(xoffset, yoffset);
+				world.camera->processMouseMovement(xoffset, yoffset);
 			});
 			break;
 		}
@@ -234,15 +234,25 @@ int main(int argc, char *argv[]) {
 	ed->subscribe(event::loop::LOOP_END_RENDER, [&im]() { im.end(); });
 
 	im.addPanel<ImGuiEntityTree>();
-	im.addPanel<ImGuiCamera>();
 	auto igEttModel = im.addPanel<ImGuiEntityModel>();
 
 	// Setting up the camera
 	world.cameraId = em->createEntity();
+	systems::ecs::updateEntityName(world.cameraId, "Main Camera");
+	auto cam = em->addComponent<CameraComponent>(world.cameraId);
+	cam->camera = CreateShared<ogl::Camera>();
+	world.camera = systems::camera::getCamera(world.cameraId);
 	em->addComponent<ColliderComponent>(world.cameraId, glm::vec3{4, 4, 4}, world.cameraSize);
-	systems::camera::updateCameraCollider(world.cameraId, world.camera.getCameraPosition(), world.cameraSize);
+	ed->post(CAMERA_UPDATE_DATA);
 	enableDefaultCameraMovement();
-	world.camera.updatePerspProjection(world.camera.getCameraZoom(), w.getWidth(), w.getHeight(), 0.1f, 100.f);
+	world.camera->updatePerspProjection(world.camera->getCameraZoom(), w.getWidth(), w.getHeight(), 0.1f, 100.f);
+
+	ed->subscribe(CAMERA_UPDATE_DATA, []() {
+		systems::camera::updateCameraCollider(world.cameraId, world.camera->getCameraPosition(), world.cameraSize);
+	});
+
+	// Initializing Scene
+	scene->init(world.camera);
 
 	Shared<ShaderProgram> skyboxShader = CreateShared<ShaderProgram>("skyboxVertShader.glsl", "skyboxFragShader.glsl");
 	skyboxShader->createShaderProgram();
@@ -313,10 +323,10 @@ int main(int argc, char *argv[]) {
 	UniformBuffer ub("Matrices");
 	ub.onAttach();
 	ub.setup(sizeof(glm::mat4), 0, 0, 0);
-	auto viewProj = world.camera.getViewProjMatrix();
+	auto viewProj = world.camera->getViewProjMatrix();
 	ub.update(0, sizeof(glm::mat4), glm::value_ptr(viewProj));
 	ed->subscribe(event::shader::SHADER_PROJECTION_CHANGED, [&ub]() {
-		auto vp = world.camera.getViewProjMatrix();
+		auto vp = world.camera->getViewProjMatrix();
 		ub.update(0, sizeof(glm::mat4), glm::value_ptr(vp));
 	});
 

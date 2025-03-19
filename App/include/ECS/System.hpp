@@ -59,8 +59,10 @@ namespace systems {
 	} // namespace collision
 
 	namespace camera {
+		Shared<ogl::Camera> getCamera(const unsigned int& id);
+
 		void updateCameraCollider(const unsigned int &id, const glm::vec3 &position, const glm::vec3 &size);
-	}
+	} // namespace camera
 
 	namespace parent {
 		void addChild(const unsigned int &parent, const unsigned int &child);

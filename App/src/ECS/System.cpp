@@ -323,6 +323,12 @@ namespace systems {
 	} // namespace collision
 
 	namespace camera {
+		Shared<ogl::Camera> getCamera(const unsigned int &id) {
+			auto c = em->getComponentFromId<CameraComponent>(id);
+			ASSERT(c != nullptr);
+			return c->camera;
+		}
+
 		void updateCameraCollider(const unsigned int &id, const glm::vec3 &position, const glm::vec3 &size) {
 			auto c = em->getComponentFromId<ColliderComponent>(id);
 			ASSERT(c != nullptr);
@@ -691,14 +697,14 @@ namespace systems {
 				index++;
 			}
 			shader->setInt("lightsCount", em->getEntitiesFromComponent<LightComponent>().size());
-			shader->setVec3("viewPos", ogl::standardCamera.getCameraPosition());
+			shader->setVec3("viewPos", scene->getCamera()->getCameraPosition());
 		}
 
 		void renderSkybox(const unsigned int &id, const Shared<ogl::ShaderProgram> &shader) {
 			shader->use();
 			auto rc = em->getComponentFromId<RenderComponent>(id);
-			shader->setMat4("view", glm::mat4(glm::mat3(ogl::standardCamera.getViewMatrix())));
-			shader->setMat4("proj", ogl::standardCamera.getProjMatrix());
+			shader->setMat4("view", glm::mat4(glm::mat3(scene->getCamera()->getViewMatrix())));
+			shader->setMat4("proj", scene->getCamera()->getProjMatrix());
 			rc->call();
 		}
 

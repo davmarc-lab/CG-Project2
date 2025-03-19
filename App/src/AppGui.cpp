@@ -14,7 +14,7 @@ void ImGuiEntityTree::onRender() {
 	for (auto id : em->getEntities()) {
 		if (ImGui::TreeNode(systems::ecs::getEntityName(id).c_str())) {
 			ImGui::PushID(&id);
-			ImGui::Text("Ett: %s", std::to_string(id).c_str());
+			ImGui::Text("(ECS) Entity Id: %s", std::to_string(id).c_str());
 
 			if (em->entityHasComponent<Transform>(id)) {
 				if (ImGui::CollapsingHeader("Transform##0")) {
@@ -139,13 +139,49 @@ void ImGuiEntityTree::onRender() {
 				}
 			}
 
+			if (em->entityHasComponent<CameraComponent>(id)) {
+				if (ImGui::CollapsingHeader("Camera##4")) {
+					auto camera = systems::camera::getCamera(id);
+					if (ImGui::CollapsingHeader("World Info##4")) {
+						auto pos = camera->getCameraPosition();
+						if (ImGui::DragFloat3("Position##4", &pos.x)) {
+							camera->setCameraPosition(pos);
+							EventManager::instance()->post(CAMERA_UPDATE_DATA);
+						}
+					}
+					if (ImGui::CollapsingHeader("Camera Info##4")) {
+						auto speed = camera->getCameraVelocity();
+						if (ImGui::SliderFloat("Velocity##4", &speed, 0.01f, 1.f)) {
+							camera->setCameraVelocity(speed);
+						}
+						auto sens = camera->getMouseSensitivity();
+						if (ImGui::SliderFloat("Sensitivity##4", &sens, 0.01f, 1.f)) {
+							camera->setMouseSensitivity(sens);
+						}
+						auto zoom = camera->getCameraZoom();
+						if (ImGui::SliderFloat("Zoom##4", &zoom, 20.f, 100.f)) {
+							camera->setCameraZoom(zoom);
+						}
+					}
+
+					if (ImGui::CollapsingHeader("Camera Rotation##4")) {
+						auto rot = camera->getCameraRotation();
+						if (ImGui::DragFloat("Yaw##4", &rot.yaw)) {
+							camera->setCameraYaw(rot.yaw);
+						}
+						if (ImGui::DragFloat("Pitch##4", &rot.pitch)) {
+							camera->setCameraPitch(rot.pitch);
+						}
+					}
+				}
+			}
 			ImGui::PopID();
 			ImGui::TreePop();
 		}
 	}
 
-    ImGui::Separator();
-    ImGui::Text("Collisions -> %zu", systems::collision::getCollisions().size());
+	ImGui::Separator();
+	ImGui::Text("Collisions -> %zu", systems::collision::getCollisions().size());
 	ImGui::End();
 }
 
@@ -153,7 +189,7 @@ void ImGuiEntityModel::onRender() {
 	if (this->m_ett >= 0) {
 		ImGui::Begin("Model", NULL, ImGuiWindowFlags_NoFocusOnAppearing);
 		ImGui::PushID(&this->m_ett);
-		ImGui::Text("Ett: %s", std::to_string(this->m_ett).c_str());
+		ImGui::Text("(ECS) Entity Id: %s", std::to_string(this->m_ett).c_str());
 		auto pos = systems::transform::getPosition(this->m_ett);
 		if (ImGui::DragFloat3("Position", &pos.x, 0.2f)) {
 			systems::transform::updatePosition(this->m_ett, pos);
@@ -172,39 +208,4 @@ void ImGuiEntityModel::onRender() {
 
 		ImGui::End();
 	}
-}
-
-void ImGuiCamera::onRender() {
-	ImGui::Begin("Camera");
-	if (ImGui::CollapsingHeader("World Info")) {
-		auto pos = standardCamera.getCameraPosition();
-		if (ImGui::DragFloat3("Position", &pos.x)) {
-			standardCamera.setCameraPosition(pos);
-		}
-	}
-	if (ImGui::CollapsingHeader("Camera Info")) {
-		auto speed = standardCamera.getCameraVelocity();
-		if (ImGui::SliderFloat("Velocity", &speed, 0.01f, 1.f)) {
-			standardCamera.setCameraVelocity(speed);
-		}
-		auto sens = standardCamera.getMouseSensitivity();
-		if (ImGui::SliderFloat("Sensitivity", &sens, 0.01f, 1.f)) {
-			standardCamera.setMouseSensitivity(sens);
-		}
-		auto zoom = standardCamera.getCameraZoom();
-		if (ImGui::SliderFloat("Zoom", &zoom, 20.f, 100.f)) {
-			standardCamera.setCameraZoom(zoom);
-		}
-	}
-
-	if (ImGui::CollapsingHeader("Camera Rotation")) {
-		auto rot = standardCamera.getCameraRotation();
-		if (ImGui::DragFloat("Yaw", &rot.yaw)) {
-			standardCamera.setCameraYaw(rot.yaw);
-		}
-		if (ImGui::DragFloat("Pitch", &rot.pitch)) {
-			standardCamera.setCameraPitch(rot.pitch);
-		}
-	}
-	ImGui::End();
 }
