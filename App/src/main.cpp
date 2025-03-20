@@ -22,13 +22,14 @@ const auto scene = BasicScene::instance();
 
 const auto ENTITY_ELECTED_CHANGED = Event("Entity Selected Changed");
 
+int ettSelected = -1;
+
 struct WorldCamera {
 	unsigned int cameraId;
 	Shared<Camera> camera;
 	glm::vec3 cameraSize = glm::vec3(1);
 	int tbBorderTolerance = 20;
 	float tbRadius = 1.f;
-	bool skipCursorPos = false;
 } world;
 
 enum InputState {
@@ -40,6 +41,7 @@ struct Mouse {
 	glm::vec2 pos{};
 	bool first = true;
 	bool trackState = false;
+	bool skipCursorPos = false;
 } mouse;
 
 void enableDefaultCameraMovement() {
@@ -73,8 +75,9 @@ void enableDefaultCameraMovement() {
 
 glm::vec3 getTrackballPoint(const Pair<float> &viewpSize, const glm::vec2 &pos) {
 	glm::vec3 point{};
-	point.x = (2 * pos.x - viewpSize.x) / viewpSize.x;
-	point.y = (viewpSize.y - 2 * pos.y) / viewpSize.y;
+	glm::vec3 offset{};
+	point.x = (2 * (pos.x) - viewpSize.x) / viewpSize.x;
+	point.y = (viewpSize.y - 2 * (pos.y)) / viewpSize.y;
 
 	auto zTmp = world.tbRadius - pow(point.x, 2) - pow(point.y, 2);
 	point.z = zTmp < 0 ? 0 : sqrt(zTmp);
@@ -124,8 +127,6 @@ bool isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const floa
 	}
 }
 
-int ettSelected = -1;
-
 void changeInputState(Window &w, const InputState &state) {
 	switch (state) {
 		case MOUSE_PASSIVE: {
@@ -157,8 +158,8 @@ void changeInputState(Window &w, const InputState &state) {
 				glfwSetInputMode(w.getContext(), GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
 			glfwSetInputMode(w.getContext(), GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
 			w.setCursorPosCallback([&w](GLFWwindow *window, double x, double y) {
-				if (world.skipCursorPos) {
-					world.skipCursorPos = false;
+				if (mouse.skipCursorPos) {
+					mouse.skipCursorPos = false;
 					return;
 				}
 				if (mouse.first) {
@@ -192,22 +193,22 @@ void changeInputState(Window &w, const InputState &state) {
 				mouse.pos = {x, y};
 				if (mouse.pos.x < world.tbBorderTolerance) {
 					mouse.pos.x = w.getWidth() - world.tbBorderTolerance;
-					world.skipCursorPos = true;
+					mouse.skipCursorPos = true;
 					glfwSetCursorPos(window, mouse.pos.x, mouse.pos.y);
 				}
 				if (mouse.pos.x > w.getWidth() - world.tbBorderTolerance) {
 					mouse.pos.x = world.tbBorderTolerance;
-					world.skipCursorPos = true;
+					mouse.skipCursorPos = true;
 					glfwSetCursorPos(window, mouse.pos.x, mouse.pos.y);
 				}
 				if (mouse.pos.y < world.tbBorderTolerance) {
 					mouse.pos.y = w.getHeight() - world.tbBorderTolerance;
-					world.skipCursorPos = true;
+					mouse.skipCursorPos = true;
 					glfwSetCursorPos(window, mouse.pos.x, mouse.pos.y);
 				}
 				if (mouse.pos.y > w.getHeight() - world.tbBorderTolerance) {
 					mouse.pos.y = world.tbBorderTolerance;
-					world.skipCursorPos = true;
+					mouse.skipCursorPos = true;
 					glfwSetCursorPos(window, mouse.pos.x, mouse.pos.y);
 				}
 			});
