@@ -11,12 +11,14 @@ project "App"
 
     includedirs {
         "include",
-        "../Opengl-Core/include/"
+        "../Opengl-Core/include/",
+        "../Opengl-Core/vendor/include/"
     }
 
     links {
         "Opengl-Core",
         "glfw",
+        "assimp"
     }
 
     dependson { "Opengl-Core" }

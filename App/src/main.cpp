@@ -26,6 +26,9 @@ struct WorldCamera {
 	unsigned int cameraId;
 	Shared<Camera> camera;
 	glm::vec3 cameraSize = glm::vec3(1);
+	int tbBorderTolerance = 20;
+	float tbRadius = 1.f;
+	bool skipCursorPos = false;
 } world;
 
 enum InputState {
@@ -73,7 +76,7 @@ glm::vec3 getTrackballPoint(const Pair<float> &viewpSize, const glm::vec2 &pos) 
 	point.x = (2 * pos.x - viewpSize.x) / viewpSize.x;
 	point.y = (viewpSize.y - 2 * pos.y) / viewpSize.y;
 
-	auto zTmp = 1.f - pow(point.x, 2) - pow(point.y, 2);
+	auto zTmp = world.tbRadius - pow(point.x, 2) - pow(point.y, 2);
 	point.z = zTmp < 0 ? 0 : sqrt(zTmp);
 	return glm::normalize(point);
 }
@@ -154,6 +157,10 @@ void changeInputState(Window &w, const InputState &state) {
 				glfwSetInputMode(w.getContext(), GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
 			glfwSetInputMode(w.getContext(), GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
 			w.setCursorPosCallback([&w](GLFWwindow *window, double x, double y) {
+				if (world.skipCursorPos) {
+					world.skipCursorPos = false;
+					return;
+				}
 				if (mouse.first) {
 					mouse.first = false;
 					mouse.pos = {x, y};
@@ -169,12 +176,40 @@ void changeInputState(Window &w, const InputState &state) {
 				auto dpos = current - pre;
 				if (dpos.x || dpos.y || dpos.z) {
 					auto speed = world.camera->getTrackballSpeed();
-					auto angle = glm::acos(glm::dot(pre, current)) * speed;
+					// lenght of the new point.
+					auto dist = glm::dot(pre, current);
+					// avoid out of bound calculations
+					if (dist > 1) {
+						dist = 1;
+					} else if (dist < -1) {
+						dist = -1;
+					}
+					auto angle = glm::acos(dist) * speed;
 					glm::vec3 rotAxis = glm::cross(pre, current);
 					world.camera->setCameraDirection(world.camera->getCameraPosition() - world.camera->getCameraTarget());
 					world.camera->setCameraPosition(glm::vec4(world.camera->getCameraTarget(), 0) + glm::rotate(glm::mat4(1.f), glm::radians(-angle), rotAxis) * glm::vec4(world.camera->getCameraDirection(), 0));
 				}
 				mouse.pos = {x, y};
+				if (mouse.pos.x < world.tbBorderTolerance) {
+					mouse.pos.x = w.getWidth() - world.tbBorderTolerance;
+					world.skipCursorPos = true;
+					glfwSetCursorPos(window, mouse.pos.x, mouse.pos.y);
+				}
+				if (mouse.pos.x > w.getWidth() - world.tbBorderTolerance) {
+					mouse.pos.x = world.tbBorderTolerance;
+					world.skipCursorPos = true;
+					glfwSetCursorPos(window, mouse.pos.x, mouse.pos.y);
+				}
+				if (mouse.pos.y < world.tbBorderTolerance) {
+					mouse.pos.y = w.getHeight() - world.tbBorderTolerance;
+					world.skipCursorPos = true;
+					glfwSetCursorPos(window, mouse.pos.x, mouse.pos.y);
+				}
+				if (mouse.pos.y > w.getHeight() - world.tbBorderTolerance) {
+					mouse.pos.y = world.tbBorderTolerance;
+					world.skipCursorPos = true;
+					glfwSetCursorPos(window, mouse.pos.x, mouse.pos.y);
+				}
 			});
 			w.setMouseButtonCallback([&w](GLFWwindow *window, int button, int action, int mods) {
 				switch (button) {
