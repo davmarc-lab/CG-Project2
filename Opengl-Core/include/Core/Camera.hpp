@@ -1,17 +1,20 @@
 #pragma once
 
 #include <glm/ext/matrix_clip_space.hpp>
+#include <glm/fwd.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <iostream>
 
 namespace ogl {
 	inline const float YAW = -90.f;
 	inline const float PITCH = 0.f;
+	inline const float ROLL = 0.f;
 	inline const float SPEED = 0.2f;
 	inline const float SENSITIVITY = 0.02f;
 	inline const float ZOOM = 45.f;
 	inline const glm::vec3 POSITION = glm::vec3(0, 0, 3);
-	// float tbSpeed = 20.f;
+	inline const float TB_SPEED = 20.f;
 
 	struct CameraVectors {
 		glm::vec3 cameraPos = POSITION;
@@ -27,12 +30,14 @@ namespace ogl {
 		float sensitivity = SENSITIVITY;
 		float zoom = ZOOM;
 		float ratio = 1;
-		// float tbSpeed = speed;
+		float tbSpeed = TB_SPEED;
 	};
 
 	struct CameraRotation {
 		float yaw = YAW;
 		float pitch = PITCH;
+		float roll = ROLL;
+		glm::quat rotQuat{};
 	};
 
 	class Camera {
@@ -104,9 +109,9 @@ namespace ogl {
 			this->updateCameraVectors();
 		}
 
-		// inline float getTrackballSpeed() { return this->info.tb_speed; }
+		inline float getTrackballSpeed() { return this->m_info.tbSpeed; }
 
-		// inline void setTrackballSpeed(const float speed) { this->info.tb_speed = speed; }
+		inline void setTrackballSpeed(const float speed) { this->m_info.tbSpeed = speed; }
 
 		inline glm::vec3 getCameraDirection() const { return this->m_vectors.cameraDirection; }
 

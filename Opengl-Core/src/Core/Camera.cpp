@@ -1,15 +1,19 @@
 #include "../../include/Core/Camera.hpp"
+#include "../../include/Core/Event.hpp"
+
 #include <algorithm>
 #include <glm/ext/matrix_transform.hpp>
-#include "../../include/Core/Event.hpp"
+#include <glm/fwd.hpp>
+#include <glm/trigonometric.hpp>
 
 namespace ogl {
 	void Camera::updateCameraVectors() {
 		this->m_vectors.cameraFront = normalize(glm::vec3(cos(glm::radians(this->m_rotation.yaw)) * cos(glm::radians(this->m_rotation.pitch)),
-		                                                  -sin(glm::radians(this->m_rotation.pitch)),
-		                                                  sin(glm::radians(this->m_rotation.yaw) * cos(glm::radians(this->m_rotation.pitch)))));
+														  -sin(glm::radians(this->m_rotation.pitch)),
+														  sin(glm::radians(this->m_rotation.yaw) * cos(glm::radians(this->m_rotation.pitch)))));
 		this->m_vectors.cameraRight = normalize(cross(this->m_vectors.cameraFront, this->m_worldUp));
 		this->m_vectors.cameraUp = normalize(cross(this->m_vectors.cameraRight, this->m_vectors.cameraFront));
+
 		this->m_view = glm::lookAt(this->m_vectors.cameraPos, this->m_vectors.cameraPos + this->m_vectors.cameraFront, this->m_vectors.cameraUp);
 		this->m_viewProj = this->m_proj * this->m_view;
 		EventManager::instance()->post(event::shader::SHADER_PROJECTION_CHANGED);
@@ -23,7 +27,6 @@ namespace ogl {
 		this->m_vectors.cameraPos = position;
 		this->updateCameraVectors();
 	}
-
 
 	void Camera::moveCamera(const glm::vec3 &axis) {
 		this->m_vectors.cameraPos += (axis * this->m_info.speed);

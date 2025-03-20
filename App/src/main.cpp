@@ -9,7 +9,9 @@
 #include "../include/Factory.hpp"
 
 #include <GLFW/glfw3.h>
+#include <glm/exponential.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/trigonometric.hpp>
 
 using namespace ogl;
 
@@ -25,6 +27,17 @@ struct WorldCamera {
 	Shared<Camera> camera;
 	glm::vec3 cameraSize = glm::vec3(1);
 } world;
+
+enum InputState {
+	MOUSE_PASSIVE,
+	MOUSE_ACTIVE
+};
+
+struct Mouse {
+	glm::vec2 pos{};
+	bool first = true;
+	bool trackState = false;
+} mouse;
 
 void enableDefaultCameraMovement() {
 	ed->subscribe(event::loop::LOOP_INPUT, []() {
@@ -55,15 +68,15 @@ void enableDefaultCameraMovement() {
 	});
 }
 
-enum InputState {
-	MOUSE_PASSIVE,
-	MOUSE_ACTIVE
-};
+glm::vec3 getTrackballPoint(const Pair<float> &viewpSize, const glm::vec2 &pos) {
+	glm::vec3 point{};
+	point.x = (2 * pos.x - viewpSize.x) / viewpSize.x;
+	point.y = (viewpSize.y - 2 * pos.y) / viewpSize.y;
 
-struct Mouse {
-	glm::vec2 pos{};
-	bool first = true;
-} mouse;
+	auto zTmp = 1.f - pow(point.x, 2) - pow(point.y, 2);
+	point.z = zTmp < 0 ? 0 : sqrt(zTmp);
+	return glm::normalize(point);
+}
 
 glm::vec3 getRayFromMouse(const Pair<float> &size, int mouse_x, int mouse_y) {
 	mouse_y = size.y - mouse_y;
@@ -100,7 +113,6 @@ bool isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const floa
 
 		return true;
 	} else {
-		// delta == 0.0f
 		float t = -b + sqrt(delta);
 		if (t < 0)
 			return false;
@@ -141,8 +153,35 @@ void changeInputState(Window &w, const InputState &state) {
 			if (glfwRawMouseMotionSupported())
 				glfwSetInputMode(w.getContext(), GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
 			glfwSetInputMode(w.getContext(), GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
+			w.setCursorPosCallback([&w](GLFWwindow *window, double x, double y) {
+				if (mouse.first) {
+					mouse.first = false;
+					mouse.pos = {x, y};
+				}
+				if (!mouse.trackState) {
+					mouse.pos = {x, y};
+					return;
+				}
+
+				auto pre = getTrackballPoint(w.getSize(), mouse.pos);
+				auto current = getTrackballPoint(w.getSize(), {x, y});
+
+				auto dpos = current - pre;
+				if (dpos.x || dpos.y || dpos.z) {
+					auto speed = world.camera->getTrackballSpeed();
+					auto angle = glm::acos(glm::dot(pre, current)) * speed;
+					glm::vec3 rotAxis = glm::cross(pre, current);
+					world.camera->setCameraDirection(world.camera->getCameraPosition() - world.camera->getCameraTarget());
+					world.camera->setCameraPosition(glm::vec4(world.camera->getCameraTarget(), 0) + glm::rotate(glm::mat4(1.f), glm::radians(-angle), rotAxis) * glm::vec4(world.camera->getCameraDirection(), 0));
+				}
+				mouse.pos = {x, y};
+			});
 			w.setMouseButtonCallback([&w](GLFWwindow *window, int button, int action, int mods) {
 				switch (button) {
+					case GLFW_MOUSE_BUTTON_3: {
+						mouse.trackState = (action == GLFW_PRESS);
+						break;
+					}
 					case GLFW_MOUSE_BUTTON_1: {
 						if (action == GLFW_PRESS) {
 							double x, y;
@@ -168,13 +207,11 @@ void changeInputState(Window &w, const InputState &state) {
 									}
 								}
 							}
+							ed->post(ENTITY_ELECTED_CHANGED);
 						}
-						ed->post(ENTITY_ELECTED_CHANGED);
 						break;
 					}
 				}
-			});
-			w.setCursorPosCallback([](GLFWwindow *window, double x, double y) {
 			});
 			break;
 		}
