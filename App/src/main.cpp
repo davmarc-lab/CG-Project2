@@ -345,6 +345,7 @@ int main(int argc, char *argv[]) {
 	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
 	em->addComponent<MaterialComponent>(shape);
+	em->addComponent<ParentComponent>(shape);
 	em->addComponent<ColliderComponent>(shape);
 	systems::ecs::updateEntityName(shape, "Cube");
 
@@ -390,6 +391,9 @@ int main(int argc, char *argv[]) {
 	scene->addEntity(lightShader, pyr);
 	pt.unbind();
 	systems::texture::setMeshReflective(shape, true);
+
+    auto obj = factory::factoryObjMesh(BasicInfo{}, "./resources/models/backpack/backpack.obj");
+    systems::ecs::updateEntityName(obj, "backpack");
 
 	auto id = factory::light::factoryDirectional({1, 0, 0});
 

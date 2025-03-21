@@ -488,3 +488,9 @@ public:
 
 	unsigned int textureId;
 };
+
+class HideTreeComponent : public Component {
+public:
+	HideTreeComponent() = default;
+	virtual ~HideTreeComponent() override = default;
+};

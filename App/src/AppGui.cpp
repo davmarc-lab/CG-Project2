@@ -12,6 +12,8 @@ const auto em = EntityManager::instance();
 void ImGuiEntityTree::onRender() {
 	ImGui::Begin("Entities", NULL, ImGuiWindowFlags_NoFocusOnAppearing);
 	for (auto id : em->getEntities()) {
+		if (em->entityHasComponent<HideTreeComponent>(id))
+			continue;
 		if (ImGui::TreeNode(systems::ecs::getEntityName(id).c_str())) {
 			ImGui::PushID(&id);
 			ImGui::Text("(ECS) Entity Id: %s", std::to_string(id).c_str());
@@ -175,6 +177,13 @@ void ImGuiEntityTree::onRender() {
 					}
 				}
 			}
+
+			if (em->entityHasComponent<ParentComponent>(id)) {
+				if (ImGui::CollapsingHeader("Parent##5")) {
+					ImGui::Text("%zu", em->getComponentFromId<ParentComponent>(id)->children.size());
+				}
+			}
+
 			ImGui::PopID();
 			ImGui::TreePop();
 		}

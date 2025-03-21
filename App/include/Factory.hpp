@@ -17,13 +17,15 @@ namespace factory {
 	unsigned int factoryPyramid(const BasicInfo &info, const glm::vec4 &color = {1, 0, 0, 1});
 	unsigned int factoryThorus(const BasicInfo &info, const glm::vec4 &color = {1, 0, 0, 1});
 
-	unsigned int factoryPlane(const glm::vec4& color);
+	unsigned int factoryPlane(const glm::vec4 &color);
 
-    unsigned int factorySkyBox(const std::string& path, const std::string& format);
+	unsigned int factorySkyBox(const std::string &path, const std::string &format);
+
+	unsigned int factoryObjMesh(const BasicInfo &info, const std::string &pathToFile);
 
 	namespace light {
 		unsigned int factoryDirectional(const glm::vec3 &direction);
 		unsigned int factoryPoint(const glm::vec3 &position, const LightConstraint &constraint);
-		unsigned int factorySpot(const glm::vec3 &position, const glm::vec3& direction, const LightConstraint &constraint, const float &cutOff = 12.5f, const float &outerCutOff = 17.5f);
+		unsigned int factorySpot(const glm::vec3 &position, const glm::vec3 &direction, const LightConstraint &constraint, const float &cutOff = 12.5f, const float &outerCutOff = 17.5f);
 	} // namespace light
 } // namespace factory
