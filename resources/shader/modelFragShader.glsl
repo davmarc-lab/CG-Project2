@@ -8,6 +8,8 @@ in VS_OUT {
 
 out vec4 fragColor;
 
+uniform sampler2D texture_diffuse1;
+
 void main() {
-    fragColor = fs_out.vertColor;
+    fragColor = texture(texture_diffuse1, fs_out.texCoord);
 }

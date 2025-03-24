@@ -340,12 +340,12 @@ int main(int argc, char *argv[]) {
 
 	auto plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
 	systems::ecs::updateEntityName(plane, "Basic Plane");
-	// scene->addEntity(shader, plane);
+	scene->addEntity(shader, plane);
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
 	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
-	// scene->addEntity(lightShader, shape);
+	scene->addEntity(lightShader, shape);
 	em->addComponent<MaterialComponent>(shape);
 	em->addComponent<ParentComponent>(shape);
 	em->addComponent<ColliderComponent>(shape);
@@ -390,7 +390,7 @@ int main(int argc, char *argv[]) {
 	em->addComponent<TextureComponent>(pyr, "./resources/texture/dirt.jpg");
 	systems::texture::setTexture(pyr, pt);
 	freeImageData(data);
-	// scene->addEntity(lightShader, pyr);
+	scene->addEntity(lightShader, pyr);
 	pt.unbind();
 	systems::texture::setMeshReflective(shape, true);
 
@@ -426,14 +426,14 @@ int main(int argc, char *argv[]) {
 		// render other meshes
 		systems::render::renderAllMeshes();
 		systems::render::renderBoundingBox();
-		// normalShader->use();
-		// auto p = world.cam.getProjMatrix();
-		// auto v = world.cam.getViewMatrix();
-		// normalShader->setMat4("view", v);
-		// normalShader->setMat4("proj", p);
-		// normalShader->setMat4("model", systems::transform::getModelMatrix(shape));
-		// auto rc = em->getComponentFromId<RenderComponent>(shape);
-		// rc->call();
+		/* normalShader->use();
+		auto p = world.camera->getProjMatrix();
+		auto v = world.camera->getViewMatrix();
+		normalShader->setMat4("view", v);
+		normalShader->setMat4("proj", p);
+		normalShader->setMat4("model", systems::transform::getModelMatrix(shape));
+		auto rc = em->getComponentFromId<RenderComponent>(shape);
+		rc->call(); */
 	});
 
 	while (!glfwWindowShouldClose(w.getContext())) {

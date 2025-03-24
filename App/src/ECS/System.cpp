@@ -750,8 +750,36 @@ namespace systems {
 					if (em->entityHasComponent<Transform>(id)) {
 						shader->setMat4("model", ::systems::transform::getModelMatrix(id));
 					}
+					// Imported Textures
+					auto it = em->getComponentFromId<ImportedMeshTextures>(id);
+					if (it != nullptr) {
+						int number = 1;
+						unsigned int ndiffuse = 1;
+						unsigned int nspecular = 1;
+						unsigned int nnormal = 1;
+						unsigned int nheight = 1;
+
+						for (unsigned int i = 0; i < it->textures.size(); i++) {
+							glActiveTexture(GL_TEXTURE2 + i);
+							// counter
+							if (it->textures[i].type == "texture_diffuse") {
+								number = ndiffuse++;
+							} else if (it->textures[i].type == "texture_specular") {
+								number = nspecular++;
+							} else if (it->textures[i].type == "texture_normal") {
+								number = nnormal++;
+							} else if (it->textures[i].type == "texture_height") {
+								number = nheight++;
+							}
+							shader->setInt((it->textures[i].type + std::to_string(number)), 2 + i);
+							glBindTexture(GL_TEXTURE_2D, it->textures[i].id);
+						}
+					}
 					if (rc != nullptr)
 						rc->call();
+					if (it != nullptr) {
+						glBindTexture(GL_TEXTURE_2D, 0);
+					}
 					auto pc = em->getComponentFromId<ParentComponent>(id);
 					if (pc != nullptr) {
 						for (auto child : pc->children) {
@@ -759,9 +787,9 @@ namespace systems {
 								shader->setMat4("model", ::systems::transform::getModelMatrix(child));
 							}
 							auto dc = em->getComponentFromId<RenderComponent>(child);
-                            if (dc != nullptr) {
-                                dc->call();
-                            }
+							if (dc != nullptr) {
+								dc->call();
+							}
 						}
 					}
 					if (sc != nullptr && sc->reflective) {

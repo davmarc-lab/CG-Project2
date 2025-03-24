@@ -489,6 +489,20 @@ public:
 	unsigned int textureId;
 };
 
+struct ImportedTexture {
+	unsigned int id;
+	std::string type{};
+	std::string path{};
+};
+
+class ImportedMeshTextures : public Component {
+public:
+	std::vector<ImportedTexture> textures{};
+
+	ImportedMeshTextures() = default;
+	virtual ~ImportedMeshTextures() override = default;
+};
+
 class HideTreeComponent : public Component {
 public:
 	HideTreeComponent() = default;

@@ -273,16 +273,88 @@ namespace factory {
 		return id;
 	}
 
-	unsigned int instanceMesh(const aiMesh *mesh) {
+	unsigned int mainMesh{};
+
+	unsigned int textureFromFile(const char *path, const std::string &dir) {
+		std::string filename = std::string(path);
+		filename = dir + '/' + filename;
+
+		unsigned int textureID;
+		glGenTextures(1, &textureID);
+
+		int width, height, nrComponents;
+		auto data = readImageData(filename, width, height, nrComponents, 0);
+		if (data) {
+			GLenum format;
+			if (nrComponents == 1)
+				format = GL_RED;
+			else if (nrComponents == 3)
+				format = GL_RGB;
+			else if (nrComponents == 4)
+				format = GL_RGBA;
+
+			glBindTexture(GL_TEXTURE_2D, textureID);
+			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+			glGenerateMipmap(GL_TEXTURE_2D);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		} else {
+			std::cerr << "Texture failed to load at path: " << path << "\n";
+		}
+		freeImageData(data);
+
+		return textureID;
+	}
+
+	std::vector<ImportedTexture> loadMaterialTextures(const aiMaterial *mat, const aiTextureType &type, const std::string &typeName, const std::string &dir) {
+		std::vector<ImportedTexture> textures{};
+		auto tt = em->getComponentFromId<ImportedMeshTextures>(mainMesh);
+		ASSERT(tt != nullptr);
+
+		for (auto i = 0; i < mat->GetTextureCount(type); i++) {
+			aiString str;
+			mat->GetTexture(type, i, &str);
+
+			bool skip = false;
+			for (int j = 0; j < tt->textures.size(); j++) {
+				if (std::strcmp(tt->textures[j].path.data(), str.C_Str()) == 0) {
+					textures.push_back(tt->textures[j]);
+					skip = true;
+					break;
+				}
+			}
+
+			if (!skip) {
+				ImportedTexture texture{};
+				texture.id = textureFromFile(str.C_Str(), dir);
+				texture.type = typeName;
+				texture.path = str.C_Str();
+				textures.push_back(texture);
+				tt->textures.push_back(texture);
+			}
+		}
+		return textures;
+	}
+
+	unsigned int instanceMesh(const aiMesh *mesh, const aiScene *scene, const std::string &dir) {
 		auto id = em->createEntity();
 		em->addComponent<Transform>(id);
 		em->addComponent<ParentComponent>(id);
 		em->addComponent<HideTreeComponent>(id);
+		em->addComponent<ImportedMeshTextures>(id);
 		MeshInfo info{};
 		for (auto i = 0; i < mesh->mNumVertices; i++) {
 			info.vertex.emplace_back(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
 			if (mesh->HasNormals())
 				info.normals.emplace_back(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+
+			if (mesh->mTextureCoords[0]) {
+				info.texCoords.emplace_back(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+			}
 		}
 
 		for (auto i = 0; i < mesh->mNumFaces; i++) {
@@ -291,8 +363,29 @@ namespace factory {
 				info.indices.push_back(face.mIndices[j]);
 			}
 		}
+
 		auto vc = em->addComponent<VertexComponent>(id, info.vertex, getColorVector({1, 0, 0, 1}, info.vertex.size()), info.indices);
 		auto bc = em->addComponent<BufferComponent>(id);
+		vc->setTexCoords(info.texCoords);
+
+		if (mesh->mMaterialIndex >= 0) {
+			auto material = scene->mMaterials[mesh->mMaterialIndex];
+			auto tt = em->getComponentFromId<ImportedMeshTextures>(id);
+			ASSERT(tt != nullptr);
+
+			std::vector<ImportedTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", dir);
+			tt->textures.insert(tt->textures.end(), ALL(diffuseMaps));
+
+			std::vector<ImportedTexture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", dir);
+			tt->textures.insert(tt->textures.end(), ALL(specularMaps));
+
+			std::vector<ImportedTexture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal", dir);
+			tt->textures.insert(tt->textures.end(), ALL(specularMaps));
+
+			std::vector<ImportedTexture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height", dir);
+			tt->textures.insert(tt->textures.end(), ALL(heightMaps));
+		}
+
 		bc->vao.onAttach();
 		bc->vao.bind();
 
@@ -320,30 +413,31 @@ namespace factory {
 		rc->setRenderCall([vaoid, vc]() {
 			// set texture units
 			rd->drawElements(vaoid, GL_TRIANGLES, vc->getIndexCoords().size(), GL_UNSIGNED_INT);
-			std::cout << "calling\n";
 		});
 		return id;
 	}
 
-	void processNode(unsigned int parent, const aiNode *node, const aiScene *scene) {
+	void processNode(unsigned int parent, const aiNode *node, const aiScene *scene, const std::string &dir) {
 		ASSERT(node->mNumMeshes <= 1);
 		unsigned int id;
 		for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 			if (!em->entityHasComponent<ParentComponent>(parent))
 				em->addComponent<ParentComponent>(parent);
-			id = instanceMesh(scene->mMeshes[node->mMeshes[i]]);
+			id = instanceMesh(scene->mMeshes[node->mMeshes[i]], scene, dir);
 			systems::parent::addChild(parent, id);
 			parent = id;
 		}
 		for (unsigned int i = 0; i < node->mNumChildren; i++) {
-			processNode(parent, node->mChildren[i], scene);
+			processNode(parent, node->mChildren[i], scene, dir);
 		}
 	}
 
 	unsigned int factoryObjMesh(const BasicInfo &info, const std::string &pathToFile) {
 		auto id = em->createEntity();
+		mainMesh = id;
 		em->addComponent<ParentComponent>(id);
 		em->addComponent<Transform>(id);
+		em->addComponent<ImportedMeshTextures>(id);
 		systems::transform::updatePosition(id, info.position);
 		systems::transform::updateScale(id, info.scale);
 		systems::transform::updateRotation(id, info.rotation);
@@ -355,7 +449,7 @@ namespace factory {
 		}
 
 		auto dir = pathToFile.substr(0, pathToFile.find_last_of('/'));
-		processNode(id, scene->mRootNode, scene);
+		processNode(id, scene->mRootNode, scene, dir);
 
 		return id;
 	}
