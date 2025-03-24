@@ -331,6 +331,8 @@ int main(int argc, char *argv[]) {
 	skyboxShader->createShaderProgram();
 	Shared<ShaderProgram> shader = CreateShared<ShaderProgram>("vertexShader.glsl", "fragmentShader.glsl");
 	shader->createShaderProgram();
+	Shared<ShaderProgram> modelShader = CreateShared<ShaderProgram>("modelVertShader.glsl", "modelFragShader.glsl");
+	modelShader->createShaderProgram();
 	Shared<ShaderProgram> lightShader = CreateShared<ShaderProgram>("lightVertShader.glsl", "lightFragShader.glsl");
 	lightShader->createShaderProgram();
 	Shared<ShaderProgram> normalShader = CreateShared<ShaderProgram>("normalVertShader.glsl", "normalFragShader.glsl", "normalGeomShader.glsl");
@@ -338,12 +340,12 @@ int main(int argc, char *argv[]) {
 
 	auto plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
 	systems::ecs::updateEntityName(plane, "Basic Plane");
-	scene->addEntity(shader, plane);
+	// scene->addEntity(shader, plane);
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
 	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
-	scene->addEntity(lightShader, shape);
+	// scene->addEntity(lightShader, shape);
 	em->addComponent<MaterialComponent>(shape);
 	em->addComponent<ParentComponent>(shape);
 	em->addComponent<ColliderComponent>(shape);
@@ -388,12 +390,13 @@ int main(int argc, char *argv[]) {
 	em->addComponent<TextureComponent>(pyr, "./resources/texture/dirt.jpg");
 	systems::texture::setTexture(pyr, pt);
 	freeImageData(data);
-	scene->addEntity(lightShader, pyr);
+	// scene->addEntity(lightShader, pyr);
 	pt.unbind();
 	systems::texture::setMeshReflective(shape, true);
 
-    auto obj = factory::factoryObjMesh(BasicInfo{}, "./resources/models/backpack/backpack.obj");
-    systems::ecs::updateEntityName(obj, "backpack");
+	auto obj = factory::factoryObjMesh(BasicInfo{}, "./resources/models/backpack/backpack.obj");
+	systems::ecs::updateEntityName(obj, "Backpack");
+	scene->addEntity(modelShader, obj);
 
 	auto id = factory::light::factoryDirectional({1, 0, 0});
 

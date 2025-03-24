@@ -273,11 +273,25 @@ namespace factory {
 		return id;
 	}
 
-	unsigned int loadChild(const unsigned int &parent) {
+	unsigned int instanceMesh(const aiMesh *mesh) {
 		auto id = em->createEntity();
-		em->addComponent<HideTreeComponent>(id);
 		em->addComponent<Transform>(id);
-		auto vc = em->addComponent<VertexComponent>(id, cubeGeometry, getColorVector({1, 0, 0, 1}, cubeGeometry.size()), cubeIndices);
+		em->addComponent<ParentComponent>(id);
+		em->addComponent<HideTreeComponent>(id);
+		MeshInfo info{};
+		for (auto i = 0; i < mesh->mNumVertices; i++) {
+			info.vertex.emplace_back(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+			if (mesh->HasNormals())
+				info.normals.emplace_back(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+		}
+
+		for (auto i = 0; i < mesh->mNumFaces; i++) {
+			auto face = mesh->mFaces[i];
+			for (auto j = 0; j < face.mNumIndices; j++) {
+				info.indices.push_back(face.mIndices[j]);
+			}
+		}
+		auto vc = em->addComponent<VertexComponent>(id, info.vertex, getColorVector({1, 0, 0, 1}, info.vertex.size()), info.indices);
 		auto bc = em->addComponent<BufferComponent>(id);
 		bc->vao.onAttach();
 		bc->vao.bind();
@@ -286,30 +300,53 @@ namespace factory {
 		bc->vbo_g.setup(vc->getVertexCoords().data(), vc->getVertexCoords().size(), GL_STATIC_DRAW);
 		bc->vao.linkAttribFast(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
+		bc->vbo_c.onAttach();
+		bc->vbo_c.setup(vc->getColorsCoords().data(), vc->getColorsCoords().size(), GL_STATIC_DRAW);
+		bc->vao.linkAttribFast(1, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
+
+		bc->vbo_n.onAttach();
+		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
+		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+
+		bc->vbo_t.onAttach();
+		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
+		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
+
+		bc->ebo.onAttach();
+		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
+
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();
 		rc->setRenderCall([vaoid, vc]() {
 			// set texture units
 			rd->drawElements(vaoid, GL_TRIANGLES, vc->getIndexCoords().size(), GL_UNSIGNED_INT);
+			std::cout << "calling\n";
 		});
 		return id;
 	}
 
-	void processNode(const unsigned int &parent, const aiNode *node, const aiScene *scene) {
+	void processNode(unsigned int parent, const aiNode *node, const aiScene *scene) {
+		ASSERT(node->mNumMeshes <= 1);
+		unsigned int id;
 		for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-			auto mesh = scene->mMeshes[node->mMeshes[i]];
-			// create Mesh
+			if (!em->entityHasComponent<ParentComponent>(parent))
+				em->addComponent<ParentComponent>(parent);
+			id = instanceMesh(scene->mMeshes[node->mMeshes[i]]);
+			systems::parent::addChild(parent, id);
+			parent = id;
 		}
 		for (unsigned int i = 0; i < node->mNumChildren; i++) {
-			auto child = loadChild(parent);
-			systems::parent::addChild(parent, child);
-			processNode(child, node->mChildren[i], scene);
+			processNode(parent, node->mChildren[i], scene);
 		}
 	}
 
 	unsigned int factoryObjMesh(const BasicInfo &info, const std::string &pathToFile) {
 		auto id = em->createEntity();
 		em->addComponent<ParentComponent>(id);
+		em->addComponent<Transform>(id);
+		systems::transform::updatePosition(id, info.position);
+		systems::transform::updateScale(id, info.scale);
+		systems::transform::updateRotation(id, info.rotation);
 		Assimp::Importer import{};
 		const auto *scene = import.ReadFile(pathToFile, aiProcess_Triangulate | aiProcess_FlipUVs);
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {

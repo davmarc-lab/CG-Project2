@@ -720,7 +720,8 @@ namespace systems {
 				// send light data
 				sendLightDataShader(shader, lightsData);
 				for (auto id : etts) {
-					shader->setInt("lightComp", ::systems::light::getLightComputation(id));
+					if (em->entityHasComponent<ShaderComponent>(id))
+						shader->setInt("lightComp", ::systems::light::getLightComputation(id));
 					shader->setInt("skybox", 1);
 					glActiveTexture(GL_TEXTURE1);
 					auto mc = em->getComponentFromId<MaterialComponent>(id);
@@ -749,7 +750,20 @@ namespace systems {
 					if (em->entityHasComponent<Transform>(id)) {
 						shader->setMat4("model", ::systems::transform::getModelMatrix(id));
 					}
-					rc->call();
+					if (rc != nullptr)
+						rc->call();
+					auto pc = em->getComponentFromId<ParentComponent>(id);
+					if (pc != nullptr) {
+						for (auto child : pc->children) {
+							if (em->entityHasComponent<Transform>(child)) {
+								shader->setMat4("model", ::systems::transform::getModelMatrix(child));
+							}
+							auto dc = em->getComponentFromId<RenderComponent>(child);
+                            if (dc != nullptr) {
+                                dc->call();
+                            }
+						}
+					}
 					if (sc != nullptr && sc->reflective) {
 						skyboxTexture->texture.unbind();
 					}
