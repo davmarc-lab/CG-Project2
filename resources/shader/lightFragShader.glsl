@@ -132,7 +132,7 @@ void main() {
         vec3 result = vec3(0);
 
         if (lightComp == 0) {
-            fragColor = fs_out.vertColor;
+            fragColor = vec4(texture(texture1, fs_out.texCoord).rgb, 1);
         } else if (lightComp > 0 && lightComp < 3) {
 
             norm = normalize(fs_out.normal);
@@ -167,6 +167,5 @@ void main() {
     } else {
         fragColor = fs_out.vertColor;
     }
-
 }
 

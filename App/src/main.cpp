@@ -340,16 +340,21 @@ int main(int argc, char *argv[]) {
 
 	auto plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
 	systems::ecs::updateEntityName(plane, "Basic Plane");
-	scene->addEntity(shader, plane);
+	// scene->addEntity(shader, plane);
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
 	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
 	em->addComponent<MaterialComponent>(shape);
-	em->addComponent<ParentComponent>(shape);
 	em->addComponent<ColliderComponent>(shape);
 	systems::ecs::updateEntityName(shape, "Cube");
+	auto sc = em->getComponentFromId<ShaderComponent>(shape);
+	sc->computation = LightComputation::NONE;
+
+	auto pyr = factory::factoryThorus(BasicInfo{{-2, 1, -3}, {1, 1, 1}, {}});
+	em->addComponent<MaterialComponent>(pyr);
+	em->addComponent<ColliderComponent>(pyr);
 
 	TextureParams params{};
 	params.target = GL_TEXTURE_2D;
@@ -357,27 +362,7 @@ int main(int argc, char *argv[]) {
 	params.format = GL_RGB;
 	params.dataType = GL_UNSIGNED_BYTE;
 	int width, height, nrChannels;
-	flipImagesVertically(true);
-	auto data = readImageData("./resources/texture/woddenContainer.jpg", width, height, nrChannels);
-	ogl::Texture t{params, {(unsigned int)width, (unsigned int)height}};
-	t.onAttach();
-	t.bind();
-	t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	t.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	t.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	t.createTexture2D(data);
-	t.generateMipmap();
-	em->addComponent<TextureComponent>(shape, "./resources/texture/woddenContainer.jpg");
-	systems::texture::setTexture(shape, t);
-	freeImageData(data);
-	t.unbind();
-
-	auto pyr = factory::factoryThorus(BasicInfo{{-1, 1, -3}, {1, 1, 1}, {}});
-	em->addComponent<MaterialComponent>(pyr);
-	em->addComponent<ColliderComponent>(pyr);
-
-	data = readImageData("./resources/texture/dirt.jpg", width, height, nrChannels);
+	auto data = readImageData("./resources/texture/dirt.jpg", width, height, nrChannels);
 	ogl::Texture pt{params, {(unsigned int)width, (unsigned int)height}};
 	pt.onAttach();
 	pt.bind();
@@ -392,12 +377,18 @@ int main(int argc, char *argv[]) {
 	freeImageData(data);
 	scene->addEntity(lightShader, pyr);
 	pt.unbind();
-	systems::texture::setMeshReflective(shape, true);
 
-	auto obj = factory::factoryObjMesh(BasicInfo{}, "./resources/models/backpack/backpack.obj");
-	em->addComponent<ColliderComponent>(obj);
-	systems::ecs::updateEntityName(obj, "Backpack");
-	scene->addEntity(modelShader, obj);
+	auto tree = factory::factoryTree(BasicInfo{{0, 1, 4}});
+	scene->addEntity(lightShader, tree);
+	{
+		auto sc = em->getComponentFromId<ShaderComponent>(tree);
+        sc->computation = LightComputation::NONE;        
+	}
+
+	// auto obj = factory::factoryObjMesh(BasicInfo{}, "./resources/models/backpack/backpack.obj");
+	// em->addComponent<ColliderComponent>(obj);
+	// systems::ecs::updateEntityName(obj, "Backpack");
+	// scene->addEntity(modelShader, obj);
 
 	auto id = factory::light::factoryDirectional({1, 0, 0});
 
@@ -412,7 +403,7 @@ int main(int argc, char *argv[]) {
 	});
 
 	ed->subscribe(event::loop::LOOP_UPDATE, [&pyr]() {
-		systems::transform::addRotation(pyr, {2, 1, 0});
+		// systems::transform::addRotation(pyr, {2, 1, 0});
 	});
 
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { auto coll = systems::collision::getCollisions(); });
@@ -427,14 +418,14 @@ int main(int argc, char *argv[]) {
 		// render other meshes
 		systems::render::renderAllMeshes();
 		systems::render::renderBoundingBox();
-		/* normalShader->use();
-		auto p = world.camera->getProjMatrix();
-		auto v = world.camera->getViewMatrix();
-		normalShader->setMat4("view", v);
-		normalShader->setMat4("proj", p);
-		normalShader->setMat4("model", systems::transform::getModelMatrix(shape));
-		auto rc = em->getComponentFromId<RenderComponent>(shape);
-		rc->call(); */
+		// normalShader->use();
+		// auto p = world.camera->getProjMatrix();
+		// auto v = world.camera->getViewMatrix();
+		// normalShader->setMat4("view", v);
+		// normalShader->setMat4("proj", p);
+		// normalShader->setMat4("model", systems::transform::getModelMatrix(shape));
+		// auto rc = em->getComponentFromId<RenderComponent>(shape);
+		// rc->call();
 	});
 
 	systems::collision::compressBoundingBox();

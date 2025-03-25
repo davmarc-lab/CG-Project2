@@ -20,16 +20,12 @@ const auto em = EntityManager::instance();
 const auto rd = ogl::Renderer::instance();
 
 namespace factory {
-	unsigned int factoryCube(const BasicInfo &info, const glm::vec4 &color) {
-		auto id = em->createEntity();
-		em->addComponent<Transform>(id);
-		systems::transform::updatePosition(id, info.position);
-		systems::transform::updateScale(id, info.scale);
-		systems::transform::updateRotation(id, info.rotation);
-		auto vc = em->addComponent<VertexComponent>(id, cubeGeometry, getColorVector(color, cubeGeometry.size()), cubeIndices);
-		vc->setNormalsCoords(cubeNormals);
-		vc->setTexCoords(cubeTexCoord);
-		auto bc = em->addComponent<BufferComponent>(id);
+	void fillBufferData(const unsigned int &id) {
+		ASSERT(em->entityHasComponent<VertexComponent>(id));
+		ASSERT(em->entityHasComponent<BufferComponent>(id));
+
+		auto vc = em->getComponentFromId<VertexComponent>(id);
+		auto bc = em->getComponentFromId<BufferComponent>(id);
 		bc->vao.onAttach();
 		bc->vao.bind();
 
@@ -51,6 +47,20 @@ namespace factory {
 
 		bc->ebo.onAttach();
 		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
+	}
+
+	unsigned int factoryCube(const BasicInfo &info, const glm::vec4 &color) {
+		auto id = em->createEntity();
+		em->addComponent<Transform>(id);
+		systems::transform::updatePosition(id, info.position);
+		systems::transform::updateScale(id, info.scale);
+		systems::transform::updateRotation(id, info.rotation);
+		auto vc = em->addComponent<VertexComponent>(id, cubeGeometry, getColorVector(color, cubeGeometry.size()), cubeIndices);
+		vc->setNormalsCoords(cubeNormals);
+		vc->setTexCoords(cubeTexCoord);
+		auto bc = em->addComponent<BufferComponent>(id);
+
+		fillBufferData(id);
 
 		em->addComponent<MaterialComponent>(id);
 		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
@@ -75,27 +85,8 @@ namespace factory {
 		vc->setNormalsCoords(coords.normals);
 		vc->setTexCoords(coords.texCoords);
 		auto bc = em->addComponent<BufferComponent>(id);
-		bc->vao.onAttach();
-		bc->vao.bind();
 
-		bc->vbo_g.onAttach();
-		bc->vbo_g.setup(vc->getVertexCoords().data(), vc->getVertexCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->vbo_c.onAttach();
-		bc->vbo_c.setup(vc->getColorsCoords().data(), vc->getColorsCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(1, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->vbo_n.onAttach();
-		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->vbo_t.onAttach();
-		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->ebo.onAttach();
-		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
+		fillBufferData(id);
 
 		em->addComponent<MaterialComponent>(id);
 		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
@@ -118,27 +109,8 @@ namespace factory {
 		vc->setNormalsCoords(pyramidNormals);
 		vc->setTexCoords(pyramidTexCoords);
 		auto bc = em->addComponent<BufferComponent>(id);
-		bc->vao.onAttach();
-		bc->vao.bind();
 
-		bc->vbo_g.onAttach();
-		bc->vbo_g.setup(vc->getVertexCoords().data(), vc->getVertexCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->vbo_c.onAttach();
-		bc->vbo_c.setup(vc->getColorsCoords().data(), vc->getColorsCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(1, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->vbo_n.onAttach();
-		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->vbo_t.onAttach();
-		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->ebo.onAttach();
-		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
+		fillBufferData(id);
 
 		em->addComponent<MaterialComponent>(id);
 		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
@@ -162,27 +134,34 @@ namespace factory {
 		vc->setNormalsCoords(coords.normals);
 		vc->setTexCoords(coords.texCoords);
 		auto bc = em->addComponent<BufferComponent>(id);
-		bc->vao.onAttach();
-		bc->vao.bind();
 
-		bc->vbo_g.onAttach();
-		bc->vbo_g.setup(vc->getVertexCoords().data(), vc->getVertexCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		fillBufferData(id);
 
-		bc->vbo_c.onAttach();
-		bc->vbo_c.setup(vc->getColorsCoords().data(), vc->getColorsCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(1, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		em->addComponent<MaterialComponent>(id);
+		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
 
-		bc->vbo_n.onAttach();
-		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		auto rc = em->addComponent<RenderComponent>(id);
+		auto vaoid = bc->vao.getId();
+		rc->setRenderCall([vc, vaoid]() {
+			rd->drawElements(vaoid, GL_TRIANGLES, vc->getIndexCoords().size(), GL_UNSIGNED_INT);
+		});
+		return id;
+	}
 
-		bc->vbo_t.onAttach();
-		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
+	unsigned int factoryCylinder(const BasicInfo &info, const glm::vec4 &color) {
+		auto id = em->createEntity();
+		em->addComponent<Transform>(id);
+		systems::transform::updatePosition(id, info.position);
+		systems::transform::updateScale(id, info.scale);
+		systems::transform::updateRotation(id, info.rotation);
+		auto coords = getCylinderVertices();
 
-		bc->ebo.onAttach();
-		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
+		auto vc = em->addComponent<VertexComponent>(id, coords.vertex, getColorVector({1, 0, 0, 1}, coords.vertex.size()), coords.indices);
+		auto bc = em->addComponent<BufferComponent>(id);
+		vc->setNormalsCoords(coords.normals);
+		vc->setTexCoords(coords.texCoords);
+
+		fillBufferData(id);
 
 		em->addComponent<MaterialComponent>(id);
 		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
@@ -210,23 +189,7 @@ namespace factory {
 		auto bc = em->addComponent<BufferComponent>(id);
 
 		// Buffers
-		bc->vao.onAttach();
-		bc->vao.bind();
-
-		bc->vbo_g.onAttach();
-		bc->vbo_g.setup(vc->getVertexCoords().data(), vc->getVertexCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->vbo_n.onAttach();
-		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->vbo_t.onAttach();
-		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->ebo.onAttach();
-		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
+		fillBufferData(id);
 
 		// Texture
 		auto tc = em->addComponent<TextureComponent>(id);
@@ -386,27 +349,7 @@ namespace factory {
 			tt->textures.insert(tt->textures.end(), ALL(heightMaps));
 		}
 
-		bc->vao.onAttach();
-		bc->vao.bind();
-
-		bc->vbo_g.onAttach();
-		bc->vbo_g.setup(vc->getVertexCoords().data(), vc->getVertexCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->vbo_c.onAttach();
-		bc->vbo_c.setup(vc->getColorsCoords().data(), vc->getColorsCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(1, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->vbo_n.onAttach();
-		bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->vbo_t.onAttach();
-		bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
-		bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-		bc->ebo.onAttach();
-		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
+		fillBufferData(id);
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();
@@ -449,6 +392,46 @@ namespace factory {
 		auto dir = pathToFile.substr(0, pathToFile.find_last_of('/'));
 		processNode(id, scene->mRootNode, scene, dir);
 
+		return id;
+	}
+
+	const glm::vec3 TREE_LOG_OFFSET = {0.f, -1.f, 0.f};
+	const glm::vec3 TREE_LOG_SCALE = {.4f, .7f, .4f};
+	const glm::vec3 TREE_LEAF_SCALE = {1, 1.4, 1};
+	const glm::vec3 TREE_LEAF_OFFSET = {0, 2 * TREE_LOG_SCALE.y, 0};
+
+	unsigned int factoryTree(const BasicInfo &info) {
+		auto id = factoryCylinder(BasicInfo{info.position + TREE_LOG_OFFSET, TREE_LOG_SCALE, {90, 0, 0}});
+		em->addComponent<ParentComponent>(id);
+
+		TextureParams params{};
+		params.target = GL_TEXTURE_2D;
+		params.internalFormat = GL_RGB;
+		params.format = GL_RGB;
+		params.dataType = GL_UNSIGNED_BYTE;
+		int width, height, nrChannels;
+		flipImagesVertically(true);
+		auto data = readImageData("./resources/texture/wood.jpg", width, height, nrChannels);
+		ogl::Texture t{params, {(unsigned int)width, (unsigned int)height}};
+		t.onAttach();
+		t.bind();
+		t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		t.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		t.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		t.createTexture2D(data);
+		t.generateMipmap();
+		em->addComponent<TextureComponent>(id, "./resources/texture/woddenContainer.jpg");
+		systems::texture::setTexture(id, t);
+		freeImageData(data);
+		t.unbind();
+
+		auto first = factoryPyramid(BasicInfo{info.position + TREE_LEAF_OFFSET, info.scale * TREE_LEAF_SCALE, {}}, {0, 1, 0, 1});
+		em->addComponent<HideTreeComponent>(first);
+		systems::parent::addChild(id, first);
+		auto second = factoryPyramid(BasicInfo{info.position + TREE_LEAF_OFFSET * glm::vec3{0.5}, info.scale * (TREE_LEAF_SCALE + glm::vec3{0.2}), {}}, {0, 1, 0, 1});
+		em->addComponent<HideTreeComponent>(second);
+		systems::parent::addChild(id, second);
 		return id;
 	}
 

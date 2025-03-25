@@ -3,7 +3,9 @@
 #include <glm/ext/scalar_constants.hpp>
 #include <glm/geometric.hpp>
 #include <glm/glm.hpp>
+#include <iostream>
 #include <vector>
+#include "Utils.hpp"
 
 const float PI = glm::pi<float>();
 
@@ -248,6 +250,93 @@ inline MeshInfo getSphereVertices(const glm::vec3 &center = {0, 0, 0}, const glm
 		coords.indices.push_back(i);
 		coords.indices.push_back(i + 1);
 	}
+	return coords;
+}
+
+inline MeshInfo getUnitCirclePoints(const unsigned int &slices = 20) {
+	MeshInfo coords{};
+	auto step = 2 * PI / slices;
+	float sectorAngle;
+
+	for (auto i = 0; i <= slices; i++) {
+		sectorAngle = i * step;
+		coords.vertex.emplace_back(glm::cos(sectorAngle), glm::sin(sectorAngle), 0);
+	}
+
+	return coords;
+}
+
+inline MeshInfo getCylinderVertices(const float &height = 5.f, const unsigned int &slices = 20, const Pair<float> radius = {1, 1}, const unsigned int &stacks = 20) {
+	MeshInfo coords{};
+	auto unitCircle = getUnitCirclePoints(slices);
+
+	for (auto i = 0; i < 2; i++) {
+		auto h = -height / 2.f + i * height;
+		auto t = 1.f - i;
+
+		for (auto j = 0; j <= slices; j++) {
+			auto uv = unitCircle.vertex[j];
+
+			// Vertices
+			coords.vertex.emplace_back(uv.x * radius.x, uv.y * radius.y, h);
+			// Normals
+			coords.normals.emplace_back(uv);
+			// Texture
+			coords.texCoords.emplace_back((float)j / slices, t);
+		}
+	}
+
+	auto baseCenterIndex = unitCircle.vertex.size();
+	auto topCenterIndex = baseCenterIndex + slices + 1;
+
+    int factor = -1;
+	for (int i = 0; i < 2; i++) {
+		auto h = (height / 2.f) * factor;
+		auto nz = factor;
+
+		coords.vertex.push_back({0, 0, h});
+		coords.normals.push_back({0, 0, nz});
+		coords.texCoords.push_back({0.5f, 0.5f});
+
+		for (int j = 0; j <= slices; j++) {
+			auto uv = unitCircle.vertex[j];
+
+			// Vertices
+			coords.vertex.push_back({uv.x * radius.x, uv.y * radius.y, h});
+			// Normals
+			coords.normals.push_back({0, 0, nz});
+			// Texture
+			coords.texCoords.push_back({-uv.x * 0.5f + 0.5f, -uv.y * 0.5f + 0.5f});
+		}
+        factor *= -1;
+	}
+
+	// indices
+	auto k1 = 0;
+	auto k2 = slices + 1;
+
+	for (auto i = 0; i < slices; i++, k1++, k2++) {
+		coords.indices.emplace_back(k1);
+		coords.indices.emplace_back(k1 + 1);
+		coords.indices.emplace_back(k2);
+
+		coords.indices.emplace_back(k2);
+		coords.indices.emplace_back(k1 + 1);
+		coords.indices.emplace_back(k2 + 1);
+	}
+
+	for (int i = 0, k = baseCenterIndex + 1; i < slices; i++, k++) {
+		coords.indices.push_back(baseCenterIndex);
+		coords.indices.push_back((i < slices - 1) ? k + 1 : baseCenterIndex + 1);
+		coords.indices.push_back(k);
+	}
+
+	for (int i = 0, k = topCenterIndex + 1; i < slices; i++, k++) {
+		coords.indices.push_back(topCenterIndex);
+		coords.indices.push_back(k);
+		coords.indices.push_back((i < slices - 1) ? k + 1 : topCenterIndex + 1);
+	}
+
 	return coords;
 }
 
