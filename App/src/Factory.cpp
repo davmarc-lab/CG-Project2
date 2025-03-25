@@ -343,7 +343,7 @@ namespace factory {
 	unsigned int instanceMesh(const aiMesh *mesh, const aiScene *scene, const std::string &dir) {
 		auto id = em->createEntity();
 		em->addComponent<Transform>(id);
-		em->addComponent<ParentComponent>(id);
+		em->addComponent<ColliderComponent>(id);
 		em->addComponent<HideTreeComponent>(id);
 		em->addComponent<ImportedMeshTextures>(id);
 		MeshInfo info{};
@@ -421,8 +421,6 @@ namespace factory {
 		ASSERT(node->mNumMeshes <= 1);
 		unsigned int id;
 		for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-			if (!em->entityHasComponent<ParentComponent>(parent))
-				em->addComponent<ParentComponent>(parent);
 			id = instanceMesh(scene->mMeshes[node->mMeshes[i]], scene, dir);
 			systems::parent::addChild(parent, id);
 			parent = id;

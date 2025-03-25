@@ -245,7 +245,7 @@ namespace systems {
 					if (em->entityHasComponent<ColliderComponent>(child)) {
 						auto cv = em->getComponentFromId<VertexComponent>(child);
 						auto model = ::systems::transform::getModelMatrix(child);
-						auto bot = glm::vec3(1, 1, 0);
+						auto bot = glm::vec3(1, 1, 1);
 						bool first = true;
 
 						for (auto vertex : cv->getVertexCoords()) {
@@ -256,9 +256,10 @@ namespace systems {
 							}
 							bot.x = bot.x >= elem.x ? elem.x : bot.x;
 							bot.y = bot.y >= elem.y ? elem.y : bot.y;
+							bot.z = bot.z >= elem.z ? elem.z : bot.z;
 						}
 
-						auto top = glm::vec3(1, 1, 0);
+						auto top = glm::vec3(1, 1, 1);
 						first = true;
 						for (auto vertex : cv->getVertexCoords()) {
 							auto elem = model * glm::vec4(vertex, 1);
@@ -268,11 +269,14 @@ namespace systems {
 							}
 							top.x = top.x <= elem.x ? elem.x : top.x;
 							top.y = top.y <= elem.y ? elem.y : top.y;
+							top.z = top.z <= elem.z ? elem.z : top.z;
 						}
 						box->botLeft.x = box->botLeft.x < bot.x ? box->botLeft.x : bot.x;
 						box->botLeft.y = box->botLeft.y < bot.y ? box->botLeft.y : bot.y;
+						box->botLeft.z = box->botLeft.z < bot.z ? box->botLeft.z : bot.z;
 						box->topRight.x = box->topRight.x > top.x ? box->topRight.x : top.x;
 						box->topRight.y = box->topRight.y > top.y ? box->topRight.y : top.y;
+						box->topRight.z = box->topRight.z > top.z ? box->topRight.z : top.z;
 						em->removeComponent<ColliderComponent>(child);
 					}
 				}

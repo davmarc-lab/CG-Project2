@@ -395,6 +395,7 @@ int main(int argc, char *argv[]) {
 	systems::texture::setMeshReflective(shape, true);
 
 	auto obj = factory::factoryObjMesh(BasicInfo{}, "./resources/models/backpack/backpack.obj");
+	em->addComponent<ColliderComponent>(obj);
 	systems::ecs::updateEntityName(obj, "Backpack");
 	scene->addEntity(modelShader, obj);
 
@@ -435,6 +436,8 @@ int main(int argc, char *argv[]) {
 		auto rc = em->getComponentFromId<RenderComponent>(shape);
 		rc->call(); */
 	});
+
+	systems::collision::compressBoundingBox();
 
 	while (!glfwWindowShouldClose(w.getContext())) {
 		ed->post(event::loop::LOOP_INPUT);

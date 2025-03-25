@@ -177,9 +177,21 @@ void ImGuiEntityTree::onRender() {
 					}
 				}
 			}
+            
+            if (em->entityHasComponent<ColliderComponent>(id)) {
+                if (ImGui::CollapsingHeader("Collider##5")) {
+                    auto cc = em->getComponentFromId<ColliderComponent>(id);
+                    auto bot = cc->botLeft;
+                    ImGui::DragFloat3("Bot Left##5", &bot.x);
+                    auto top = cc->topRight;
+                    ImGui::DragFloat3("Top Right##5", &top.x);
+                    auto pos = cc->position;
+                    ImGui::DragFloat3("Position##5", &pos.x);
+                }
+            }
 
 			if (em->entityHasComponent<ParentComponent>(id)) {
-				if (ImGui::CollapsingHeader("Parent##5")) {
+				if (ImGui::CollapsingHeader("Parent##6")) {
 					ImGui::Text("%zu", em->getComponentFromId<ParentComponent>(id)->children.size());
 				}
 			}
