@@ -340,19 +340,19 @@ int main(int argc, char *argv[]) {
 
 	auto plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
 	systems::ecs::updateEntityName(plane, "Basic Plane");
-	// scene->addEntity(shader, plane);
+	scene->addEntity(shader, plane);
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
 	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
-	scene->addEntity(lightShader, shape);
+	// scene->addEntity(lightShader, shape);
 	em->addComponent<MaterialComponent>(shape);
 	em->addComponent<ColliderComponent>(shape);
 	systems::ecs::updateEntityName(shape, "Cube");
 	auto sc = em->getComponentFromId<ShaderComponent>(shape);
 	sc->computation = LightComputation::NONE;
 
-	auto pyr = factory::factoryThorus(BasicInfo{{-2, 1, -3}, {1, 1, 1}, {}});
+	auto pyr = factory::factorySphere(BasicInfo{{-2, 1, -3}, {1, 1, 1}, {}});
 	em->addComponent<MaterialComponent>(pyr);
 	em->addComponent<ColliderComponent>(pyr);
 
@@ -363,6 +363,7 @@ int main(int argc, char *argv[]) {
 	params.dataType = GL_UNSIGNED_BYTE;
 	int width, height, nrChannels;
 	auto data = readImageData("./resources/texture/dirt.jpg", width, height, nrChannels);
+    if (!data) { std::cerr << "PD\n";}
 	ogl::Texture pt{params, {(unsigned int)width, (unsigned int)height}};
 	pt.onAttach();
 	pt.bind();
@@ -385,9 +386,9 @@ int main(int argc, char *argv[]) {
         sc->computation = LightComputation::NONE;        
 	}
 
-	// auto obj = factory::factoryObjMesh(BasicInfo{}, "./resources/models/backpack/backpack.obj");
+	// auto obj = factory::factoryObjMesh(BasicInfo{}, "./resources/models/car/car.obj");
 	// em->addComponent<ColliderComponent>(obj);
-	// systems::ecs::updateEntityName(obj, "Backpack");
+	// systems::ecs::updateEntityName(obj, "Car");
 	// scene->addEntity(modelShader, obj);
 
 	auto id = factory::light::factoryDirectional({1, 0, 0});

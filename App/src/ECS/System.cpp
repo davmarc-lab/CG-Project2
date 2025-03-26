@@ -764,7 +764,7 @@ namespace systems {
 						unsigned int nheight = 1;
 
 						for (unsigned int i = 0; i < it->textures.size(); i++) {
-							glActiveTexture(GL_TEXTURE2 + i);
+							glActiveTexture(GL_TEXTURE0 + i);
 							// counter
 							if (it->textures[i].type == "texture_diffuse") {
 								number = ndiffuse++;
@@ -775,7 +775,7 @@ namespace systems {
 							} else if (it->textures[i].type == "texture_height") {
 								number = nheight++;
 							}
-							shader->setInt((it->textures[i].type + std::to_string(number)), 2 + i);
+							shader->setInt((it->textures[i].type + std::to_string(number)), i);
 							glBindTexture(GL_TEXTURE_2D, it->textures[i].id);
 						}
 					}

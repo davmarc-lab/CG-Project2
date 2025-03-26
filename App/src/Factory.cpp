@@ -246,7 +246,7 @@ namespace factory {
 		glGenTextures(1, &textureID);
 
 		int width, height, nrComponents;
-		auto data = readImageData(filename, width, height, nrComponents, 0);
+		auto data = readImageData(path, width, height, nrComponents, 0);
 		if (data) {
 			GLenum format;
 			if (nrComponents == 1)
@@ -277,6 +277,7 @@ namespace factory {
 		std::vector<ImportedTexture> textures{};
 		auto tt = em->getComponentFromId<ImportedMeshTextures>(mainMesh);
 		ASSERT(tt != nullptr);
+		flipImagesVertically(false);
 
 		for (auto i = 0; i < mat->GetTextureCount(type); i++) {
 			aiString str;
@@ -329,7 +330,9 @@ namespace factory {
 
 		auto vc = em->addComponent<VertexComponent>(id, info.vertex, getColorVector({1, 0, 0, 1}, info.vertex.size()), info.indices);
 		auto bc = em->addComponent<BufferComponent>(id);
-		vc->setTexCoords(info.texCoords);
+		if (!info.texCoords.empty()) {
+			vc->setTexCoords(info.texCoords);
+		}
 
 		if (mesh->mMaterialIndex >= 0) {
 			auto material = scene->mMaterials[mesh->mMaterialIndex];
@@ -349,7 +352,30 @@ namespace factory {
 			tt->textures.insert(tt->textures.end(), ALL(heightMaps));
 		}
 
-		fillBufferData(id);
+		bc->vao.onAttach();
+		bc->vao.bind();
+
+		bc->vbo_g.onAttach();
+		bc->vbo_g.setup(vc->getVertexCoords().data(), vc->getVertexCoords().size(), GL_STATIC_DRAW);
+		bc->vao.linkAttribFast(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+
+		bc->vbo_c.onAttach();
+		bc->vbo_c.setup(vc->getColorsCoords().data(), vc->getColorsCoords().size(), GL_STATIC_DRAW);
+		bc->vao.linkAttribFast(1, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
+
+		if (!info.normals.empty()) {
+			bc->vbo_n.onAttach();
+			bc->vbo_n.setup(vc->getNormalsCoords().data(), vc->getNormalsCoords().size(), GL_STATIC_DRAW);
+			bc->vao.linkAttribFast(2, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		}
+		if (!info.texCoords.empty()) {
+			bc->vbo_t.onAttach();
+			bc->vbo_t.setup(vc->getTexCoords().data(), vc->getTexCoords().size(), GL_STATIC_DRAW);
+			bc->vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		}
+
+		bc->ebo.onAttach();
+		bc->ebo.setup(vc->getIndexCoords().data(), vc->getIndexCoords().size(), GL_STATIC_DRAW);
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();
@@ -361,12 +387,10 @@ namespace factory {
 	}
 
 	void processNode(unsigned int parent, const aiNode *node, const aiScene *scene, const std::string &dir) {
-		ASSERT(node->mNumMeshes <= 1);
 		unsigned int id;
 		for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 			id = instanceMesh(scene->mMeshes[node->mMeshes[i]], scene, dir);
 			systems::parent::addChild(parent, id);
-			parent = id;
 		}
 		for (unsigned int i = 0; i < node->mNumChildren; i++) {
 			processNode(parent, node->mChildren[i], scene, dir);
@@ -388,6 +412,8 @@ namespace factory {
 			std::cerr << "ERROR::ASSIMP::" << import.GetErrorString() << "\n";
 			return -1;
 		}
+
+		auto sc = em->addComponent<ShaderComponent>(id, LightComputation::NONE);
 
 		auto dir = pathToFile.substr(0, pathToFile.find_last_of('/'));
 		processNode(id, scene->mRootNode, scene, dir);
@@ -421,7 +447,7 @@ namespace factory {
 		t.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
 		t.createTexture2D(data);
 		t.generateMipmap();
-		em->addComponent<TextureComponent>(id, "./resources/texture/woddenContainer.jpg");
+		em->addComponent<TextureComponent>(id, "./resources/texture/wood.jpg");
 		systems::texture::setTexture(id, t);
 		freeImageData(data);
 		t.unbind();
@@ -429,6 +455,21 @@ namespace factory {
 		auto first = factoryPyramid(BasicInfo{info.position + TREE_LEAF_OFFSET, info.scale * TREE_LEAF_SCALE, {}}, {0, 1, 0, 1});
 		em->addComponent<HideTreeComponent>(first);
 		systems::parent::addChild(id, first);
+		// auto ddata = readImageData("./resources/texture/leaves.jpg", width, height, nrChannels);
+		// std::cout << width << ", " << height << ", " << nrChannels << "\n";
+		// ogl::Texture leaves{params, {(unsigned int)400, (unsigned int)400}};
+		// leaves.onAttach();
+		// leaves.bind();
+		// leaves.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		// leaves.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		// leaves.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		// leaves.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		// leaves.createTexture2D(ddata);
+		// em->addComponent<TextureComponent>(first, "./resources/texture/leaves.jpg");
+		// systems::texture::setTexture(first, leaves);
+		// freeImageData(ddata);
+		// leaves.unbind();
+
 		auto second = factoryPyramid(BasicInfo{info.position + TREE_LEAF_OFFSET * glm::vec3{0.5}, info.scale * (TREE_LEAF_SCALE + glm::vec3{0.2}), {}}, {0, 1, 0, 1});
 		em->addComponent<HideTreeComponent>(second);
 		systems::parent::addChild(id, second);
