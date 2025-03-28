@@ -210,7 +210,24 @@ inline std::vector<glm::vec3> pyramidNormals{
 	{0, 0, 0},
 };
 
-inline std::vector<glm::vec2> pyramidTexCoords{};
+inline std::vector<glm::vec2> pyramidTexCoords{
+    {0.f, 0.f},
+    {1.f, 0.f},
+    {1.f, 1.f},
+    {0.f, 1.f},
+    {1.f, 0.f},
+    {0.5f, 1.f},
+    {0.f, 1.f},
+    {1.f, 0.f},
+    {0.5f, 1.f},
+    {0.f, 1.f},
+    {1.f, 0.f},
+    {0.5f, 1.f},
+    {0.f, 1.f},
+    {1.f, 0.f},
+    {0.5f, 1.f},
+    {0.f, 1.f},
+};
 
 // sphere
 inline MeshInfo getSphereVertices(const glm::vec3 &center = {0, 0, 0}, const glm::vec3 &radius = {1, 1, 1}, const unsigned int &stacks = 30, const unsigned int &slices = 30) {

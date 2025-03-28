@@ -438,6 +438,7 @@ namespace factory {
 		int width, height, nrChannels;
 		flipImagesVertically(true);
 		auto data = readImageData("./resources/texture/wood.jpg", width, height, nrChannels);
+        nrChannels = 0;
 		ogl::Texture t{params, {(unsigned int)width, (unsigned int)height}};
 		t.onAttach();
 		t.bind();
@@ -455,24 +456,26 @@ namespace factory {
 		auto first = factoryPyramid(BasicInfo{info.position + TREE_LEAF_OFFSET, info.scale * TREE_LEAF_SCALE, {}}, {0, 1, 0, 1});
 		em->addComponent<HideTreeComponent>(first);
 		systems::parent::addChild(id, first);
-		// auto ddata = readImageData("./resources/texture/leaves.jpg", width, height, nrChannels);
-		// std::cout << width << ", " << height << ", " << nrChannels << "\n";
-		// ogl::Texture leaves{params, {(unsigned int)400, (unsigned int)400}};
-		// leaves.onAttach();
-		// leaves.bind();
-		// leaves.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		// leaves.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		// leaves.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
-		// leaves.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
-		// leaves.createTexture2D(ddata);
-		// em->addComponent<TextureComponent>(first, "./resources/texture/leaves.jpg");
-		// systems::texture::setTexture(first, leaves);
-		// freeImageData(ddata);
-		// leaves.unbind();
+		auto ddata = readImageData("./resources/texture/leaves.jpg", width, height, nrChannels);
+		ogl::Texture leaves{params, {(unsigned int)width, (unsigned int)height}};
+		leaves.onAttach();
+		leaves.bind();
+		leaves.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		leaves.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		leaves.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		leaves.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		leaves.createTexture2D(ddata);
+        leaves.generateMipmap();
+		em->addComponent<TextureComponent>(first, "./resources/texture/leaves.jpg");
+		systems::texture::setTexture(first, leaves);
+		freeImageData(ddata);
+		leaves.unbind();
 
 		auto second = factoryPyramid(BasicInfo{info.position + TREE_LEAF_OFFSET * glm::vec3{0.5}, info.scale * (TREE_LEAF_SCALE + glm::vec3{0.2}), {}}, {0, 1, 0, 1});
 		em->addComponent<HideTreeComponent>(second);
 		systems::parent::addChild(id, second);
+        em->addComponent<TextureComponent>(second);
+        systems::texture::setTexture(second, leaves);
 		return id;
 	}
 

@@ -787,12 +787,21 @@ namespace systems {
 					auto pc = em->getComponentFromId<ParentComponent>(id);
 					if (pc != nullptr) {
 						for (auto child : pc->children) {
+							auto tc = em->getComponentFromId<TextureComponent>(child);
+							if (tc != nullptr) {
+								glActiveTexture(GL_TEXTURE0);
+								shader->setInt("texture1", 0);
+								tc->texture.bind();
+							}
 							if (em->entityHasComponent<Transform>(child)) {
 								shader->setMat4("model", ::systems::transform::getModelMatrix(child));
 							}
 							auto dc = em->getComponentFromId<RenderComponent>(child);
 							if (dc != nullptr) {
 								dc->call();
+							}
+							if (tc != nullptr) {
+								tc->texture.unbind();
 							}
 						}
 					}
