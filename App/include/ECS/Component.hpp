@@ -412,6 +412,19 @@ public:
 	virtual ~CameraComponent() override = default;
 };
 
+class PhysicComponent : public Component {
+public:
+	glm::vec3 velocity{};
+	glm::vec3 a{};
+	glm::vec3 force{};
+
+	float mass = 1;
+
+	PhysicComponent() :
+		Component() {}
+	virtual ~PhysicComponent() override = default;
+};
+
 class ColliderComponent : public Component {
 public:
 	glm::vec3 position{};

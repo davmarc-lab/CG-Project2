@@ -8,6 +8,8 @@
 
 #include "../include/Factory.hpp"
 
+#include "../include/PhysicWorld.hpp"
+
 #include <GLFW/glfw3.h>
 #include <glm/exponential.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -324,6 +326,10 @@ int main(int argc, char *argv[]) {
 		systems::camera::updateCameraCollider(world.cameraId, world.camera->getCameraPosition(), world.cameraSize);
 	});
 
+	PhysicWorld pw = PhysicWorld();
+	pw.onAttach();
+	ed->subscribe(event::loop::LOOP_UPDATE, [&pw]() { pw.onUpdate(); });
+
 	// Initializing Scene
 	scene->init(world.camera);
 
@@ -341,20 +347,26 @@ int main(int argc, char *argv[]) {
 	auto plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
 	systems::ecs::updateEntityName(plane, "Basic Plane");
 	scene->addEntity(shader, plane);
+	pw.addSolver<PlaneSolver>(systems::transform::getPosition(plane));
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
 	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
-	// scene->addEntity(lightShader, shape);
+	scene->addEntity(lightShader, shape);
 	em->addComponent<MaterialComponent>(shape);
 	em->addComponent<ColliderComponent>(shape);
 	systems::ecs::updateEntityName(shape, "Cube");
 	auto sc = em->getComponentFromId<ShaderComponent>(shape);
 	sc->computation = LightComputation::NONE;
 
+	auto other = factory::factorySphere(BasicInfo{{0.5, 1, -3}, {1, 1, 1}, {}});
+	em->addComponent<MaterialComponent>(other);
+	pw.addEntity(other);
+	scene->addEntity(shader, other);
+
 	auto pyr = factory::factorySphere(BasicInfo{{-2, 1, -3}, {1, 1, 1}, {}});
 	em->addComponent<MaterialComponent>(pyr);
-	em->addComponent<ColliderComponent>(pyr);
+	pw.addEntity(pyr);
 
 	TextureParams params{};
 	params.target = GL_TEXTURE_2D;
@@ -363,7 +375,6 @@ int main(int argc, char *argv[]) {
 	params.dataType = GL_UNSIGNED_BYTE;
 	int width, height, nrChannels;
 	auto data = readImageData("./resources/texture/dirt.jpg", width, height, nrChannels);
-    if (!data) { std::cerr << "PD\n";}
 	ogl::Texture pt{params, {(unsigned int)width, (unsigned int)height}};
 	pt.onAttach();
 	pt.bind();
@@ -379,12 +390,12 @@ int main(int argc, char *argv[]) {
 	scene->addEntity(lightShader, pyr);
 	pt.unbind();
 
-	auto tree = factory::factoryTree(BasicInfo{{0, 1, 4}});
-	scene->addEntity(lightShader, tree);
-	{
-		auto sc = em->getComponentFromId<ShaderComponent>(tree);
-        sc->computation = LightComputation::NONE;        
-	}
+	// auto tree = factory::factoryTree(BasicInfo{{0, 1, 4}});
+	// scene->addEntity(lightShader, tree);
+	// {
+	// 	auto sc = em->getComponentFromId<ShaderComponent>(tree);
+	//        sc->computation = LightComputation::NONE;
+	// }
 
 	// auto obj = factory::factoryObjMesh(BasicInfo{}, "./resources/models/car/car.obj");
 	// em->addComponent<ColliderComponent>(obj);
@@ -429,6 +440,7 @@ int main(int argc, char *argv[]) {
 		// rc->call();
 	});
 
+	systems::collision::updateAllColliders();
 	systems::collision::compressBoundingBox();
 
 	while (!glfwWindowShouldClose(w.getContext())) {

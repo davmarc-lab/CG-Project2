@@ -4,6 +4,7 @@
 
 #include "../include/ECS/EntityManager.hpp"
 #include "../include/ECS/System.hpp"
+#include "../include/PhysicWorld.hpp"
 
 #include "../../Opengl-Core/include/Core.hpp"
 
@@ -23,6 +24,7 @@ void ImGuiEntityTree::onRender() {
 					auto pos = systems::transform::getPosition(id);
 					if (ImGui::DragFloat3("Position##0", &pos.x, 0.2f)) {
 						systems::transform::updatePosition(id, pos);
+						systems::physic::resetMovement(id);
 					}
 
 					auto scale = systems::transform::getScale(id);
@@ -33,6 +35,28 @@ void ImGuiEntityTree::onRender() {
 					auto rot = glm::degrees(systems::transform::getRotation(id));
 					if (ImGui::DragFloat3("Rotation##0", &rot.x)) {
 						systems::transform::updateRotation(id, rot);
+					}
+				}
+			}
+
+			if (em->entityHasComponent<PhysicComponent>(id)) {
+				if (ImGui::CollapsingHeader("Physics##0")) {
+					auto vel = systems::physic::getVelocity(id);
+					if (ImGui::DragFloat3("Velocity##0", &vel.x)) {
+						systems::physic::updateVelocity(id, vel);
+					}
+					auto acc = systems::physic::getAcceleration(id);
+					if (ImGui::DragFloat3("Acceleration##0", &acc.x)) {
+						systems::physic::updateAcceleration(id, acc);
+					}
+					auto force = systems::physic::getForce(id);
+					if (ImGui::DragFloat3("Force##0", &force.x)) {
+						systems::physic::updateForce(id, force);
+					}
+					auto mass = systems::physic::getMass(id);
+					if (ImGui::DragFloat("Mass##0", &mass, 0.05f)) {
+						if (mass > 0.f)
+							systems::physic::updateMass(id, mass);
 					}
 				}
 			}
@@ -177,18 +201,18 @@ void ImGuiEntityTree::onRender() {
 					}
 				}
 			}
-            
-            if (em->entityHasComponent<ColliderComponent>(id)) {
-                if (ImGui::CollapsingHeader("Collider##5")) {
-                    auto cc = em->getComponentFromId<ColliderComponent>(id);
-                    auto bot = cc->botLeft;
-                    ImGui::DragFloat3("Bot Left##5", &bot.x);
-                    auto top = cc->topRight;
-                    ImGui::DragFloat3("Top Right##5", &top.x);
-                    auto pos = cc->position;
-                    ImGui::DragFloat3("Position##5", &pos.x);
-                }
-            }
+
+			if (em->entityHasComponent<ColliderComponent>(id)) {
+				if (ImGui::CollapsingHeader("Collider##5")) {
+					auto cc = em->getComponentFromId<ColliderComponent>(id);
+					auto bot = cc->botLeft;
+					ImGui::DragFloat3("Bot Left##5", &bot.x);
+					auto top = cc->topRight;
+					ImGui::DragFloat3("Top Right##5", &top.x);
+					auto pos = cc->position;
+					ImGui::DragFloat3("Position##5", &pos.x);
+				}
+			}
 
 			if (em->entityHasComponent<ParentComponent>(id)) {
 				if (ImGui::CollapsingHeader("Parent##6")) {
@@ -203,6 +227,7 @@ void ImGuiEntityTree::onRender() {
 
 	ImGui::Separator();
 	ImGui::Text("Collisions -> %zu", systems::collision::getCollisions().size());
+	ImGui::Text("FPS -> %f", ImGui::GetIO().Framerate);
 	ImGui::End();
 }
 
@@ -214,6 +239,7 @@ void ImGuiEntityModel::onRender() {
 		auto pos = systems::transform::getPosition(this->m_ett);
 		if (ImGui::DragFloat3("Position", &pos.x, 0.2f)) {
 			systems::transform::updatePosition(this->m_ett, pos);
+			systems::physic::resetMovement(this->m_ett);
 		}
 
 		auto scale = systems::transform::getScale(this->m_ett);
