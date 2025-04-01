@@ -37,12 +37,22 @@ private:
 
 class CollisionSolver : public Solver {
 public:
-    virtual void solve() override;
+	virtual void solve() override;
 
 	CollisionSolver(PhysicWorld &world) :
 		Solver(world) {}
 
 	virtual ~CollisionSolver() override = default;
+};
+
+class PositionSolver : public Solver {
+public:
+	virtual void solve() override;
+
+	PositionSolver(PhysicWorld &world) :
+		Solver(world) {}
+
+	virtual ~PositionSolver() override = default;
 };
 
 class GravitySolver : public Solver {

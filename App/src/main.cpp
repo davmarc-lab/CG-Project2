@@ -491,6 +491,8 @@ int main(int argc, char *argv[]) {
 	systems::collision::updateAllColliders();
 	systems::collision::compressBoundingBox();
 
+    pw.addSolver<PositionSolver>();
+
 	while (!glfwWindowShouldClose(w.getContext())) {
 		ed->post(event::loop::LOOP_INPUT);
 		ed->post(event::loop::LOOP_UPDATE);
