@@ -48,29 +48,75 @@ struct Mouse {
 
 void enableDefaultCameraMovement() {
 	ed->subscribe(event::loop::LOOP_INPUT, []() {
+		auto collider = em->getComponentFromId<ColliderComponent>(world.cameraId);
+		ASSERT(collider != nullptr);
+
+		bool collision = false;
 		if (im->isKeyPressed(GLFW_KEY_W)) {
 			world.camera->moveCamera(world.camera->getCameraFront());
+			systems::collision::updateAllColliders();
 			ed->post(CAMERA_UPDATE_DATA);
+			for (auto [first, second] : systems::collision::getCollisions()) {
+				if (first == world.cameraId || second == world.cameraId) {
+					world.camera->moveCamera(-world.camera->getCameraFront());
+					ed->post(CAMERA_UPDATE_DATA);
+				}
+			}
 		}
 		if (im->isKeyPressed(GLFW_KEY_S)) {
 			world.camera->moveCamera(-world.camera->getCameraFront());
+			systems::collision::updateAllColliders();
 			ed->post(CAMERA_UPDATE_DATA);
+			for (auto [first, second] : systems::collision::getCollisions()) {
+				if (first == world.cameraId || second == world.cameraId) {
+					world.camera->moveCamera(world.camera->getCameraFront());
+					ed->post(CAMERA_UPDATE_DATA);
+				}
+			}
 		}
 		if (im->isKeyPressed(GLFW_KEY_D)) {
 			world.camera->moveCamera(world.camera->getCameraRight());
+			systems::collision::updateAllColliders();
 			ed->post(CAMERA_UPDATE_DATA);
+			for (auto [first, second] : systems::collision::getCollisions()) {
+				if (first == world.cameraId || second == world.cameraId) {
+					world.camera->moveCamera(-world.camera->getCameraRight());
+					ed->post(CAMERA_UPDATE_DATA);
+				}
+			}
 		}
 		if (im->isKeyPressed(GLFW_KEY_A)) {
 			world.camera->moveCamera(-world.camera->getCameraRight());
+			systems::collision::updateAllColliders();
 			ed->post(CAMERA_UPDATE_DATA);
+			for (auto [first, second] : systems::collision::getCollisions()) {
+				if (first == world.cameraId || second == world.cameraId) {
+					world.camera->moveCamera(world.camera->getCameraRight());
+					ed->post(CAMERA_UPDATE_DATA);
+				}
+			}
 		}
 		if (im->isKeyPressed(GLFW_KEY_SPACE)) {
 			world.camera->moveCamera(world.camera->getCameraUp());
+			systems::collision::updateAllColliders();
 			ed->post(CAMERA_UPDATE_DATA);
+			for (auto [first, second] : systems::collision::getCollisions()) {
+				if (first == world.cameraId || second == world.cameraId) {
+					world.camera->moveCamera(-world.camera->getCameraUp());
+					ed->post(CAMERA_UPDATE_DATA);
+				}
+			}
 		}
 		if (im->isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
 			world.camera->moveCamera(-world.camera->getCameraUp());
+			systems::collision::updateAllColliders();
 			ed->post(CAMERA_UPDATE_DATA);
+			for (auto [first, second] : systems::collision::getCollisions()) {
+				if (first == world.cameraId || second == world.cameraId) {
+					world.camera->moveCamera(world.camera->getCameraUp());
+					ed->post(CAMERA_UPDATE_DATA);
+				}
+			}
 		}
 	});
 }
@@ -357,10 +403,12 @@ int main(int argc, char *argv[]) {
 	em->addComponent<ColliderComponent>(shape);
 	systems::ecs::updateEntityName(shape, "Cube");
 	auto sc = em->getComponentFromId<ShaderComponent>(shape);
-	sc->computation = LightComputation::NONE;
+	sc->computation = LightComputation::PHONG;
 
 	auto other = factory::factorySphere(BasicInfo{{0.5, 1, -3}, {1, 1, 1}, {}});
 	em->addComponent<MaterialComponent>(other);
+	auto ss = em->getComponentFromId<ShaderComponent>(other);
+	ss->computation = LightComputation::NONE;
 	pw.addEntity(other);
 	scene->addEntity(shader, other);
 
@@ -418,7 +466,7 @@ int main(int argc, char *argv[]) {
 		// systems::transform::addRotation(pyr, {2, 1, 0});
 	});
 
-	ed->subscribe(event::loop::LOOP_UPDATE, []() { auto coll = systems::collision::getCollisions(); });
+	ed->subscribe(event::loop::LOOP_UPDATE, []() { auto _ = systems::collision::getCollisions(); });
 
 	ed->subscribe(ENTITY_ELECTED_CHANGED, [&igEttModel]() {
 		igEttModel->setSelectedEntity(ettSelected);

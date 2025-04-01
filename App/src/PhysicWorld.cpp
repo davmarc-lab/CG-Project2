@@ -1,4 +1,5 @@
 #include "../include/PhysicWorld.hpp"
+#include <GLFW/glfw3.h>
 #include <algorithm>
 
 #include "../include/ECS/EntityManager.hpp"
@@ -38,12 +39,13 @@ void GravitySolver::solve() {
 		for (auto id : this->world.getEntities()) {
 			force = systems::physic::getForce(id);
 			mass = systems::physic::getMass(id);
-			if (force == glm::vec3{0})
-				systems::physic::updateForce(id, mass * GRAVITY);
-			systems::physic::updateAcceleration(id, force / mass);
-			vel = ((force / mass) * dt / glm::vec3(2));
-			systems::physic::addVelocity(id, vel);
-			systems::transform::addPosition(id, vel * dt);
+			if (force == glm::vec3{0}) {
+				force = mass * GRAVITY;
+			}
+            acc = force / mass;
+			systems::physic::updateAcceleration(id, acc);
+			systems::physic::addVelocity(id, ((force / mass) * dt / glm::vec3(2)));
+			systems::transform::addPosition(id, systems::physic::getVelocity(id) * dt);
 		}
 	}
 }
@@ -52,8 +54,8 @@ void PlaneSolver::solve() {
 	for (auto id : this->world.getEntities()) {
 		auto bb = systems::collision::getCollider(id);
 		if (bb.x.y < this->m_planePosition.y) {
-			pos = systems::transform::getPosition(id);
-			systems::transform::updatePosition(id, pos - (bb.x - this->m_planePosition) * glm::vec3(0, 1, 0));
+			auto objpos = systems::transform::getPosition(id);
+			systems::transform::updatePosition(id, objpos - (bb.x - this->m_planePosition) * glm::vec3(0, 1, 0));
 			systems::physic::resetMovement(id);
 		}
 	}

@@ -413,7 +413,7 @@ namespace factory {
 			return -1;
 		}
 
-		auto sc = em->addComponent<ShaderComponent>(id, LightComputation::NONE);
+		auto sc = em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
 
 		auto dir = pathToFile.substr(0, pathToFile.find_last_of('/'));
 		processNode(id, scene->mRootNode, scene, dir);
