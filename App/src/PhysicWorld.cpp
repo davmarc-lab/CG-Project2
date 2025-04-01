@@ -1,5 +1,4 @@
 #include "../include/PhysicWorld.hpp"
-#include <GLFW/glfw3.h>
 #include <algorithm>
 
 #include "../include/ECS/EntityManager.hpp"
@@ -9,19 +8,16 @@ const auto em = EntityManager::instance();
 
 void CollisionSolver::solve() {
 	auto collisions = systems::collision::getCollisions();
+	auto etts = this->world.getEntities();
 
-	// IDK doesn't skip
 	for (auto [first, second] : collisions) {
 		if (first == second)
 			continue;
-		if (std::find(ALL(this->world.getEntities()), first) == this->world.getEntities().end()) {
-			std::cout << "SKIP\n";
+
+		if (std::find(ALL(etts), first) == etts.end())
 			continue;
-		}
-		if (std::find(ALL(this->world.getEntities()), second) == this->world.getEntities().end()) {
-			std::cout << "SKIP\n";
+		if (std::find(ALL(etts), second) == etts.end())
 			continue;
-		}
 
 		auto fb = systems::collision::getCollider(first);
 		auto sb = systems::collision::getCollider(second);
@@ -31,28 +27,23 @@ void CollisionSolver::solve() {
 		systems::transform::addPosition(first, -offset);
 		systems::transform::addPosition(second, offset);
 	}
-	// for (auto it = collisions.begin(); it != collisions.end();) {
-	// 	if (std::find(ALL(this->world.getEntities()), it->x) == this->world.getEntities().end()) {
-	// 		it = collisions.erase(it);
-	// 		continue;
-	// 	}
-	// 	if (std::find(ALL(this->world.getEntities()), it->y) == this->world.getEntities().end()) {
-	// 		it = collisions.erase(it);
-	// 		continue;
-	// 	}
-	// 	it++;
-	// }
 }
+
+glm::vec3 force{}, acc{}, vel{}, pos{};
+float mass{};
 
 void GravitySolver::solve() {
 	if (glfwGetTime() > 3) {
 		auto dt = this->world.getWorldDeltaTime();
 		for (auto id : this->world.getEntities()) {
-			if (systems::physic::getForce(id) == glm::vec3{0})
-				systems::physic::updateForce(id, systems::physic::getMass(id) * GRAVITY);
-			systems::physic::updateAcceleration(id, systems::physic::getForce(id) / systems::physic::getMass(id));
-			systems::physic::addVelocity(id, (systems::physic::getAcceleration(id) * dt / glm::vec3(2)));
-			systems::transform::addPosition(id, systems::physic::getVelocity(id) * dt);
+			force = systems::physic::getForce(id);
+			mass = systems::physic::getMass(id);
+			if (force == glm::vec3{0})
+				systems::physic::updateForce(id, mass * GRAVITY);
+			systems::physic::updateAcceleration(id, force / mass);
+			vel = ((force / mass) * dt / glm::vec3(2));
+			systems::physic::addVelocity(id, vel);
+			systems::transform::addPosition(id, vel * dt);
 		}
 	}
 }
@@ -61,8 +52,8 @@ void PlaneSolver::solve() {
 	for (auto id : this->world.getEntities()) {
 		auto bb = systems::collision::getCollider(id);
 		if (bb.x.y < this->m_planePosition.y) {
-			auto objpos = systems::transform::getPosition(id);
-			systems::transform::updatePosition(id, objpos - (bb.x - this->m_planePosition) * glm::vec3(0, 1, 0));
+			pos = systems::transform::getPosition(id);
+			systems::transform::updatePosition(id, pos - (bb.x - this->m_planePosition) * glm::vec3(0, 1, 0));
 			systems::physic::resetMovement(id);
 		}
 	}
