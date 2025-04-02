@@ -45,6 +45,36 @@ public:
 	virtual ~CollisionSolver() override = default;
 };
 
+class ForceSolver : public Solver {
+public:
+	virtual void solve() override;
+
+	ForceSolver(PhysicWorld &world) :
+		Solver(world) {}
+
+	virtual ~ForceSolver() override = default;
+};
+
+class AccelerationSolver : public Solver {
+public:
+	virtual void solve() override;
+
+	AccelerationSolver(PhysicWorld &world) :
+		Solver(world) {}
+
+	virtual ~AccelerationSolver() override = default;
+};
+
+class VelocitySolver : public Solver {
+public:
+	virtual void solve() override;
+
+	VelocitySolver(PhysicWorld &world) :
+		Solver(world) {}
+
+	virtual ~VelocitySolver() override = default;
+};
+
 class PositionSolver : public Solver {
 public:
 	virtual void solve() override;
@@ -100,7 +130,7 @@ private:
 
 namespace systems {
 	namespace physic {
-		void resetMovement(const unsigned int &id);
+		void resetGravitySolver(const unsigned int &id);
 
 		glm::vec3 getVelocity(const unsigned int &id);
 		void updateVelocity(const unsigned int &id, const glm::vec3 velocity);

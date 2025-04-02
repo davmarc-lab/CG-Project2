@@ -12,6 +12,8 @@ std::vector<unsigned int> skip{};
 glm::vec3 force{}, acc{}, vel{}, pos{};
 float mass{};
 
+const float zfighting = 0.01f;
+
 void CollisionSolver::solve() {
 	auto collisions = systems::collision::getCollisions();
 	auto etts = this->world.getEntities();
@@ -42,6 +44,28 @@ void PositionSolver::solve() {
 	}
 }
 
+void PlaneSolver::solve() {
+	auto etts = this->world.getEntities();
+	int i = 0;
+	for (auto id : etts) {
+		auto bb = systems::collision::getCollider(id);
+		if (bb.x.y - zfighting < this->m_planePosition.y) {
+			if (std::find(ALL(skip), id) != skip.end()) {
+				continue;
+			}
+			skip.push_back(id);
+			auto objpos = systems::transform::getPosition(id);
+			systems::transform::updatePosition(id, objpos - (bb.x - this->m_planePosition) * glm::vec3(0, 1, 0));
+			systems::physic::resetGravitySolver(id);
+		} else {
+			auto elem = std::find(ALL(skip), id);
+			if (elem != skip.end()) {
+				skip.erase(elem);
+			}
+		}
+	}
+}
+
 void GravitySolver::solve() {
 	if (glfwGetTime() > 3) {
 		auto dt = this->world.getWorldDeltaTime();
@@ -49,7 +73,7 @@ void GravitySolver::solve() {
 		for (auto id : etts) {
 			if (std::find(ALL(skip), id) != skip.end()) {
 				continue;
-            }
+			}
 			force = systems::physic::getForce(id);
 			mass = systems::physic::getMass(id);
 			if (force == glm::vec3{0}) {
@@ -59,25 +83,6 @@ void GravitySolver::solve() {
 			systems::physic::updateForce(id, force);
 			systems::physic::updateAcceleration(id, acc);
 			systems::physic::addVelocity(id, ((force / mass) * dt / glm::vec3(2)));
-		}
-	}
-}
-
-void PlaneSolver::solve() {
-	auto etts = this->world.getEntities();
-	int i = 0;
-	for (auto id : etts) {
-		auto bb = systems::collision::getCollider(id);
-		if (bb.x.y < this->m_planePosition.y) {
-			skip.push_back(id);
-			auto objpos = systems::transform::getPosition(id);
-			systems::transform::updatePosition(id, objpos - (bb.x - this->m_planePosition) * glm::vec3(0, 1, 0));
-			systems::physic::resetMovement(id);
-		} else {
-			auto elem = std::find(ALL(skip), id);
-			if (elem != skip.end()) {
-                skip.erase(elem);
-            }
 		}
 	}
 }
@@ -121,11 +126,11 @@ bool PhysicWorld::removeEntity(const unsigned int &id) {
 
 namespace systems {
 	namespace physic {
-		void resetMovement(const unsigned int &id) {
+		void resetGravitySolver(const unsigned int &id) {
 			auto c = em->getComponentFromId<PhysicComponent>(id);
 			ASSERT(c != nullptr);
 
-			c->velocity = {};
+			c->velocity *= glm::vec3{1, 0, 1};
 			c->a = {};
 			c->force = {};
 		}

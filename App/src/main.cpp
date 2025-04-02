@@ -397,13 +397,14 @@ int main(int argc, char *argv[]) {
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
-	auto shape = factory::factoryCube(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
+	auto shape = factory::factorySphere(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
 	em->addComponent<MaterialComponent>(shape);
 	em->addComponent<ColliderComponent>(shape);
 	systems::ecs::updateEntityName(shape, "Cube");
 	auto sc = em->getComponentFromId<ShaderComponent>(shape);
 	sc->computation = LightComputation::PHONG;
+    sc->reflective = true;
 
 	auto other = factory::factorySphere(BasicInfo{{0.5, 1, -3}, {1, 1, 1}, {}});
 	em->addComponent<MaterialComponent>(other);

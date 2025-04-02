@@ -24,7 +24,8 @@ void ImGuiEntityTree::onRender() {
 					auto pos = systems::transform::getPosition(id);
 					if (ImGui::DragFloat3("Position##0", &pos.x, 0.2f)) {
 						systems::transform::updatePosition(id, pos);
-						systems::physic::resetMovement(id);
+						if (em->entityHasComponent<PhysicComponent>(id))
+							systems::physic::resetGravitySolver(id);
 					}
 
 					auto scale = systems::transform::getScale(id);
@@ -239,7 +240,8 @@ void ImGuiEntityModel::onRender() {
 		auto pos = systems::transform::getPosition(this->m_ett);
 		if (ImGui::DragFloat3("Position", &pos.x, 0.2f)) {
 			systems::transform::updatePosition(this->m_ett, pos);
-			systems::physic::resetMovement(this->m_ett);
+			if (em->entityHasComponent<PhysicComponent>(this->m_ett))
+				systems::physic::resetGravitySolver(this->m_ett);
 		}
 
 		auto scale = systems::transform::getScale(this->m_ett);
