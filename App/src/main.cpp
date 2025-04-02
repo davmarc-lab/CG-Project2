@@ -394,28 +394,31 @@ int main(int argc, char *argv[]) {
 	systems::ecs::updateEntityName(plane, "Basic Plane");
 	scene->addEntity(shader, plane);
 	pw.addSolver<PlaneSolver>(systems::transform::getPosition(plane));
+	pw.addSolver<CollisionSolver>();
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
-	auto shape = factory::factorySphere(BasicInfo{{1, 1, -3}, {1, 1, 1}, {}});
+	auto shape = factory::factorySphere(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
 	em->addComponent<MaterialComponent>(shape);
 	em->addComponent<ColliderComponent>(shape);
 	systems::ecs::updateEntityName(shape, "Cube");
 	auto sc = em->getComponentFromId<ShaderComponent>(shape);
 	sc->computation = LightComputation::PHONG;
-    sc->reflective = true;
+	sc->reflective = true;
 
-	auto other = factory::factorySphere(BasicInfo{{0.5, 1, -3}, {1, 1, 1}, {}});
+	auto other = factory::factorySphere(BasicInfo{{0, 1, -3}, {1, 1, 1}, {}});
 	em->addComponent<MaterialComponent>(other);
 	auto ss = em->getComponentFromId<ShaderComponent>(other);
-	ss->computation = LightComputation::NONE;
+	ss->computation = LightComputation::PHONG;
 	pw.addEntity(other);
 	scene->addEntity(shader, other);
+	systems::collision::updateColliderType(other, ColliderType::COLLIDER_SPHERE);
 
 	auto pyr = factory::factorySphere(BasicInfo{{-2, 1, -3}, {1, 1, 1}, {}});
 	em->addComponent<MaterialComponent>(pyr);
 	pw.addEntity(pyr);
+	systems::collision::updateColliderType(pyr, ColliderType::COLLIDER_SPHERE);
 
 	TextureParams params{};
 	params.target = GL_TEXTURE_2D;
@@ -492,7 +495,7 @@ int main(int argc, char *argv[]) {
 	systems::collision::updateAllColliders();
 	systems::collision::compressBoundingBox();
 
-    pw.addSolver<PositionSolver>();
+	pw.addSolver<PositionSolver>();
 
 	while (!glfwWindowShouldClose(w.getContext())) {
 		ed->post(event::loop::LOOP_INPUT);

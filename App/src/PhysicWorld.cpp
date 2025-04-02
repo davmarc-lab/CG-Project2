@@ -1,6 +1,9 @@
 #include "../include/PhysicWorld.hpp"
 #include <GLFW/glfw3.h>
 #include <algorithm>
+#include <glm/common.hpp>
+#include <glm/ext/quaternion_geometric.hpp>
+#include <glm/geometric.hpp>
 
 #include "../include/ECS/EntityManager.hpp"
 #include "../include/ECS/System.hpp"
@@ -13,6 +16,53 @@ glm::vec3 force{}, acc{}, vel{}, pos{};
 float mass{};
 
 const float zfighting = 0.01f;
+
+struct CollisionPoints {
+	glm::vec3 A{};
+	glm::vec3 B{};
+	glm::vec3 normal{};
+	float depth{};
+	bool colliding = false;
+};
+
+CollisionPoints testSphereSphere(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb) {
+	CollisionPoints points{};
+	glm::vec3 ac = ta->getPosition();
+	glm::vec3 bc = tb->getPosition();
+	// distance between centers
+	auto dir = glm::distance(bc, ac);
+
+	points.normal = (bc - ac) / dir;
+
+	// radius sum
+	auto rs = glm::length(points.normal * (ta->getScale() + tb->getScale()));
+	points.colliding = dir <= rs;
+	points.depth = rs - dir;
+
+	return points;
+}
+CollisionPoints testPlaneSphere(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb) {}
+
+using CollisionFunc = CollisionPoints (*)(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb);
+
+const CollisionFunc testFunc[2][2] = {
+	{nullptr, testPlaneSphere},
+	{nullptr, testSphereSphere}};
+
+CollisionPoints testCollisions(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb) {
+	bool swap = b->type > a->type;
+	if (swap) {
+		std::swap(a, b);
+		std::swap(ta, tb);
+	}
+	auto points = testFunc[a->type][b->type](a, ta, b, tb);
+
+	if (swap) {
+		std::swap(points.A, points.B);
+		points.normal = -points.normal;
+	}
+	return points;
+}
 
 void CollisionSolver::solve() {
 	auto collisions = systems::collision::getCollisions();
@@ -27,13 +77,17 @@ void CollisionSolver::solve() {
 		if (std::find(ALL(etts), second) == etts.end())
 			continue;
 
-		auto fb = systems::collision::getCollider(first);
-		auto sb = systems::collision::getCollider(second);
-		auto fpos = systems::transform::getPosition(first);
-		auto spos = systems::transform::getPosition(second);
-		auto offset = (spos - fpos) / glm::vec3{2};
-		systems::transform::addPosition(first, -offset);
-		systems::transform::addPosition(second, offset);
+		auto ca = em->getComponentFromId<ColliderComponent>(first);
+		auto cb = em->getComponentFromId<ColliderComponent>(second);
+		auto ta = em->getComponentFromId<Transform>(first);
+		auto tb = em->getComponentFromId<Transform>(second);
+		// collision points
+		auto p = testCollisions(ca, ta, cb, tb);
+		if (ca->type == COLLIDER_SPHERE && cb->type == COLLIDER_SPHERE) {
+			// solve for spheres
+            systems::transform::addPosition(first, p.normal * (-p.depth / 2));
+            systems::transform::addPosition(second, p.normal * (p.depth / 2));
+		}
 	}
 }
 
@@ -53,7 +107,9 @@ void PlaneSolver::solve() {
 			if (std::find(ALL(skip), id) != skip.end()) {
 				continue;
 			}
+			// skip next iterations
 			skip.push_back(id);
+
 			auto objpos = systems::transform::getPosition(id);
 			systems::transform::updatePosition(id, objpos - (bb.x - this->m_planePosition) * glm::vec3(0, 1, 0));
 			systems::physic::resetGravitySolver(id);
@@ -89,7 +145,6 @@ void GravitySolver::solve() {
 
 void PhysicWorld::onAttach() {
 	this->m_solvers.push_back(CreateShared<GravitySolver>(*this));
-	this->m_solvers.push_back(CreateShared<CollisionSolver>(*this));
 	this->m_attached = true;
 }
 

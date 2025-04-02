@@ -43,6 +43,9 @@ namespace systems {
 		void updateCollider(const unsigned int &id);
 		void updateAllColliders();
 
+        ColliderType getColliderType(const unsigned int& id);
+        void updateColliderType(const unsigned int& id, const ColliderType& type);
+
 		void compressBoundingBox();
 
 		void resolveCollisions();

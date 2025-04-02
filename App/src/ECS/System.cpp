@@ -235,6 +235,20 @@ namespace systems {
 			return {c->botLeft, c->topRight};
 		}
 
+		ColliderType getColliderType(const unsigned int &id) {
+			auto c = em->getComponentFromId<ColliderComponent>(id);
+			ASSERT(c != nullptr);
+
+			return c->type;
+		}
+
+		void updateColliderType(const unsigned int &id, const ColliderType &type) {
+			auto c = em->getComponentFromId<ColliderComponent>(id);
+			ASSERT(c != nullptr);
+
+			c->type = type;
+		}
+
 		void compressBoundingBox() {
 			for (auto id : em->getEntitiesFromComponent<ParentComponent>()) {
 				auto c = em->getComponentFromId<ParentComponent>(id);

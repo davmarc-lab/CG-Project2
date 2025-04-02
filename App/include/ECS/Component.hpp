@@ -132,7 +132,7 @@ public:
 	bool dirty = true;
 	bool enableModel = true;
 
-	const float MAX_DEGREE_ANGLE = 180;
+	float MAX_DEGREE_ANGLE = 180;
 };
 
 class MultiMesh : public Component {
@@ -425,8 +425,14 @@ public:
 	virtual ~PhysicComponent() override = default;
 };
 
+enum ColliderType : unsigned int {
+	COLLIDER_CUBE = 0,
+    COLLIDER_SPHERE
+};
+
 class ColliderComponent : public Component {
 public:
+	ColliderType type = COLLIDER_CUBE;
 	glm::vec3 position{};
 	glm::vec3 size{};
 	glm::vec3 botLeft{};
