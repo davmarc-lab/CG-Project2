@@ -5,10 +5,6 @@
 
 #include "../../Opengl-Core/include/Core.hpp"
 
-#include "../../Opengl-Core/vendor/include/assimp/Importer.hpp"
-#include "../../Opengl-Core/vendor/include/assimp/postprocess.h"
-#include "../../Opengl-Core/vendor/include/assimp/scene.h"
-
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/geometric.hpp>
 #include <iostream>
@@ -273,6 +269,7 @@ namespace factory {
 		return textureID;
 	}
 
+	/*
 	std::vector<ImportedTexture> loadMaterialTextures(const aiMaterial *mat, const aiTextureType &type, const std::string &typeName, const std::string &dir) {
 		std::vector<ImportedTexture> textures{};
 		auto tt = em->getComponentFromId<ImportedMeshTextures>(mainMesh);
@@ -420,6 +417,7 @@ namespace factory {
 
 		return id;
 	}
+	*/
 
 	const glm::vec3 TREE_LOG_OFFSET = {0.f, -1.f, 0.f};
 	const glm::vec3 TREE_LOG_SCALE = {.4f, .7f, .4f};

@@ -150,6 +150,7 @@
     <ClInclude Include="include\ECS\EntityManager.hpp" />
     <ClInclude Include="include\ECS\System.hpp" />
     <ClInclude Include="include\Factory.hpp" />
+    <ClInclude Include="include\PhysicWorld.hpp" />
     <ClInclude Include="include\stb_image.hpp" />
     <ClInclude Include="include\Utils.hpp" />
   </ItemGroup>
@@ -159,12 +160,28 @@
     <ClCompile Include="src\ECS\System.cpp" />
     <ClCompile Include="src\Factory.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\PhysicWorld.cpp" />
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
+    <Content Include="resources\models\backpack\ao.jpg" />
+    <Content Include="resources\models\backpack\backpack.mtl" />
+    <Content Include="resources\models\backpack\backpack.obj" />
+    <Content Include="resources\models\backpack\diffuse.jpg" />
+    <Content Include="resources\models\backpack\normal.png" />
+    <Content Include="resources\models\backpack\roughness.jpg" />
+    <Content Include="resources\models\backpack\source_attribution.txt" />
+    <Content Include="resources\models\backpack\specular.jpg" />
+    <Content Include="resources\models\car\car.mtl" />
+    <Content Include="resources\models\car\car.obj" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship Ao_Blender.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship_color_4.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship_curvature.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship_emi.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship_metalness.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship_nmap_2_Tris.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship_rough.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic_Spaceship-(Wavefront).mtl" />
     <Content Include="resources\shader\fragmentShader.glsl" />
     <Content Include="resources\shader\lightFragShader.glsl" />
     <Content Include="resources\shader\normalFragShader.glsl" />
@@ -196,6 +213,9 @@
       <Project>{12e0fe4a-6d54-4ee3-aba2-3695f8764c39}</Project>
       <Name>Opengl-Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
