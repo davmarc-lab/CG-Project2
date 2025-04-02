@@ -10,10 +10,10 @@
 
 const auto em = EntityManager::instance();
 
-std::vector<unsigned int> skip{};
+std::vector<unsigned int> etts{}, skip{};
 
 glm::vec3 force{}, acc{}, vel{}, pos{};
-float mass{};
+float mass{}, dt{};
 
 const float zfighting = 0.01f;
 
@@ -66,7 +66,8 @@ CollisionPoints testCollisions(Shared<ColliderComponent> &a, Shared<Transform> &
 
 void CollisionSolver::solve() {
 	auto collisions = systems::collision::getCollisions();
-	auto etts = this->world.getEntities();
+	dt = this->world.getWorldDeltaTime();
+	etts = this->world.getEntities();
 
 	for (auto [first, second] : collisions) {
 		if (first == second)
@@ -77,6 +78,8 @@ void CollisionSolver::solve() {
 		if (std::find(ALL(etts), second) == etts.end())
 			continue;
 
+		auto pa = em->getComponentFromId<PhysicComponent>(first);
+		auto pb = em->getComponentFromId<PhysicComponent>(first);
 		auto ca = em->getComponentFromId<ColliderComponent>(first);
 		auto cb = em->getComponentFromId<ColliderComponent>(second);
 		auto ta = em->getComponentFromId<Transform>(first);
@@ -85,21 +88,37 @@ void CollisionSolver::solve() {
 		auto p = testCollisions(ca, ta, cb, tb);
 		if (ca->type == COLLIDER_SPHERE && cb->type == COLLIDER_SPHERE) {
 			// solve for spheres
-            systems::transform::addPosition(first, p.normal * (-p.depth / 2));
-            systems::transform::addPosition(second, p.normal * (p.depth / 2));
+			auto av = systems::physic::getVelocity(first);
+			auto bv = systems::physic::getVelocity(second);
+			auto rv = bv - av;
+			auto speed = glm::dot(rv, p.normal);
+			if (speed >= 0) {
+				continue;
+			}
+
+			auto j = -1 * speed / ((1 / pa->mass) + (1 / pb->mass));
+			auto impulse = j * p.normal;
+			av -= impulse / pa->mass;
+			bv += impulse / pb->mass;
+			systems::physic::updateVelocity(first, av);
+			systems::physic::updateVelocity(second, bv);
+
+			systems::transform::addPosition(first, p.normal * (-p.depth / 2) + av * dt);
+			systems::transform::addPosition(second, p.normal * (p.depth / 2) + bv * dt);
 		}
 	}
 }
 
 void PositionSolver::solve() {
-	auto dt = this->world.getWorldDeltaTime();
-	for (auto e : this->world.getEntities()) {
+	dt = this->world.getWorldDeltaTime();
+	etts = this->world.getEntities();
+	for (auto e : etts) {
 		systems::transform::addPosition(e, systems::physic::getVelocity(e) * dt);
 	}
 }
 
 void PlaneSolver::solve() {
-	auto etts = this->world.getEntities();
+	etts = this->world.getEntities();
 	int i = 0;
 	for (auto id : etts) {
 		auto bb = systems::collision::getCollider(id);
@@ -111,6 +130,7 @@ void PlaneSolver::solve() {
 			skip.push_back(id);
 
 			auto objpos = systems::transform::getPosition(id);
+			auto objscale = systems::transform::getScale(id);
 			systems::transform::updatePosition(id, objpos - (bb.x - this->m_planePosition) * glm::vec3(0, 1, 0));
 			systems::physic::resetGravitySolver(id);
 		} else {
@@ -123,9 +143,9 @@ void PlaneSolver::solve() {
 }
 
 void GravitySolver::solve() {
-	if (glfwGetTime() > 3) {
-		auto dt = this->world.getWorldDeltaTime();
-		auto etts = this->world.getEntities();
+	if (glfwGetTime() > 1) {
+		dt = this->world.getWorldDeltaTime();
+		etts = this->world.getEntities();
 		for (auto id : etts) {
 			if (std::find(ALL(skip), id) != skip.end()) {
 				continue;
@@ -154,6 +174,7 @@ void PhysicWorld::onUpdate() {
 	this->m_deltaTime = this->m_currentFrame - this->m_lastFrame;
 	this->m_lastFrame = this->m_currentFrame;
 
+	// execute each solver step
 	for (auto s : this->m_solvers) {
 		s->solve();
 	}
