@@ -393,8 +393,6 @@ int main(int argc, char *argv[]) {
 	auto plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
 	systems::ecs::updateEntityName(plane, "Basic Plane");
 	scene->addEntity(shader, plane);
-	pw.addSolver<PlaneSolver>(systems::transform::getPosition(plane));
-	pw.addSolver<CollisionSolver>();
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
@@ -495,6 +493,9 @@ int main(int argc, char *argv[]) {
 	systems::collision::updateAllColliders();
 	systems::collision::compressBoundingBox();
 
+	// std::cout << glm::to_string(glm::normalize(glm::vec3{0} - systems::transform::getPosition(plane))) << "\n";
+    pw.addSolver<PlaneSolver>(systems::transform::getPosition(plane), glm::vec3{0, 1, 0});
+	pw.addSolver<CollisionSolver>();
 	pw.addSolver<PositionSolver>();
 
 	while (!glfwWindowShouldClose(w.getContext())) {

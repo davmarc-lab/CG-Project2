@@ -172,6 +172,7 @@ namespace factory {
 
 	unsigned int factoryPlane(const glm::vec4 &color) {
 		auto id = factoryCube(BasicInfo{{0, -2, 0}, {100, 0, 100}}, color);
+		systems::transform::updateModelMatrix(id);
 		em->removeComponent<MaterialComponent>(id);
 		return id;
 	}
@@ -436,7 +437,7 @@ namespace factory {
 		int width, height, nrChannels;
 		flipImagesVertically(true);
 		auto data = readImageData("./resources/texture/wood.jpg", width, height, nrChannels);
-        nrChannels = 0;
+		nrChannels = 0;
 		ogl::Texture t{params, {(unsigned int)width, (unsigned int)height}};
 		t.onAttach();
 		t.bind();
@@ -463,7 +464,7 @@ namespace factory {
 		leaves.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
 		leaves.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
 		leaves.createTexture2D(ddata);
-        leaves.generateMipmap();
+		leaves.generateMipmap();
 		em->addComponent<TextureComponent>(first, "./resources/texture/leaves.jpg");
 		systems::texture::setTexture(first, leaves);
 		freeImageData(ddata);
@@ -472,8 +473,8 @@ namespace factory {
 		auto second = factoryPyramid(BasicInfo{info.position + TREE_LEAF_OFFSET * glm::vec3{0.5}, info.scale * (TREE_LEAF_SCALE + glm::vec3{0.2}), {}}, {0, 1, 0, 1});
 		em->addComponent<HideTreeComponent>(second);
 		systems::parent::addChild(id, second);
-        em->addComponent<TextureComponent>(second);
-        systems::texture::setTexture(second, leaves);
+		em->addComponent<TextureComponent>(second);
+		systems::texture::setTexture(second, leaves);
 		return id;
 	}
 

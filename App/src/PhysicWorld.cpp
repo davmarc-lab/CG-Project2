@@ -87,7 +87,7 @@ void CollisionSolver::solve() {
 		// collision points
 		auto p = testCollisions(ca, ta, cb, tb);
 		if (ca->type == COLLIDER_SPHERE && cb->type == COLLIDER_SPHERE) {
-			// solve for spheres
+			// impulse solver
 			auto av = systems::physic::getVelocity(first);
 			auto bv = systems::physic::getVelocity(second);
 			auto rv = bv - av;
@@ -103,8 +103,9 @@ void CollisionSolver::solve() {
 			systems::physic::updateVelocity(first, av);
 			systems::physic::updateVelocity(second, bv);
 
-			systems::transform::addPosition(first, p.normal * (-p.depth / 2) + av * dt);
-			systems::transform::addPosition(second, p.normal * (p.depth / 2) + bv * dt);
+			// position solver
+			systems::transform::addPosition(first, p.normal * (-p.depth / 2));
+			systems::transform::addPosition(second, p.normal * (p.depth / 2));
 		}
 	}
 }
@@ -131,7 +132,7 @@ void PlaneSolver::solve() {
 
 			auto objpos = systems::transform::getPosition(id);
 			auto objscale = systems::transform::getScale(id);
-			systems::transform::updatePosition(id, objpos - (bb.x - this->m_planePosition) * glm::vec3(0, 1, 0));
+			systems::transform::updatePosition(id, objpos - (bb.x - this->m_planePosition) * this->m_normal);
 			systems::physic::resetGravitySolver(id);
 		} else {
 			auto elem = std::find(ALL(skip), id);

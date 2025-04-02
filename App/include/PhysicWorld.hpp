@@ -26,13 +26,14 @@ class PlaneSolver : public Solver {
 public:
 	virtual void solve() override;
 
-	PlaneSolver(PhysicWorld &world, const glm::vec3 &position) :
-		m_planePosition(position), Solver(world) {}
+	PlaneSolver(PhysicWorld &world, const glm::vec3 &position, const glm::vec3 &normal) :
+		m_planePosition(position), m_normal(normal), Solver(world) {}
 
 	virtual ~PlaneSolver() override = default;
 
 private:
 	glm::vec3 m_planePosition{};
+	glm::vec3 m_normal{};
 };
 
 class CollisionSolver : public Solver {

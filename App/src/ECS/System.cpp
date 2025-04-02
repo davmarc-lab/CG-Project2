@@ -160,7 +160,7 @@ namespace systems {
 
 		glm::mat4 getModelMatrix(const unsigned int &id) {
 			auto tc = em->getComponentFromId<Transform>(id);
-			// ASSERT(tc != nullptr);
+			ASSERT(tc != nullptr);
 
 			if (tc->isDirty())
 				updateModelMatrix(id);
