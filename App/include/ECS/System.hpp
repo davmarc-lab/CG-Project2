@@ -48,8 +48,6 @@ namespace systems {
 
 		void compressBoundingBox();
 
-		void resolveCollisions();
-
 		float getEnemyLastHit(const unsigned int &id);
 		float getPlayerLastHit(const unsigned int &id);
 

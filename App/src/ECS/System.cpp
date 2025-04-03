@@ -297,17 +297,6 @@ namespace systems {
 			}
 		}
 
-		void resolveCollisions() {
-			auto time = glfwGetTime();
-			auto rmv = std::set<unsigned int>{};
-			auto colls = getCollisions();
-			for (auto c : colls) {
-			}
-			for (auto e : rmv) {
-				::systems::ecs::removeEntityFromAll(e);
-			}
-		}
-
 		std::vector<Pair<unsigned int>> getCollisions() {
 			std::vector<Pair<unsigned int>> coll{};
 			auto collidable = em->getEntitiesFromComponent<ColliderComponent>();

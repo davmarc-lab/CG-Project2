@@ -7,10 +7,11 @@
 #include "../include/AppGui.hpp"
 
 #include "../include/Factory.hpp"
-
 #include "../include/PhysicWorld.hpp"
+#include "../include/Profiler.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
+#include <iomanip>
 
 using namespace ogl;
 
@@ -20,6 +21,8 @@ const auto em = EntityManager::instance();
 const auto scene = BasicScene::instance();
 
 const auto ENTITY_ELECTED_CHANGED = Event("Entity Selected Changed");
+
+Profiler profiler{PROFILE_ALL};
 
 float lastTime = 0;
 unsigned int plane;
@@ -335,6 +338,7 @@ glm::vec3 getRandVelocity(float time = 1) {
 }
 
 int main(int argc, char *argv[]) {
+	std::cout << std::fixed << std::setprecision(10);
 	srand(time(NULL));
 	WindowSettings s{};
 	s.decorated = false;
@@ -473,7 +477,7 @@ int main(int argc, char *argv[]) {
 
 	ed->subscribe(event::loop::LOOP_UPDATE, [&shader, &pw]() {
 		auto time = glfwGetTime();
-		if (time - lastTime > 0.3 && time < 4) {
+		if (time - lastTime > 0.3 && time < 2) {
 			lastTime = time;
 			auto id = factory::factorySphere(BasicInfo{{}, glm::vec3{0.2}}, glm::vec4(getRandColor(), 1));
 			em->addComponent<MaterialComponent>(id);
@@ -491,7 +495,7 @@ int main(int argc, char *argv[]) {
 		systems::render::renderSkybox(skybox, skyboxShader);
 		// render other meshes
 		systems::render::renderAllMeshes();
-		// systems::render::renderBoundingBox();
+		systems::render::renderBoundingBox();
 		// normalShader->use();
 		// auto p = world.camera->getProjMatrix();
 		// auto v = world.camera->getViewMatrix();
@@ -510,11 +514,23 @@ int main(int argc, char *argv[]) {
 	pw.addSolver<PositionSolver>();
 
 	while (!glfwWindowShouldClose(w.getContext())) {
+		profiler.start();
 		ed->post(event::loop::LOOP_INPUT);
+		profiler.end();
+		// profiler.dump("INPUT");
+		profiler.start();
 		ed->post(event::loop::LOOP_UPDATE);
+		profiler.end();
+		// profiler.dump("UPDATE");
 		ed->post(event::loop::LOOP_BEGIN_RENDER);
+		profiler.start();
 		ed->post(event::loop::LOOP_RENDER);
+		profiler.end();
+		// profiler.dump("GLFW RENDER");
+		profiler.start();
 		ed->post(event::loop::LOOP_END_RENDER);
+		profiler.end();
+		// profiler.dump("IMGUI RENDER");
 	}
 
 	w.onDetach();

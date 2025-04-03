@@ -21,6 +21,10 @@ project "App"
         "assimp"
     }
 
+    buildoptions {
+        "-g",
+    }
+
     dependson { "Opengl-Core" }
 
     filter "configurations:Debug"

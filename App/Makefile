@@ -28,8 +28,8 @@ ifeq ($(config),debug)
   INCLUDES += -Iinclude -I../Opengl-Core/include -I../Opengl-Core/vendor/include
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g -g
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -g
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   LIBS += ../bin/linux-x86_64/Debug/Opengl-Core/libOpengl-Core.a -lglfw -lassimp
   LDDEPS += ../bin/linux-x86_64/Debug/Opengl-Core/libOpengl-Core.a
@@ -64,8 +64,8 @@ ifeq ($(config),release)
   INCLUDES += -Iinclude -I../Opengl-Core/include -I../Opengl-Core/vendor/include
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -g
-  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -g
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -g -g
+  ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -g -g
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   LIBS += ../bin/linux-x86_64/Release/Opengl-Core/libOpengl-Core.a -lglfw -lassimp
   LDDEPS += ../bin/linux-x86_64/Release/Opengl-Core/libOpengl-Core.a
@@ -88,6 +88,7 @@ OBJECTS := \
 	$(OBJDIR)/System.o \
 	$(OBJDIR)/Factory.o \
 	$(OBJDIR)/PhysicWorld.o \
+	$(OBJDIR)/Profiler.o \
 	$(OBJDIR)/Utils.o \
 	$(OBJDIR)/main.o \
 
@@ -161,6 +162,9 @@ $(OBJDIR)/Factory.o: src/Factory.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/PhysicWorld.o: src/PhysicWorld.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/Profiler.o: src/Profiler.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Utils.o: src/Utils.cpp
