@@ -10,10 +10,7 @@
 
 #include "../include/PhysicWorld.hpp"
 
-#include <GLFW/glfw3.h>
-#include <glm/exponential.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/trigonometric.hpp>
 
 using namespace ogl;
 
@@ -23,6 +20,9 @@ const auto em = EntityManager::instance();
 const auto scene = BasicScene::instance();
 
 const auto ENTITY_ELECTED_CHANGED = Event("Entity Selected Changed");
+
+float lastTime = 0;
+unsigned int plane;
 
 int ettSelected = -1;
 
@@ -58,6 +58,9 @@ void enableDefaultCameraMovement() {
 			ed->post(CAMERA_UPDATE_DATA);
 			for (auto [first, second] : systems::collision::getCollisions()) {
 				if (first == world.cameraId || second == world.cameraId) {
+					if (first == plane || second == plane) {
+						continue;
+					}
 					world.camera->moveCamera(-world.camera->getCameraFront());
 					ed->post(CAMERA_UPDATE_DATA);
 				}
@@ -69,6 +72,9 @@ void enableDefaultCameraMovement() {
 			ed->post(CAMERA_UPDATE_DATA);
 			for (auto [first, second] : systems::collision::getCollisions()) {
 				if (first == world.cameraId || second == world.cameraId) {
+					if (first == plane || second == plane) {
+						continue;
+					}
 					world.camera->moveCamera(world.camera->getCameraFront());
 					ed->post(CAMERA_UPDATE_DATA);
 				}
@@ -80,6 +86,9 @@ void enableDefaultCameraMovement() {
 			ed->post(CAMERA_UPDATE_DATA);
 			for (auto [first, second] : systems::collision::getCollisions()) {
 				if (first == world.cameraId || second == world.cameraId) {
+					if (first == plane || second == plane) {
+						continue;
+					}
 					world.camera->moveCamera(-world.camera->getCameraRight());
 					ed->post(CAMERA_UPDATE_DATA);
 				}
@@ -91,6 +100,9 @@ void enableDefaultCameraMovement() {
 			ed->post(CAMERA_UPDATE_DATA);
 			for (auto [first, second] : systems::collision::getCollisions()) {
 				if (first == world.cameraId || second == world.cameraId) {
+					if (first == plane || second == plane) {
+						continue;
+					}
 					world.camera->moveCamera(world.camera->getCameraRight());
 					ed->post(CAMERA_UPDATE_DATA);
 				}
@@ -102,6 +114,9 @@ void enableDefaultCameraMovement() {
 			ed->post(CAMERA_UPDATE_DATA);
 			for (auto [first, second] : systems::collision::getCollisions()) {
 				if (first == world.cameraId || second == world.cameraId) {
+					if (first == plane || second == plane) {
+						continue;
+					}
 					world.camera->moveCamera(-world.camera->getCameraUp());
 					ed->post(CAMERA_UPDATE_DATA);
 				}
@@ -113,6 +128,9 @@ void enableDefaultCameraMovement() {
 			ed->post(CAMERA_UPDATE_DATA);
 			for (auto [first, second] : systems::collision::getCollisions()) {
 				if (first == world.cameraId || second == world.cameraId) {
+					if (first == plane || second == plane) {
+						continue;
+					}
 					world.camera->moveCamera(world.camera->getCameraUp());
 					ed->post(CAMERA_UPDATE_DATA);
 				}
@@ -304,7 +322,20 @@ void changeInputState(Window &w, const InputState &state) {
 	}
 }
 
+float randf() {
+	return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+}
+
+glm::vec3 getRandColor() {
+	return glm::vec3(randf(), randf(), randf());
+}
+
+glm::vec3 getRandVelocity(float time = 1) {
+	return std::sin(time) * glm::vec3(randf() + std::rand() % 5 - 2, randf() + std::rand() % 5 - 2, randf() + std::rand() % 5 - 2);
+}
+
 int main(int argc, char *argv[]) {
+	srand(time(NULL));
 	WindowSettings s{};
 	s.decorated = false;
 	s.size = {1366, 768};
@@ -390,7 +421,7 @@ int main(int argc, char *argv[]) {
 	Shared<ShaderProgram> normalShader = CreateShared<ShaderProgram>("normalVertShader.glsl", "normalFragShader.glsl", "normalGeomShader.glsl");
 	normalShader->createShaderProgram();
 
-	auto plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
+	plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
 	systems::ecs::updateEntityName(plane, "Basic Plane");
 	scene->addEntity(shader, plane);
 	pw.addEntity(plane);
@@ -405,41 +436,6 @@ int main(int argc, char *argv[]) {
 	auto sc = em->getComponentFromId<ShaderComponent>(shape);
 	sc->computation = LightComputation::PHONG;
 	sc->reflective = true;
-
-	auto other = factory::factorySphere(BasicInfo{{-2, 3, -3}, {1, 1, 1}, {}});
-	em->addComponent<MaterialComponent>(other);
-	auto ss = em->getComponentFromId<ShaderComponent>(other);
-	ss->computation = LightComputation::PHONG;
-	pw.addEntity(other);
-	scene->addEntity(shader, other);
-	systems::collision::updateColliderType(other, ColliderType::COLLIDER_SPHERE);
-
-	auto pyr = factory::factorySphere(BasicInfo{{-2, 1, -3}, {1, 1, 1}, {}});
-	em->addComponent<MaterialComponent>(pyr);
-	pw.addEntity(pyr);
-	systems::collision::updateColliderType(pyr, ColliderType::COLLIDER_SPHERE);
-
-	TextureParams params{};
-	params.target = GL_TEXTURE_2D;
-	params.internalFormat = GL_RGB;
-	params.format = GL_RGB;
-	params.dataType = GL_UNSIGNED_BYTE;
-	int width, height, nrChannels;
-	auto data = readImageData("./resources/texture/dirt.jpg", width, height, nrChannels);
-	ogl::Texture pt{params, {(unsigned int)width, (unsigned int)height}};
-	pt.onAttach();
-	pt.bind();
-	pt.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	pt.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	pt.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	pt.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	pt.createTexture2D(data);
-	pt.generateMipmap();
-	em->addComponent<TextureComponent>(pyr, "./resources/texture/dirt.jpg");
-	systems::texture::setTexture(pyr, pt);
-	freeImageData(data);
-	scene->addEntity(lightShader, pyr);
-	pt.unbind();
 
 	// auto tree = factory::factoryTree(BasicInfo{{0, 1, 4}});
 	// scene->addEntity(lightShader, tree);
@@ -465,9 +461,9 @@ int main(int argc, char *argv[]) {
 		ub.update(0, sizeof(glm::mat4), glm::value_ptr(vp));
 	});
 
-	ed->subscribe(event::loop::LOOP_UPDATE, [&pyr]() {
-		// systems::transform::addRotation(pyr, {2, 1, 0});
-	});
+	// ed->subscribe(event::loop::LOOP_UPDATE, [&pyr]() {
+	// systems::transform::addRotation(pyr, {2, 1, 0});
+	// });
 
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { auto _ = systems::collision::getCollisions(); });
 
@@ -475,12 +471,27 @@ int main(int argc, char *argv[]) {
 		igEttModel->setSelectedEntity(ettSelected);
 	});
 
+	ed->subscribe(event::loop::LOOP_UPDATE, [&shader, &pw]() {
+		auto time = glfwGetTime();
+		if (time - lastTime > 0.3 && time < 4) {
+			lastTime = time;
+			auto id = factory::factorySphere(BasicInfo{{}, glm::vec3{0.2}}, glm::vec4(getRandColor(), 1));
+			em->addComponent<MaterialComponent>(id);
+			auto ss = em->getComponentFromId<ShaderComponent>(id);
+			ss->computation = LightComputation::NONE;
+			pw.addEntity(id);
+			scene->addEntity(shader, id);
+			systems::collision::updateColliderType(id, ColliderType::COLLIDER_SPHERE);
+			systems::physic::updateVelocity(id, getRandVelocity(time));
+		}
+	});
+
 	ed->subscribe(event::loop::LOOP_RENDER, [&normalShader, &skyboxShader, &shape, &skybox]() {
 		// render skybox
 		systems::render::renderSkybox(skybox, skyboxShader);
 		// render other meshes
 		systems::render::renderAllMeshes();
-		systems::render::renderBoundingBox();
+		// systems::render::renderBoundingBox();
 		// normalShader->use();
 		// auto p = world.camera->getProjMatrix();
 		// auto v = world.camera->getViewMatrix();
