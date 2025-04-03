@@ -393,6 +393,7 @@ int main(int argc, char *argv[]) {
 	auto plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
 	systems::ecs::updateEntityName(plane, "Basic Plane");
 	scene->addEntity(shader, plane);
+	pw.addEntity(plane);
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
@@ -405,7 +406,7 @@ int main(int argc, char *argv[]) {
 	sc->computation = LightComputation::PHONG;
 	sc->reflective = true;
 
-	auto other = factory::factorySphere(BasicInfo{{0, 1, -3}, {1, 1, 1}, {}});
+	auto other = factory::factorySphere(BasicInfo{{-2, 3, -3}, {1, 1, 1}, {}});
 	em->addComponent<MaterialComponent>(other);
 	auto ss = em->getComponentFromId<ShaderComponent>(other);
 	ss->computation = LightComputation::PHONG;
@@ -494,7 +495,6 @@ int main(int argc, char *argv[]) {
 	systems::collision::compressBoundingBox();
 
 	// std::cout << glm::to_string(glm::normalize(glm::vec3{0} - systems::transform::getPosition(plane))) << "\n";
-    pw.addSolver<PlaneSolver>(systems::transform::getPosition(plane), glm::vec3{0, 1, 0});
 	pw.addSolver<CollisionSolver>();
 	pw.addSolver<PositionSolver>();
 

@@ -426,17 +426,20 @@ public:
 };
 
 enum ColliderType : unsigned int {
-	COLLIDER_CUBE = 0,
-    COLLIDER_SPHERE
+	COLLIDER_SPHERE = 0,
+    COLLIDER_CUBE,
 };
 
 class ColliderComponent : public Component {
 public:
 	ColliderType type = COLLIDER_CUBE;
 	glm::vec3 position{};
+	glm::vec3 normal{};
 	glm::vec3 size{};
 	glm::vec3 botLeft{};
 	glm::vec3 topRight{};
+
+	bool isStatic = false;
 
 	// optimized bounding box
 	void updateCollider(const std::vector<glm::vec3> &coords, const glm::mat4 &model) {

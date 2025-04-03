@@ -171,9 +171,17 @@ namespace factory {
 	}
 
 	unsigned int factoryPlane(const glm::vec4 &color) {
-		auto id = factoryCube(BasicInfo{{0, -2, 0}, {100, 0, 100}}, color);
+		auto pos = glm::vec3{0, -2, 0};
+		auto size = glm::vec3{100, 0, 100};
+		auto id = factoryCube(BasicInfo{pos, size}, color);
 		systems::transform::updateModelMatrix(id);
 		em->removeComponent<MaterialComponent>(id);
+		auto cc = em->addComponent<ColliderComponent>(id);
+		cc->type = ColliderType::COLLIDER_CUBE;
+		cc->position = pos;
+		cc->normal = {0, 1, 0};
+		cc->size = size;
+		cc->isStatic = true;
 		return id;
 	}
 

@@ -26,28 +26,53 @@ struct CollisionPoints {
 };
 
 CollisionPoints testSphereSphere(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb) {
-	CollisionPoints points{};
+	CollisionPoints point{};
+	ASSERT(a->type == ColliderType::COLLIDER_SPHERE);
+	ASSERT(b->type == ColliderType::COLLIDER_SPHERE);
 	glm::vec3 ac = ta->getPosition();
 	glm::vec3 bc = tb->getPosition();
 	// distance between centers
 	auto dir = glm::distance(bc, ac);
 
-	points.normal = (bc - ac) / dir;
+	point.normal = (bc - ac) / dir;
 
 	// radius sum
-	auto rs = glm::length(points.normal * (ta->getScale() + tb->getScale()));
-	points.colliding = dir <= rs;
-	points.depth = rs - dir;
+	auto rs = glm::length(point.normal * (ta->getScale() + tb->getScale()));
+	point.colliding = dir <= rs;
+	point.depth = rs - dir;
 
-	return points;
+	return point;
 }
-CollisionPoints testPlaneSphere(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb) {}
+CollisionPoints testPlaneSphere(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb) {
+	CollisionPoints point{};
+	ASSERT(a->type == ColliderType::COLLIDER_CUBE);
+	ASSERT(b->type == ColliderType::COLLIDER_SPHERE);
+
+	glm::vec3 ac = ta->getPosition();
+	glm::vec3 bc = tb->getPosition();
+
+	// glm::dot((bc - ac), a->normal) = distance vector from sphere center and the plane
+	// collPoint = collsion point on the plane
+	auto collPoint = bc + (glm::dot((bc - ac), a->normal) * a->normal);
+
+	// direction from sphere center and collision point
+	point.normal = glm::normalize(collPoint - bc);
+	// distance from sphere center and collision point
+	auto dist = glm::distance(bc, collPoint);
+	// sphere radius length
+	auto rsize = glm::length(tb->getScale() * point.normal);
+
+	point.depth = rsize - dist;
+	point.colliding = dist < rsize;
+
+	return point;
+}
 
 using CollisionFunc = CollisionPoints (*)(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb);
 
 const CollisionFunc testFunc[2][2] = {
-	{nullptr, testPlaneSphere},
-	{nullptr, testSphereSphere}};
+	{testSphereSphere, nullptr},
+	{testPlaneSphere, nullptr}};
 
 CollisionPoints testCollisions(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb) {
 	bool swap = b->type > a->type;
@@ -78,15 +103,30 @@ void CollisionSolver::solve() {
 		if (std::find(ALL(etts), second) == etts.end())
 			continue;
 
-		auto pa = em->getComponentFromId<PhysicComponent>(first);
-		auto pb = em->getComponentFromId<PhysicComponent>(first);
 		auto ca = em->getComponentFromId<ColliderComponent>(first);
 		auto cb = em->getComponentFromId<ColliderComponent>(second);
 		auto ta = em->getComponentFromId<Transform>(first);
 		auto tb = em->getComponentFromId<Transform>(second);
 		// collision points
 		auto p = testCollisions(ca, ta, cb, tb);
+		if ((ca->type == COLLIDER_CUBE && cb->type == COLLIDER_SPHERE)) {
+			if (ca->isStatic) {
+				auto pb = em->getComponentFromId<PhysicComponent>(second);
+				auto bv = systems::physic::getVelocity(second);
+				auto speed = glm::dot(bv, p.normal);
+				auto j = -1 * speed / (1 / pb->mass);
+				auto impulse = j * p.normal;
+				bv += impulse / pb->mass;
+				systems::physic::updateVelocity(second, bv);
+
+				// position solver
+				systems::transform::addPosition(second, p.normal * (p.depth / 2));
+			}
+		}
 		if (ca->type == COLLIDER_SPHERE && cb->type == COLLIDER_SPHERE) {
+			auto pa = em->getComponentFromId<PhysicComponent>(first);
+			auto pb = em->getComponentFromId<PhysicComponent>(first);
+
 			// impulse solver
 			auto av = systems::physic::getVelocity(first);
 			auto bv = systems::physic::getVelocity(second);
@@ -118,37 +158,15 @@ void PositionSolver::solve() {
 	}
 }
 
-void PlaneSolver::solve() {
-	etts = this->world.getEntities();
-	int i = 0;
-	for (auto id : etts) {
-		auto bb = systems::collision::getCollider(id);
-		if (bb.x.y - zfighting < this->m_planePosition.y) {
-			if (std::find(ALL(skip), id) != skip.end()) {
-				continue;
-			}
-			// skip next iterations
-			skip.push_back(id);
-
-			auto objpos = systems::transform::getPosition(id);
-			auto objscale = systems::transform::getScale(id);
-			systems::transform::updatePosition(id, objpos - (bb.x - this->m_planePosition) * this->m_normal);
-			systems::physic::resetGravitySolver(id);
-		} else {
-			auto elem = std::find(ALL(skip), id);
-			if (elem != skip.end()) {
-				skip.erase(elem);
-			}
-		}
-	}
-}
-
 void GravitySolver::solve() {
 	if (glfwGetTime() > 1) {
 		dt = this->world.getWorldDeltaTime();
 		etts = this->world.getEntities();
 		for (auto id : etts) {
 			if (std::find(ALL(skip), id) != skip.end()) {
+				continue;
+			}
+			if (em->getComponentFromId<ColliderComponent>(id)->isStatic) {
 				continue;
 			}
 			force = systems::physic::getForce(id);
