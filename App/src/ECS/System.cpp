@@ -818,6 +818,11 @@ namespace systems {
 			}
 		}
 
+		void renderInstancedMeshes() {
+			for (auto id : em->getEntitiesFromComponent<InstancedComponent>()) {
+			}
+		}
+
 		std::vector<glm::vec3> getBoxLines(glm::vec3 &botLeft, glm::vec3 &topRight) {
 			std::vector<glm::vec3> lines{};
 			lines.push_back(topRight);

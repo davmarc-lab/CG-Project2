@@ -15,6 +15,13 @@
 const auto em = EntityManager::instance();
 const auto rd = ogl::Renderer::instance();
 
+struct InstanceData {
+	unsigned int nspheres = 0;
+	std::vector<unsigned int> spheresIds{};
+	std::vector<glm::vec4> spheresColor{};
+	std::vector<glm::mat4> spheresModel{};
+} data;
+
 namespace factory {
 	void fillBufferData(const unsigned int &id) {
 		ASSERT(em->entityHasComponent<VertexComponent>(id));
@@ -83,6 +90,28 @@ namespace factory {
 		auto bc = em->addComponent<BufferComponent>(id);
 
 		fillBufferData(id);
+
+		// data.nspheres++;
+		// data.spheresIds.push_back(id);
+		// data.spheresColor.push_back(color);
+		// data.spheresModel.push_back(systems::transform::getModelMatrix(id));
+		// bc->vao.linkAttribFast(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		//
+		// bc->vbo_co.onAttach();
+		// bc->vbo_co.setup(data.spheresColor.data(), data.spheresColor.size(), GL_STATIC_DRAW);
+		// bc->vao.linkAttribFast(4, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		// glVertexAttribDivisor(4, 1);
+		//
+		// bc->vbo_mo.onAttach();
+		// bc->vbo_mo.setup(data.spheresModel.data(), data.spheresModel.size(), GL_STATIC_DRAW);
+		// bc->vao.linkAttribFast(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void *)0);
+		// glVertexAttribDivisor(5, 1);
+		// bc->vao.linkAttribFast(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void *)(sizeof(glm::vec4)));
+		// glVertexAttribDivisor(6, 1);
+		// bc->vao.linkAttribFast(7, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void *)(2 * sizeof(glm::vec4)));
+		// glVertexAttribDivisor(7, 1);
+		// bc->vao.linkAttribFast(8, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void *)(3 * sizeof(glm::vec4)));
+		// glVertexAttribDivisor(8, 1);
 
 		em->addComponent<MaterialComponent>(id);
 		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);

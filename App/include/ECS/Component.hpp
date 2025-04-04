@@ -159,6 +159,9 @@ public:
 	ogl::VertexBuffer vbo_c{};
 	ogl::ElementBuffer ebo{};
 	ogl::VertexBuffer vbo_n{};
+	// instanced
+	ogl::VertexBuffer vbo_co{};
+	ogl::VertexBuffer vbo_mo{};
 };
 
 class VertexComponent : public Component {
@@ -277,6 +280,14 @@ public:
 
 private:
 	std::function<void()> m_renderCall = nullptr;
+};
+
+class InstancedComponent : public Component {
+public:
+	InstancedComponent() :
+		Component() {}
+
+	virtual ~InstancedComponent() override = default;
 };
 
 class Outlined : public Component {
@@ -427,7 +438,7 @@ public:
 
 enum ColliderType : unsigned int {
 	COLLIDER_SPHERE = 0,
-    COLLIDER_CUBE,
+	COLLIDER_CUBE,
 };
 
 class ColliderComponent : public Component {

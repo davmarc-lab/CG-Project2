@@ -69,7 +69,6 @@ void enableDefaultCameraMovement() {
 		bool collision = false;
 		if (im->isKeyPressed(GLFW_KEY_W)) {
 			world.camera->moveCamera(world.camera->getCameraFront());
-			systems::collision::updateAllColliders();
 			ed->post(CAMERA_UPDATE_DATA);
 			for (auto [first, second] : systems::collision::getCollisions()) {
 				if (first == world.cameraId || second == world.cameraId) {
@@ -83,7 +82,6 @@ void enableDefaultCameraMovement() {
 		}
 		if (im->isKeyPressed(GLFW_KEY_S)) {
 			world.camera->moveCamera(-world.camera->getCameraFront());
-			systems::collision::updateAllColliders();
 			ed->post(CAMERA_UPDATE_DATA);
 			for (auto [first, second] : systems::collision::getCollisions()) {
 				if (first == world.cameraId || second == world.cameraId) {
@@ -97,7 +95,6 @@ void enableDefaultCameraMovement() {
 		}
 		if (im->isKeyPressed(GLFW_KEY_D)) {
 			world.camera->moveCamera(world.camera->getCameraRight());
-			systems::collision::updateAllColliders();
 			ed->post(CAMERA_UPDATE_DATA);
 			for (auto [first, second] : systems::collision::getCollisions()) {
 				if (first == world.cameraId || second == world.cameraId) {
@@ -111,7 +108,6 @@ void enableDefaultCameraMovement() {
 		}
 		if (im->isKeyPressed(GLFW_KEY_A)) {
 			world.camera->moveCamera(-world.camera->getCameraRight());
-			systems::collision::updateAllColliders();
 			ed->post(CAMERA_UPDATE_DATA);
 			for (auto [first, second] : systems::collision::getCollisions()) {
 				if (first == world.cameraId || second == world.cameraId) {
@@ -125,7 +121,6 @@ void enableDefaultCameraMovement() {
 		}
 		if (im->isKeyPressed(GLFW_KEY_SPACE)) {
 			world.camera->moveCamera(world.camera->getCameraUp());
-			systems::collision::updateAllColliders();
 			ed->post(CAMERA_UPDATE_DATA);
 			for (auto [first, second] : systems::collision::getCollisions()) {
 				if (first == world.cameraId || second == world.cameraId) {
@@ -139,7 +134,6 @@ void enableDefaultCameraMovement() {
 		}
 		if (im->isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
 			world.camera->moveCamera(-world.camera->getCameraUp());
-			systems::collision::updateAllColliders();
 			ed->post(CAMERA_UPDATE_DATA);
 			for (auto [first, second] : systems::collision::getCollisions()) {
 				if (first == world.cameraId || second == world.cameraId) {
@@ -489,7 +483,7 @@ int main(int argc, char *argv[]) {
 
 	ed->subscribe(event::loop::LOOP_UPDATE, [&shader, &pw]() {
 		auto time = glfwGetTime();
-		if (time - lastTime > 0.3) {
+		if (time - lastTime > 0.3 && time < 1) {
 			lastTime = time;
 			auto id = factory::factorySphere(BasicInfo{{}, glm::vec3{0.2}}, glm::vec4(getRandColor(), 1));
 			em->addComponent<MaterialComponent>(id);
