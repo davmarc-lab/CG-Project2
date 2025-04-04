@@ -15,6 +15,7 @@ public:
 	virtual void end();
 
 	void dump(const std::string &msg = "");
+	void dump(double &wall, double &cpu);
 	void wallDump();
 	void cpuDump();
 

@@ -28,7 +28,7 @@ void getTime(ProfileFilter &filter, std::timespec &wallTime, std::timespec &cpuT
 			return;
 		}
 		case PROFILE_ALL: {
-            clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &cpuTime);
+			clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &cpuTime);
 			clock_gettime(CLOCK_REALTIME, &wallTime);
 			return;
 		}
@@ -65,6 +65,16 @@ void Profiler::dump(const std::string &msg) {
 			return;
 		}
 	}
+}
+
+void Profiler::dump(double &wall, double &cpu) {
+	this->m_wall = this->m_wallEnd.tv_nsec - this->m_wallBegin.tv_nsec;
+	this->m_wall *= 1e-9;
+	wall = this->m_wall;
+
+	this->m_cpu = this->m_cpuEnd.tv_nsec - this->m_cpuBegin.tv_nsec;
+	this->m_cpu *= 1e-9;
+	cpu = this->m_cpu;
 }
 
 void Profiler::wallDump() {

@@ -10,8 +10,13 @@
 #include "../include/PhysicWorld.hpp"
 #include "../include/Profiler.hpp"
 
+#include <algorithm>
+#include <array>
+#include <functional>
 #include <glm/gtc/type_ptr.hpp>
 #include <iomanip>
+#include <iterator>
+#include <vector>
 
 using namespace ogl;
 
@@ -21,6 +26,13 @@ const auto em = EntityManager::instance();
 const auto scene = BasicScene::instance();
 
 const auto ENTITY_ELECTED_CHANGED = Event("Entity Selected Changed");
+
+double inputWalltime{}, inputCputime{};
+double updateWalltime{}, updateCputime{};
+double renderWalltime{}, renderCputime{};
+std::array<std::reference_wrapper<double>, 3> walltimes{inputWalltime, updateWalltime, renderWalltime};
+std::array<std::reference_wrapper<double>, 3> cputimes{inputCputime, updateCputime, renderCputime};
+std::array<std::string, 3> names{"Input", "Update", "Render"};
 
 Profiler profiler{PROFILE_ALL};
 
@@ -477,7 +489,7 @@ int main(int argc, char *argv[]) {
 
 	ed->subscribe(event::loop::LOOP_UPDATE, [&shader, &pw]() {
 		auto time = glfwGetTime();
-		if (time - lastTime > 0.3 && time < 2) {
+		if (time - lastTime > 0.3) {
 			lastTime = time;
 			auto id = factory::factorySphere(BasicInfo{{}, glm::vec3{0.2}}, glm::vec4(getRandColor(), 1));
 			em->addComponent<MaterialComponent>(id);
@@ -513,24 +525,38 @@ int main(int argc, char *argv[]) {
 	pw.addSolver<CollisionSolver>();
 	pw.addSolver<PositionSolver>();
 
+	auto pp = im.addPanel<ImGuiPanel>("Profiler");
+	pp->setRenderFunc([]() {
+		ImGui::Begin("Profiler");
+		auto maxwall = std::distance(walltimes.begin(), std::max_element(ALL(walltimes)));
+		auto maxcpu = std::distance(cputimes.begin(), std::max_element(ALL(cputimes)));
+		for (auto i = 0; i < names.size(); i++) {
+			ImGui::PushID(i);
+			ImGui::SeparatorText(names[i].c_str());
+			ImGui::TextColored((ImGui::GetIO().Framerate < 40 && maxwall == i) ? ImVec4{1, 1, 0, 1} : ImVec4{1, 1, 1, 1}, "Wall Time: %lf", walltimes[i].get());
+			ImGui::TextColored((ImGui::GetIO().Framerate < 40 && maxcpu == i) ? ImVec4{1, 1, 0, 1} : ImVec4{1, 1, 1, 1}, "CPU Time: %lf", cputimes[i].get());
+			ImGui::PopID();
+		}
+		ImGui::End();
+	});
+
 	while (!glfwWindowShouldClose(w.getContext())) {
 		profiler.start();
 		ed->post(event::loop::LOOP_INPUT);
 		profiler.end();
-		// profiler.dump("INPUT");
+		profiler.dump(inputWalltime, inputCputime);
+
 		profiler.start();
 		ed->post(event::loop::LOOP_UPDATE);
 		profiler.end();
-		// profiler.dump("UPDATE");
+		profiler.dump(updateWalltime, updateCputime);
+
 		ed->post(event::loop::LOOP_BEGIN_RENDER);
 		profiler.start();
 		ed->post(event::loop::LOOP_RENDER);
 		profiler.end();
-		// profiler.dump("GLFW RENDER");
-		profiler.start();
+		profiler.dump(renderWalltime, renderCputime);
 		ed->post(event::loop::LOOP_END_RENDER);
-		profiler.end();
-		// profiler.dump("IMGUI RENDER");
 	}
 
 	w.onDetach();
