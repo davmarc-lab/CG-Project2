@@ -35,6 +35,9 @@ std::array<std::reference_wrapper<double>, 3> walltimes{inputWalltime, updateWal
 std::array<std::reference_wrapper<double>, 3> cputimes{inputCputime, updateCputime, renderCputime};
 std::array<std::string, 3> names{"Input", "Update", "Render"};
 
+std::vector<glm::mat4> sphereModels{};
+std::vector<glm::vec4> sphereColors{};
+
 Profiler profiler{PROFILE_ALL};
 
 float lastTime = 0;
@@ -365,9 +368,9 @@ int main(int argc, char *argv[]) {
 	s.decorated = false;
 	s.size = {1366, 768};
 	s.position = {400, 12};
-#ifdef _WIN32
+	#ifdef _WIN32
 	s.position = {470, 50};
-#endif
+	#endif
 	s.focused = true;
 
 	Window w{s};
@@ -454,7 +457,7 @@ int main(int argc, char *argv[]) {
 	scene->addEntity(shader, plane);
 	pw.addEntity(plane);
 
-	auto left = factory::factoryCube(BasicInfo{{-3, 0, 0}, {0.1, 3, 3}, {0, -90, 0}, false}, {0, 1, 0, 1});
+	auto left = factory::factoryCube(BasicInfo{{-3, 0, 0}, {0.1, 3, 3}, {0, -90, 0}}, {0, 1, 0, 1});
 	auto cl = em->addComponent<ColliderComponent>(left);
 	systems::collision::updateColliderType(left, ColliderType::COLLIDER_CUBE);
 	pw.addEntity(left);
@@ -462,7 +465,7 @@ int main(int argc, char *argv[]) {
 	cl->normal = evaluateNormal(left);
 	systems::collision::updateSimulated(left, false);
 
-	auto right = factory::factoryCube(BasicInfo{{3, 0, 0}, {0.1, 3, 3}, {0, 90, 0}, false}, {0, 1, 0, 1});
+	auto right = factory::factoryCube(BasicInfo{{3, 0, 0}, {0.1, 3, 3}, {0, 90, 0}}, {0, 1, 0, 1});
 	auto cr = em->addComponent<ColliderComponent>(right);
 	systems::collision::updateColliderType(left, ColliderType::COLLIDER_CUBE);
 	pw.addEntity(right);
@@ -474,7 +477,7 @@ int main(int argc, char *argv[]) {
 	auto cb = em->addComponent<ColliderComponent>(back);
 	systems::collision::updateColliderType(back, ColliderType::COLLIDER_CUBE);
 	pw.addEntity(back);
-	// scene->addEntity(shader, back);
+	scene->addEntity(shader, back);
 	cb->normal = evaluateNormal(back);
 	systems::collision::updateSimulated(back, false);
 
@@ -533,14 +536,19 @@ int main(int argc, char *argv[]) {
 
 	ed->subscribe(event::loop::LOOP_UPDATE, [&shader, &pw]() {
 		auto time = glfwGetTime();
-		if (time - lastTime > 0.3 && time < 4) {
+		if (time - lastTime > 0.3 && time < 2) {
 			lastTime = time;
-			auto id = factory::factorySphereInstanced(BasicInfo{{}, glm::vec3{0.2}}, glm::vec4(getRandColor(), 1));
-			em->addComponent<MaterialComponent>(id);
+			auto color = glm::vec4(getRandColor(), 1);
+			auto id = factory::factorySphereInstanced(BasicInfo{{}, glm::vec3{0.2}}, color);
+			sphereModels.push_back(systems::transform::getModelMatrix(id));
+			sphereColors.push_back(color);
 			auto ss = em->getComponentFromId<ShaderComponent>(id);
 			ss->computation = LightComputation::NONE;
+			em->addComponent<MaterialComponent>(id);
+			em->addComponent<ColliderComponent>(id);
 			pw.addEntity(id);
 			// scene->addEntity(shader, id);
+			systems::collision::updateCollider(id);
 			systems::collision::updateColliderType(id, ColliderType::COLLIDER_SPHERE);
 			systems::physic::updateVelocity(id, getRandVelocity(time));
 		}
@@ -585,7 +593,13 @@ int main(int argc, char *argv[]) {
 		ImGui::End();
 	});
 
-	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() { systems::render::prepareInstancedMesh(); });
+	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() {
+		sphereModels.clear();
+		for (auto e : em->getEntitiesFromComponent<InstancedComponent>()) {
+			sphereModels.push_back(systems::transform::getModelMatrix(e));
+		}
+		ogl::Renderer::instance()->prepareBuffers(sphereModels, sphereColors);
+	});
 
 	while (!glfwWindowShouldClose(w.getContext())) {
 		profiler.start();

@@ -158,13 +158,13 @@ namespace ogl {
 		glVertexAttribDivisor(8, 1);
 	}
 
-	void Renderer::prepareBuffers() {
+	void Renderer::prepareBuffers(const std::vector<glm::mat4>& models, const std::vector<glm::vec4>& colors) {
 		ASSERT(this->m_init);
 		if (this->m_stats.numSpheres) {
 			this->m_sphere.vbomo.bind();
-			this->m_sphere.vbomo.setup(this->m_sphere.modelOffset.data(), this->m_sphere.modelOffset.size(), GL_STATIC_DRAW);
+			this->m_sphere.vbomo.setup(models.data(), models.size(), GL_STATIC_DRAW);
 			this->m_sphere.vboco.bind();
-			this->m_sphere.vboco.setup(this->m_sphere.colorOffset.data(), this->m_sphere.colorOffset.size(), GL_STATIC_DRAW);
+			this->m_sphere.vboco.setup(colors.data(), colors.size(), GL_STATIC_DRAW);
 		}
 	}
 

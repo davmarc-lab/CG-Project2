@@ -52,7 +52,7 @@ namespace ogl {
 
 		void drawAllInstanced();
 
-		void prepareBuffers();
+		void prepareBuffers(const std::vector<glm::mat4>& models, const std::vector<glm::vec4>& colors);
 
 		RendererStats getRendererStats() const { return this->m_stats; }
 

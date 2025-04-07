@@ -622,9 +622,8 @@ namespace systems {
 			stencil.createShaderProgram();
 		}
 
-		void prepareInstancedMesh() {
-			if (data.nspheres > 0) {
-			}
+		void prepareInstancedMesh(const std::vector<glm::mat4>& models, const std::vector<glm::vec4>& colors) {
+			ogl::Renderer::instance()->prepareBuffers(models, colors);
 		}
 
 		void getOtherLightData(LightShaderBlock &block, const Shared<LightComponent> &light) {

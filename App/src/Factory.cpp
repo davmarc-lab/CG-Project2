@@ -102,6 +102,8 @@ namespace factory {
 	unsigned int factorySphereInstanced(const BasicInfo &info, const glm::vec4 &color) {
 		auto id = em->createEntity();
 		auto c = em->addComponent<Transform>(id);
+		auto coords = getSphereVertices();
+		auto vc = em->addComponent<VertexComponent>(id, coords.vertex, getColorVector(color, coords.vertex.size()), coords.indices);
 		systems::transform::updatePosition(id, info.position);
 		systems::transform::updateScale(id, info.scale);
 		systems::transform::updateRotation(id, info.rotation);

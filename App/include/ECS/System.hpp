@@ -132,7 +132,7 @@ namespace systems {
 	namespace render {
 		void initStencilShader();
 
-		void prepareInstancedMesh();
+		void prepareInstancedMesh(const std::vector<glm::mat4>& models, const std::vector<glm::vec4>& colors);
 
 		void renderSkybox(const unsigned int &id, const Shared<ogl::ShaderProgram> &shader);
 		void renderAllMeshes();

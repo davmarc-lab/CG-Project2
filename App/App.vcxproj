@@ -151,6 +151,7 @@
     <ClInclude Include="include\ECS\System.hpp" />
     <ClInclude Include="include\Factory.hpp" />
     <ClInclude Include="include\PhysicWorld.hpp" />
+    <ClInclude Include="include\Profiler.hpp" />
     <ClInclude Include="include\stb_image.hpp" />
     <ClInclude Include="include\Utils.hpp" />
   </ItemGroup>
@@ -161,6 +162,7 @@
     <ClCompile Include="src\Factory.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PhysicWorld.cpp" />
+    <ClCompile Include="src\Profiler.cpp" />
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -183,7 +185,12 @@
     <Content Include="resources\models\spaceship\Intergalactic Spaceship_rough.jpg" />
     <Content Include="resources\models\spaceship\Intergalactic_Spaceship-(Wavefront).mtl" />
     <Content Include="resources\shader\fragmentShader.glsl" />
+    <Content Include="resources\shader\instancedFragShader.glsl" />
+    <Content Include="resources\shader\instancedVertShader.glsl" />
     <Content Include="resources\shader\lightFragShader.glsl" />
+    <Content Include="resources\shader\lightVertShader.glsl" />
+    <Content Include="resources\shader\modelFragShader.glsl" />
+    <Content Include="resources\shader\modelVertShader.glsl" />
     <Content Include="resources\shader\normalFragShader.glsl" />
     <Content Include="resources\shader\normalGeomShader.glsl" />
     <Content Include="resources\shader\normalVertShader.glsl" />

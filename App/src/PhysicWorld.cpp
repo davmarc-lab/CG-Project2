@@ -10,7 +10,7 @@
 
 const auto em = EntityManager::instance();
 
-std::vector<unsigned int> etts{}, skip{};
+std::vector<unsigned int> etts{};
 
 glm::vec3 force{}, acc{}, vel{}, pos{};
 float mass{}, dt{};
@@ -115,7 +115,8 @@ void CollisionSolver::solve() {
 		auto tb = em->getComponentFromId<Transform>(second);
 		// collision points
 		auto p = testCollisions(ca, ta, cb, tb);
-		if ((ca->type == COLLIDER_CUBE && cb->type == COLLIDER_SPHERE)) {
+		if ((cb->type == COLLIDER_CUBE && ca->type == COLLIDER_SPHERE)) {
+			std::cout << "iN\n";
 			if (ca->isStatic) {
 				auto pa = em->getComponentFromId<PhysicComponent>(first);
 				auto pb = em->getComponentFromId<PhysicComponent>(second);
@@ -173,9 +174,6 @@ void GravitySolver::solve() {
 		dt = this->world.getWorldDeltaTime();
 		etts = this->world.getEntities();
 		for (auto id : etts) {
-			if (std::find(ALL(skip), id) != skip.end()) {
-				continue;
-			}
 			if (em->getComponentFromId<ColliderComponent>(id)->isStatic) {
 				continue;
 			}
