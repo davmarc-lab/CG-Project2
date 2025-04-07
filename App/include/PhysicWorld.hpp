@@ -123,6 +123,8 @@ namespace systems {
 		void updateVelocity(const unsigned int &id, const glm::vec3 velocity);
 		void addVelocity(const unsigned int &id, const glm::vec3 offset);
 
+        void updateRestitutionFactor(const unsigned int& id, const float& factor);
+
 		glm::vec3 getAcceleration(const unsigned int &id);
 		void updateAcceleration(const unsigned int &id, const glm::vec3 acceleration);
 		void addAcceleration(const unsigned int &id, const glm::vec3 offset);

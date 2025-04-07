@@ -43,6 +43,7 @@ CollisionPoints testSphereSphere(Shared<ColliderComponent> &a, Shared<Transform>
 
 	return point;
 }
+
 CollisionPoints testPlaneSphere(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb) {
 	CollisionPoints point{};
 	ASSERT(a->type == ColliderType::COLLIDER_CUBE);
@@ -60,19 +61,22 @@ CollisionPoints testPlaneSphere(Shared<ColliderComponent> &a, Shared<Transform> 
 	// distance from sphere center and collision point
 	auto dist = glm::distance(bc, collPoint);
 	// sphere radius length
-	auto rsize = glm::length(tb->getScale() * point.normal);
+	auto rsize = glm::length(tb->getScale() * point.normal) + glm::length(ta->getScale() * point.normal);
 
 	point.depth = rsize - dist;
 	point.colliding = dist < rsize;
 
 	return point;
 }
+CollisionPoints testCubeCube(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb) {
+	return {};
+}
 
 using CollisionFunc = CollisionPoints (*)(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb);
 
 const CollisionFunc testFunc[2][2] = {
-	{testSphereSphere, nullptr},
-	{testPlaneSphere, nullptr}};
+	{testSphereSphere, testPlaneSphere},
+	{testPlaneSphere, testCubeCube}};
 
 CollisionPoints testCollisions(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb) {
 	bool swap = b->type > a->type;
@@ -105,16 +109,22 @@ void CollisionSolver::solve() {
 
 		auto ca = em->getComponentFromId<ColliderComponent>(first);
 		auto cb = em->getComponentFromId<ColliderComponent>(second);
+        if (ca->isStatic && cb->isStatic) continue;
+
 		auto ta = em->getComponentFromId<Transform>(first);
 		auto tb = em->getComponentFromId<Transform>(second);
 		// collision points
 		auto p = testCollisions(ca, ta, cb, tb);
 		if ((ca->type == COLLIDER_CUBE && cb->type == COLLIDER_SPHERE)) {
 			if (ca->isStatic) {
+				auto pa = em->getComponentFromId<PhysicComponent>(first);
 				auto pb = em->getComponentFromId<PhysicComponent>(second);
 				auto bv = systems::physic::getVelocity(second);
 				auto speed = glm::dot(bv, p.normal);
-				auto j = -1 * speed / (1 / pb->mass);
+				if (speed >= 0) {
+					continue;
+				}
+				auto j = -(1 + (pa->restitution * pb->restitution)) * speed / (1 / pb->mass);
 				auto impulse = j * p.normal;
 				bv += impulse / pb->mass;
 				systems::physic::updateVelocity(second, bv);
@@ -136,7 +146,7 @@ void CollisionSolver::solve() {
 				continue;
 			}
 
-			auto j = -1 * speed / ((1 / pa->mass) + (1 / pb->mass));
+			auto j = -(1 + (pa->restitution * pb->restitution)) * speed / ((1 / pa->mass) + (1 / pb->mass));
 			auto impulse = j * p.normal;
 			av -= impulse / pa->mass;
 			bv += impulse / pb->mass;
@@ -247,6 +257,13 @@ namespace systems {
 			ASSERT(c != nullptr);
 
 			c->velocity += offset;
+		}
+
+		void updateRestitutionFactor(const unsigned int &id, const float &factor) {
+			auto c = em->getComponentFromId<PhysicComponent>(id);
+			ASSERT(c != nullptr);
+
+			c->restitution = factor;
 		}
 
 		glm::vec3 getAcceleration(const unsigned int &id) {

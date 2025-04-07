@@ -9,6 +9,7 @@ struct BasicInfo {
 	glm::vec3 position{};
 	glm::vec3 scale{1, 1, 1};
 	glm::vec3 rotation{};
+	bool render = true;
 };
 
 namespace factory {
@@ -24,7 +25,7 @@ namespace factory {
 
 	unsigned int factoryObjMesh(const BasicInfo &info, const std::string &pathToFile);
 
-    unsigned int factoryTree(const BasicInfo& info);
+	unsigned int factoryTree(const BasicInfo &info);
 
 	namespace light {
 		unsigned int factoryDirectional(const glm::vec3 &direction);

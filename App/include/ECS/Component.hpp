@@ -430,6 +430,7 @@ public:
 	glm::vec3 force{};
 
 	float mass = 1;
+	float restitution = 1;
 
 	PhysicComponent() :
 		Component() {}

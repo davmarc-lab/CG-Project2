@@ -46,6 +46,8 @@ namespace systems {
 		ColliderType getColliderType(const unsigned int &id);
 		void updateColliderType(const unsigned int &id, const ColliderType &type);
 
+		void updateSimulated(const unsigned int &id, const bool &simulated);
+
 		void compressBoundingBox();
 
 		float getEnemyLastHit(const unsigned int &id);

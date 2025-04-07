@@ -70,9 +70,13 @@ namespace factory {
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();
-		rc->setRenderCall([vc, vaoid]() {
-			rd->drawElements(vaoid, GL_TRIANGLES, vc->getIndexCoords().size(), GL_UNSIGNED_INT);
-		});
+		if (info.render) {
+			rc->setRenderCall([vc, vaoid]() {
+				rd->drawElements(vaoid, GL_TRIANGLES, vc->getIndexCoords().size(), GL_UNSIGNED_INT);
+			});
+		} else {
+			rc->setRenderCall([]() {});
+		}
 
 		return id;
 	}
@@ -206,6 +210,8 @@ namespace factory {
 		systems::transform::updateModelMatrix(id);
 		em->removeComponent<MaterialComponent>(id);
 		auto cc = em->addComponent<ColliderComponent>(id);
+		auto pc = em->addComponent<PhysicComponent>(id);
+		pc->restitution = 0.4;
 		cc->type = ColliderType::COLLIDER_CUBE;
 		cc->position = pos;
 		cc->normal = {0, 1, 0};

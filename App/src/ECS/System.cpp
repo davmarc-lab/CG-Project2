@@ -249,6 +249,13 @@ namespace systems {
 			c->type = type;
 		}
 
+		void updateSimulated(const unsigned int &id, const bool &simulated) {
+			auto c = em->getComponentFromId<ColliderComponent>(id);
+			ASSERT(c != nullptr);
+
+			c->isStatic = !simulated;
+		}
+
 		void compressBoundingBox() {
 			for (auto id : em->getEntitiesFromComponent<ParentComponent>()) {
 				auto c = em->getComponentFromId<ParentComponent>(id);

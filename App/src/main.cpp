@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <array>
 #include <functional>
+#include <glm/ext/quaternion_geometric.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iomanip>
 #include <iterator>
@@ -343,6 +344,20 @@ glm::vec3 getRandVelocity(float time = 1) {
 	return std::sin(time) * glm::vec3(randf() + std::rand() % 5 - 2, randf() + std::rand() % 5 - 2, randf() + std::rand() % 5 - 2);
 }
 
+glm::vec3 evaluateNormal(const unsigned int &id) {
+	auto v = em->getComponentFromId<VertexComponent>(id);
+	glm::vec3 norm{};
+	glm::vec3 v1 = glm::vec4(v->getVertexCoords()[v->getIndexCoords()[0]], 0) * systems::transform::getModelMatrix(id);
+	glm::vec3 v2 = glm::vec4(v->getVertexCoords()[v->getIndexCoords()[1]], 0) * systems::transform::getModelMatrix(id);
+	glm::vec3 v3 = glm::vec4(v->getVertexCoords()[v->getIndexCoords()[2]], 0) * systems::transform::getModelMatrix(id);
+
+	v1 -= v2;
+	v3 -= v2;
+	norm = glm::normalize(glm::cross(v1, v3));
+
+	return norm;
+}
+
 int main(int argc, char *argv[]) {
 	std::cout << std::fixed << std::setprecision(10);
 	srand(time(NULL));
@@ -404,6 +419,7 @@ int main(int argc, char *argv[]) {
 	auto cam = em->addComponent<CameraComponent>(world.cameraId);
 	cam->camera = CreateShared<ogl::Camera>();
 	world.camera = systems::camera::getCamera(world.cameraId);
+	world.camera->setCameraPosition({0, 1, 7});
 	em->addComponent<ColliderComponent>(world.cameraId, glm::vec3{4, 4, 4}, world.cameraSize);
 	ed->post(CAMERA_UPDATE_DATA);
 	enableDefaultCameraMovement();
@@ -435,6 +451,38 @@ int main(int argc, char *argv[]) {
 	systems::ecs::updateEntityName(plane, "Basic Plane");
 	scene->addEntity(shader, plane);
 	pw.addEntity(plane);
+
+	auto left = factory::factoryCube(BasicInfo{{-3, 0, 0}, {0.1, 3, 3}, {0, -90, 0}, false}, {0, 1, 0, 1});
+	auto cl = em->addComponent<ColliderComponent>(left);
+	systems::collision::updateColliderType(left, ColliderType::COLLIDER_CUBE);
+	pw.addEntity(left);
+	scene->addEntity(shader, left);
+	cl->normal = evaluateNormal(left);
+	systems::collision::updateSimulated(left, false);
+
+	auto right = factory::factoryCube(BasicInfo{{3, 0, 0}, {0.1, 3, 3}, {0, 90, 0}, false}, {0, 1, 0, 1});
+	auto cr = em->addComponent<ColliderComponent>(right);
+	systems::collision::updateColliderType(left, ColliderType::COLLIDER_CUBE);
+	pw.addEntity(right);
+	scene->addEntity(shader, right);
+	cr->normal = evaluateNormal(right);
+	systems::collision::updateSimulated(right, false);
+
+	auto back = factory::factoryCube(BasicInfo{{0, 0, -3}, {3, 3, 0.1}, {0, -180, 0}, false}, {0, 1, 0, 1});
+	auto cb = em->addComponent<ColliderComponent>(back);
+	systems::collision::updateColliderType(back, ColliderType::COLLIDER_CUBE);
+	pw.addEntity(back);
+	scene->addEntity(shader, back);
+	cb->normal = evaluateNormal(back);
+	systems::collision::updateSimulated(back, false);
+
+	auto front = factory::factoryCube(BasicInfo{{0, 0, 3}, {3, 3, 0.1}, {0, 0, 0}, false}, {0, 1, 0, 0});
+	auto cf = em->addComponent<ColliderComponent>(front);
+	systems::collision::updateColliderType(front, ColliderType::COLLIDER_CUBE);
+	pw.addEntity(front);
+	scene->addEntity(shader, front);
+	cf->normal = evaluateNormal(front);
+	systems::collision::updateSimulated(front, false);
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
@@ -483,7 +531,7 @@ int main(int argc, char *argv[]) {
 
 	ed->subscribe(event::loop::LOOP_UPDATE, [&shader, &pw]() {
 		auto time = glfwGetTime();
-		if (time - lastTime > 0.3 && time < 1) {
+		if (time - lastTime > 0.3 && time < 4) {
 			lastTime = time;
 			auto id = factory::factorySphere(BasicInfo{{}, glm::vec3{0.2}}, glm::vec4(getRandColor(), 1));
 			em->addComponent<MaterialComponent>(id);
@@ -496,7 +544,7 @@ int main(int argc, char *argv[]) {
 		}
 	});
 
-	ed->subscribe(event::loop::LOOP_RENDER, [&normalShader, &skyboxShader, &shape, &skybox]() {
+	ed->subscribe(event::loop::LOOP_RENDER, [&normalShader, &skyboxShader, &left, &skybox]() {
 		// render skybox
 		systems::render::renderSkybox(skybox, skyboxShader);
 		// render other meshes
@@ -507,8 +555,8 @@ int main(int argc, char *argv[]) {
 		// auto v = world.camera->getViewMatrix();
 		// normalShader->setMat4("view", v);
 		// normalShader->setMat4("proj", p);
-		// normalShader->setMat4("model", systems::transform::getModelMatrix(shape));
-		// auto rc = em->getComponentFromId<RenderComponent>(shape);
+		// normalShader->setMat4("model", systems::transform::getModelMatrix(left));
+		// auto rc = em->getComponentFromId<RenderComponent>(left);
 		// rc->call();
 	});
 
