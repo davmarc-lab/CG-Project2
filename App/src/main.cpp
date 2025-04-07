@@ -447,6 +447,8 @@ int main(int argc, char *argv[]) {
 	Shared<ShaderProgram> normalShader = CreateShared<ShaderProgram>("normalVertShader.glsl", "normalFragShader.glsl", "normalGeomShader.glsl");
 	normalShader->createShaderProgram();
 
+	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
+
 	plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
 	systems::ecs::updateEntityName(plane, "Basic Plane");
 	scene->addEntity(shader, plane);
@@ -468,11 +470,11 @@ int main(int argc, char *argv[]) {
 	cr->normal = evaluateNormal(right);
 	systems::collision::updateSimulated(right, false);
 
-	auto back = factory::factoryCube(BasicInfo{{0, 0, -3}, {3, 3, 0.1}, {0, -180, 0}, false}, {0, 1, 0, 1});
+	auto back = factory::factoryCube(BasicInfo{{0, 0, -3}, {3, 3, 0.1}, {0, -180, 0}}, {0, 1, 0, 1});
 	auto cb = em->addComponent<ColliderComponent>(back);
 	systems::collision::updateColliderType(back, ColliderType::COLLIDER_CUBE);
 	pw.addEntity(back);
-	scene->addEntity(shader, back);
+	// scene->addEntity(shader, back);
 	cb->normal = evaluateNormal(back);
 	systems::collision::updateSimulated(back, false);
 
@@ -484,8 +486,6 @@ int main(int argc, char *argv[]) {
 	cf->normal = evaluateNormal(front);
 	systems::collision::updateSimulated(front, false);
 
-	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
-
 	auto shape = factory::factorySphere(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
 	em->addComponent<MaterialComponent>(shape);
@@ -494,6 +494,8 @@ int main(int argc, char *argv[]) {
 	auto sc = em->getComponentFromId<ShaderComponent>(shape);
 	sc->computation = LightComputation::PHONG;
 	sc->reflective = true;
+
+	// auto inst = factory::factorySphereInstanced(BasicInfo{});
 
 	// auto tree = factory::factoryTree(BasicInfo{{0, 1, 4}});
 	// scene->addEntity(lightShader, tree);
@@ -533,12 +535,12 @@ int main(int argc, char *argv[]) {
 		auto time = glfwGetTime();
 		if (time - lastTime > 0.3 && time < 4) {
 			lastTime = time;
-			auto id = factory::factorySphere(BasicInfo{{}, glm::vec3{0.2}}, glm::vec4(getRandColor(), 1));
+			auto id = factory::factorySphereInstanced(BasicInfo{{}, glm::vec3{0.2}}, glm::vec4(getRandColor(), 1));
 			em->addComponent<MaterialComponent>(id);
 			auto ss = em->getComponentFromId<ShaderComponent>(id);
 			ss->computation = LightComputation::NONE;
 			pw.addEntity(id);
-			scene->addEntity(shader, id);
+			// scene->addEntity(shader, id);
 			systems::collision::updateColliderType(id, ColliderType::COLLIDER_SPHERE);
 			systems::physic::updateVelocity(id, getRandVelocity(time));
 		}
@@ -550,6 +552,7 @@ int main(int argc, char *argv[]) {
 		// render other meshes
 		systems::render::renderAllMeshes();
 		systems::render::renderBoundingBox();
+		systems::render::renderInstancedMeshes();
 		// normalShader->use();
 		// auto p = world.camera->getProjMatrix();
 		// auto v = world.camera->getViewMatrix();
@@ -581,6 +584,8 @@ int main(int argc, char *argv[]) {
 		}
 		ImGui::End();
 	});
+
+	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() { systems::render::prepareInstancedMesh(); });
 
 	while (!glfwWindowShouldClose(w.getContext())) {
 		profiler.start();

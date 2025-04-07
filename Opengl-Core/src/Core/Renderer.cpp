@@ -1,5 +1,6 @@
 #include "../../include/Core/Renderer.hpp"
-#include <glm/ext/matrix_transform.hpp>
+
+#include "../../include/Core/Event.hpp"
 
 #include "../../include/Graphic.hpp"
 
@@ -14,9 +15,11 @@ glm::mat4 calcModelMatrix(const glm::vec3 &pos, const glm::vec3 &dim, const glm:
 
 namespace ogl {
 	ShaderProgram rendShader = ShaderProgram("vertexShader.glsl", "fragmentShader.glsl");
+	ShaderProgram instancedShader = ShaderProgram("instancedVertShader.glsl", "instancedFragShader.glsl");
 
 	void Renderer::init() {
 		rendShader.createShaderProgram();
+		instancedShader.createShaderProgram();
 
 		// cube
 		this->m_cube.vao.onAttach();
@@ -94,6 +97,11 @@ namespace ogl {
 		this->m_sphere.vbot.setup(this->m_sphere.texCoords.data(), this->m_sphere.texCoords.size(), GL_STATIC_DRAW);
 		this->m_sphere.vao.linkAttribFast(3, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
+		// Instanced Buffers
+		this->m_sphere.vboco.onAttach();
+
+		this->m_sphere.vbomo.onAttach();
+
 		this->m_sphere.ebo.onAttach();
 		this->m_sphere.ebo.setup(this->m_sphere.index.data(), this->m_sphere.index.size(), GL_STATIC_DRAW);
 
@@ -127,44 +135,37 @@ namespace ogl {
 		this->m_init = true;
 	}
 
-	void Renderer::drawCube(const glm::vec3 &pos, const glm::vec3 &scale, const glm::vec3 &rot) {
+	void Renderer::appendSphere(const unsigned int &id, const glm::mat4 &model, const glm::vec4 &color) {
 		ASSERT(this->m_init);
-
-		auto model = calcModelMatrix(pos, scale, rot);
-		rendShader.use();
-		rendShader.setMat4("model", model);
-		drawElements(this->m_cube.vao.getId(), GL_TRIANGLES, this->m_cube.index.size(), GL_UNSIGNED_INT);
-		this->m_stats.numCubes++;
-	}
-
-	void Renderer::drawPyramid(const glm::vec3 &pos, const glm::vec3 &scale, const glm::vec3 &rot) {
-		ASSERT(this->m_init);
-
-		auto model = calcModelMatrix(pos, scale, rot);
-		rendShader.use();
-		rendShader.setMat4("model", model);
-		drawElements(this->m_pyramid.vao.getId(), GL_TRIANGLES, this->m_pyramid.index.size(), GL_UNSIGNED_INT);
-		this->m_stats.numPyramids++;
-	}
-
-	void Renderer::drawSphere(const glm::vec3 &pos, const glm::vec3 &scale, const glm::vec3 &rot) {
-		ASSERT(this->m_init);
-
-		auto model = calcModelMatrix(pos, scale, rot);
-		rendShader.use();
-		rendShader.setMat4("model", model);
-		drawElements(this->m_sphere.vao.getId(), GL_TRIANGLES, this->m_sphere.index.size(), GL_UNSIGNED_INT);
 		this->m_stats.numSpheres++;
+		this->m_sphere.index.push_back(id);
+		this->m_sphere.modelOffset.push_back(model);
+		this->m_sphere.colorOffset.push_back(color);
+        this->m_sphere.vao.bind();
+		this->m_sphere.vboco.bind();
+		this->m_sphere.vboco.setup(this->m_sphere.colorOffset.data(), this->m_sphere.colorOffset.size(), GL_STATIC_DRAW);
+		this->m_sphere.vao.linkAttribFast(4, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		glVertexAttribDivisor(4, 1);
+
+		this->m_sphere.vbomo.setup(this->m_sphere.modelOffset.data(), this->m_sphere.modelOffset.size(), GL_STATIC_DRAW);
+		this->m_sphere.vao.linkAttribFast(5, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void *)0);
+		this->m_sphere.vao.linkAttribFast(6, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void *)(sizeof(glm::vec4)));
+		this->m_sphere.vao.linkAttribFast(7, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void *)(2 * sizeof(glm::vec4)));
+		this->m_sphere.vao.linkAttribFast(8, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void *)(3 * sizeof(glm::vec4)));
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+		glVertexAttribDivisor(7, 1);
+		glVertexAttribDivisor(8, 1);
 	}
 
-	void Renderer::drawThorus(const glm::vec3 &pos, const glm::vec3 &scale, const glm::vec3 &rot) {
+	void Renderer::prepareBuffers() {
 		ASSERT(this->m_init);
-
-		auto model = calcModelMatrix(pos, scale, rot);
-		rendShader.use();
-		rendShader.setMat4("model", model);
-		drawElements(this->m_thorus.vao.getId(), GL_TRIANGLES, this->m_thorus.index.size(), GL_UNSIGNED_INT);
-		this->m_stats.numThorus++;
+		if (this->m_stats.numSpheres) {
+			this->m_sphere.vbomo.bind();
+			this->m_sphere.vbomo.setup(this->m_sphere.modelOffset.data(), this->m_sphere.modelOffset.size(), GL_STATIC_DRAW);
+			this->m_sphere.vboco.bind();
+			this->m_sphere.vboco.setup(this->m_sphere.colorOffset.data(), this->m_sphere.colorOffset.size(), GL_STATIC_DRAW);
+		}
 	}
 
 	void Renderer::drawArrays(const unsigned int &vao, const unsigned int &mode, const int &first, const size_t &size) {
@@ -177,6 +178,17 @@ namespace ogl {
 		glBindVertexArray(vao);
 		glDrawElements(mode, size, type, indices);
 		this->m_stats.drawCalls++;
+	}
+
+	void Renderer::drawAllInstanced() {
+		if (!(this->m_stats.numCubes + this->m_stats.numPyramids + this->m_stats.numSpheres + this->m_stats.numThorus))
+			return;
+
+		instancedShader.use();
+		if (this->m_stats.numSpheres) {
+			this->m_sphere.vao.bind();
+			glDrawElementsInstanced(GL_TRIANGLES, this->m_sphere.index.size(), GL_UNSIGNED_INT, 0, this->m_stats.numSpheres);
+		}
 	}
 
 } // namespace ogl

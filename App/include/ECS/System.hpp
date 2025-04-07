@@ -8,6 +8,13 @@
 #include "../../../Opengl-Core/include/Core.hpp"
 #include "Component.hpp"
 
+struct InstanceData {
+	unsigned int nspheres = 0;
+	std::vector<unsigned int> spheresIds{};
+	std::vector<glm::vec4> spheresColor{};
+	std::vector<glm::mat4> spheresModel{};
+} inline data;
+
 namespace systems {
 	namespace ecs {
 		bool removeEntityFromManager(const unsigned int &id);
@@ -124,6 +131,8 @@ namespace systems {
 
 	namespace render {
 		void initStencilShader();
+
+		void prepareInstancedMesh();
 
 		void renderSkybox(const unsigned int &id, const Shared<ogl::ShaderProgram> &shader);
 		void renderAllMeshes();

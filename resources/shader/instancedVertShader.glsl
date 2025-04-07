@@ -19,8 +19,8 @@ layout(std140, binding = 0) uniform Matrices {
 };
 
 void main() {
-    gl_Position = viewProj * aModelOffset * (aPos, 1.f);
-    vs_out.vertColor = aColor;
-    vs_out.normal = mat3(transpose(inverse(model))) * aNormal;
+    gl_Position = viewProj * aModelOffset * vec4(aPos, 1.f);
+    vs_out.vertColor = aColorOffset;
+    vs_out.normal = mat3(transpose(inverse(aModelOffset))) * aNormal;
     vs_out.texCoord = aTexCoord;
 }

@@ -9,5 +9,6 @@ in VS_OUT {
 out vec4 FragColor;
 
 void main() {
-    FragColor = fs_out.vertColor;
+    // FragColor = fs_out.vertColor;
+    FragColor = vec4(1, 0, 0, 1);
 }

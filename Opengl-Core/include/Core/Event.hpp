@@ -77,5 +77,9 @@ namespace ogl {
 			const Event SHADER_PROJECTION_CHANGED = Event("Shader Projection Changed");
 			const Event INIT_DEFAULT_SHADER = Event("Initialize Default Shader");
 		} // namespace shader
+
+		namespace render {
+			const Event PREPARE_INSTANCED = Event("Prepare Instanced Mesh");
+		}
 	} // namespace event
 } // namespace ogl

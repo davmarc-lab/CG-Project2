@@ -24,6 +24,12 @@ namespace ogl {
 		std::vector<glm::vec2> texCoords{};
 		VertexBuffer vbon{};
 		std::vector<glm::vec3> normals{};
+
+		std::vector<unsigned int> ids{};
+		VertexBuffer vbomo{};
+		std::vector<glm::mat4> modelOffset{};
+		VertexBuffer vboco{};
+		std::vector<glm::vec4> colorOffset{};
 	};
 
 	struct RendererStats {
@@ -38,20 +44,22 @@ namespace ogl {
 	public:
 		void init();
 
+		void appendSphere(const unsigned int &id, const glm::mat4 &model, const glm::vec4 &color);
+
 		void drawArrays(const unsigned int &vao, const unsigned int &mode, const int &first, const size_t &size);
 
 		void drawElements(const unsigned int &vao, const unsigned int &mode, const size_t &size, const unsigned int &type, const void *indices = 0);
 
-		void drawCube(const glm::vec3 &pos = {}, const glm::vec3 &scale = {1, 1, 1}, const glm::vec3 &rot = {});
-		void drawPyramid(const glm::vec3 &pos = {}, const glm::vec3 &scale = {1, 1, 1}, const glm::vec3 &rot = {});
-		void drawSphere(const glm::vec3 &pos = {}, const glm::vec3 &scale = {1, 1, 1}, const glm::vec3 &rot = {});
-		void drawThorus(const glm::vec3 &pos = {}, const glm::vec3 &scale = {1, 1, 1}, const glm::vec3 &rot = {});
+		void drawAllInstanced();
+
+		void prepareBuffers();
 
 		RendererStats getRendererStats() const { return this->m_stats; }
 
 		void resetDrawStats() {
 			this->m_stats.numCubes = 0;
 			this->m_stats.numPyramids = 0;
+			this->m_stats.numSpheres = 0;
 		}
 
 		Renderer(Renderer &other) = delete;

@@ -622,6 +622,11 @@ namespace systems {
 			stencil.createShaderProgram();
 		}
 
+		void prepareInstancedMesh() {
+			if (data.nspheres > 0) {
+			}
+		}
+
 		void getOtherLightData(LightShaderBlock &block, const Shared<LightComponent> &light) {
 			switch (light->type) {
 				case LIGHT_DIRECTIONAL: {
@@ -826,8 +831,7 @@ namespace systems {
 		}
 
 		void renderInstancedMeshes() {
-			for (auto id : em->getEntitiesFromComponent<InstancedComponent>()) {
-			}
+			ogl::Renderer::instance()->drawAllInstanced();
 		}
 
 		std::vector<glm::vec3> getBoxLines(glm::vec3 &botLeft, glm::vec3 &topRight) {
