@@ -167,6 +167,9 @@ void ImGuiEntityTree::onRender() {
 			}
 
 			if (em->entityHasComponent<CameraComponent>(id)) {
+				if (ImGui::Button("Reset##4")) {
+					EventManager::instance()->post(CAMERA_RESET_POSITION);
+				}
 				if (ImGui::CollapsingHeader("Camera##4")) {
 					auto camera = systems::camera::getCamera(id);
 					if (ImGui::CollapsingHeader("World Info##4")) {
@@ -227,7 +230,7 @@ void ImGuiEntityTree::onRender() {
 	}
 
 	ImGui::Separator();
-	ImGui::Text("Collisions -> %zu", systems::collision::getCollisions().size());
+	// ImGui::Text("Collisions -> %zu", systems::collision::getCollisions().size());
 	ImGui::Text("FPS -> %f", ImGui::GetIO().Framerate);
 	ImGui::End();
 }

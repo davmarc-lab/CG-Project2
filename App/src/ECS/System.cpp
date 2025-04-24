@@ -875,6 +875,13 @@ namespace systems {
 				defaultShader.vbog.onAttach();
 				defaultShader.vboc.onAttach();
 				defaultShader.init = true;
+				defaultShader.vao.bind();
+				defaultShader.vbog.setup(defaultShader.coords.data(), defaultShader.coords.size(), GL_STATIC_DRAW);
+				defaultShader.vao.linkAttribFast(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+				defaultShader.vboc.setup(defaultShader.colors.data(), defaultShader.colors.size(), GL_STATIC_DRAW);
+				defaultShader.vao.linkAttribFast(1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+
 			}
 
 			defaultShader.program.use();
@@ -888,13 +895,6 @@ namespace systems {
 
 				for (auto i = 0; i < defaultShader.coords.size(); i++)
 					defaultShader.colors.push_back(BOUNDING_BOX_COLOR);
-
-				defaultShader.vao.bind();
-				defaultShader.vbog.setup(defaultShader.coords.data(), defaultShader.coords.size(), GL_STATIC_DRAW);
-				defaultShader.vao.linkAttribFast(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-				defaultShader.vboc.setup(defaultShader.colors.data(), defaultShader.colors.size(), GL_STATIC_DRAW);
-				defaultShader.vao.linkAttribFast(1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
 				defaultShader.program.setMat4("model", glm::mat4(1));
 				glDrawArrays(GL_LINES, 0, defaultShader.coords.size());

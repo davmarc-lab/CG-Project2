@@ -27,6 +27,7 @@ const auto em = EntityManager::instance();
 const auto scene = BasicScene::instance();
 
 const auto ENTITY_ELECTED_CHANGED = Event("Entity Selected Changed");
+const auto CAMERA_START_POSITION = glm::vec3{0, 1, 12};
 
 double inputWalltime{}, inputCputime{};
 double updateWalltime{}, updateCputime{};
@@ -44,6 +45,7 @@ float lastTime = 0;
 unsigned int plane;
 
 int ettSelected = -1;
+bool renderBB = false;
 
 struct WorldCamera {
 	unsigned int cameraId;
@@ -368,9 +370,9 @@ int main(int argc, char *argv[]) {
 	s.decorated = false;
 	s.size = {1366, 768};
 	s.position = {400, 12};
-	#ifdef _WIN32
+#ifdef _WIN32
 	s.position = {470, 50};
-	#endif
+#endif
 	s.focused = true;
 
 	Window w{s};
@@ -422,7 +424,7 @@ int main(int argc, char *argv[]) {
 	auto cam = em->addComponent<CameraComponent>(world.cameraId);
 	cam->camera = CreateShared<ogl::Camera>();
 	world.camera = systems::camera::getCamera(world.cameraId);
-	world.camera->setCameraPosition({0, 1, 7});
+	world.camera->setCameraPosition(CAMERA_START_POSITION);
 	em->addComponent<ColliderComponent>(world.cameraId, glm::vec3{4, 4, 4}, world.cameraSize);
 	ed->post(CAMERA_UPDATE_DATA);
 	enableDefaultCameraMovement();
@@ -430,6 +432,11 @@ int main(int argc, char *argv[]) {
 
 	ed->subscribe(CAMERA_UPDATE_DATA, []() {
 		systems::camera::updateCameraCollider(world.cameraId, world.camera->getCameraPosition(), world.cameraSize);
+	});
+
+	ed->subscribe(CAMERA_RESET_POSITION, []() {
+		world.camera->setCameraPosition(CAMERA_START_POSITION);
+		ed->post(CAMERA_UPDATE_DATA);
 	});
 
 	PhysicWorld pw = PhysicWorld();
@@ -460,7 +467,7 @@ int main(int argc, char *argv[]) {
 	auto left = factory::factoryCube(BasicInfo{{-3, 0, 0}, {0.1, 3, 3}, {0, -90, 0}}, {0, 1, 0, 1});
 	auto cl = em->addComponent<ColliderComponent>(left);
 	systems::collision::updateColliderType(left, ColliderType::COLLIDER_CUBE);
-    em->addComponent<PhysicComponent>(left);
+	em->addComponent<PhysicComponent>(left);
 	pw.addEntity(left);
 	scene->addEntity(shader, left);
 	cl->normal = evaluateNormal(left);
@@ -468,7 +475,7 @@ int main(int argc, char *argv[]) {
 
 	auto right = factory::factoryCube(BasicInfo{{3, 0, 0}, {0.1, 3, 3}, {0, 90, 0}}, {0, 1, 0, 1});
 	auto cr = em->addComponent<ColliderComponent>(right);
-    em->addComponent<PhysicComponent>(right);
+	em->addComponent<PhysicComponent>(right);
 	systems::collision::updateColliderType(left, ColliderType::COLLIDER_CUBE);
 	pw.addEntity(right);
 	scene->addEntity(shader, right);
@@ -477,7 +484,7 @@ int main(int argc, char *argv[]) {
 
 	auto back = factory::factoryCube(BasicInfo{{0, 0, -3}, {3, 3, 0.1}, {0, -180, 0}}, {0, 1, 0, 1});
 	auto cb = em->addComponent<ColliderComponent>(back);
-    em->addComponent<PhysicComponent>(back);
+	em->addComponent<PhysicComponent>(back);
 	systems::collision::updateColliderType(back, ColliderType::COLLIDER_CUBE);
 	pw.addEntity(back);
 	scene->addEntity(shader, back);
@@ -486,7 +493,7 @@ int main(int argc, char *argv[]) {
 
 	auto front = factory::factoryCube(BasicInfo{{0, 0, 3}, {3, 3, 0.1}, {0, 0, 0}, false}, {0, 1, 0, 0});
 	auto cf = em->addComponent<ColliderComponent>(front);
-    em->addComponent<PhysicComponent>(front);
+	em->addComponent<PhysicComponent>(front);
 	systems::collision::updateColliderType(front, ColliderType::COLLIDER_CUBE);
 	pw.addEntity(front);
 	scene->addEntity(shader, front);
@@ -532,15 +539,13 @@ int main(int argc, char *argv[]) {
 	// systems::transform::addRotation(pyr, {2, 1, 0});
 	// });
 
-	ed->subscribe(event::loop::LOOP_UPDATE, []() { auto _ = systems::collision::getCollisions(); });
-
 	ed->subscribe(ENTITY_ELECTED_CHANGED, [&igEttModel]() {
 		igEttModel->setSelectedEntity(ettSelected);
 	});
 
 	ed->subscribe(event::loop::LOOP_UPDATE, [&shader, &pw]() {
 		auto time = glfwGetTime();
-		if (time - lastTime > 0.3 && time < 2) {
+		if (time - lastTime > 0.3 && time < 6) {
 			lastTime = time;
 			auto color = glm::vec4(getRandColor(), 1);
 			auto id = factory::factorySphereInstanced(BasicInfo{{}, glm::vec3{0.2}}, color);
@@ -563,7 +568,8 @@ int main(int argc, char *argv[]) {
 		systems::render::renderSkybox(skybox, skyboxShader);
 		// render other meshes
 		systems::render::renderAllMeshes();
-		systems::render::renderBoundingBox();
+		if (renderBB)
+			systems::render::renderBoundingBox();
 		systems::render::renderInstancedMeshes();
 		// normalShader->use();
 		// auto p = world.camera->getProjMatrix();

@@ -6,6 +6,7 @@
 using namespace ogl;
 
 const auto CAMERA_UPDATE_DATA = Event("Camera Update Data");
+const auto CAMERA_RESET_POSITION = Event("Camera Reset Position");
 
 class ImGuiEntityTree : public ImGuiPanel {
 public:
