@@ -109,14 +109,14 @@ void CollisionSolver::solve() {
 
 		auto ca = em->getComponentFromId<ColliderComponent>(first);
 		auto cb = em->getComponentFromId<ColliderComponent>(second);
-        if (ca->isStatic && cb->isStatic) continue;
+		if (ca->isStatic && cb->isStatic)
+			continue;
 
 		auto ta = em->getComponentFromId<Transform>(first);
 		auto tb = em->getComponentFromId<Transform>(second);
 		// collision points
 		auto p = testCollisions(ca, ta, cb, tb);
-		if ((cb->type == COLLIDER_CUBE && ca->type == COLLIDER_SPHERE)) {
-			std::cout << "iN\n";
+		if ((ca->type == COLLIDER_CUBE && cb->type == COLLIDER_SPHERE)) {
 			if (ca->isStatic) {
 				auto pa = em->getComponentFromId<PhysicComponent>(first);
 				auto pb = em->getComponentFromId<PhysicComponent>(second);
@@ -208,12 +208,9 @@ void PhysicWorld::onUpdate() {
 }
 
 void PhysicWorld::addEntity(const unsigned int &id) {
-	if (!em->entityHasComponent<PhysicComponent>(id)) {
-		em->addComponent<PhysicComponent>(id);
-	}
-	if (!em->entityHasComponent<ColliderComponent>(id)) {
-		em->addComponent<ColliderComponent>(id);
-	}
+	ASSERT(em->entityHasComponent<PhysicComponent>(id));
+	ASSERT(em->entityHasComponent<ColliderComponent>(id));
+
 	this->m_entities.push_back(id);
 }
 

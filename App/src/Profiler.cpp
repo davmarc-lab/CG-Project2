@@ -20,16 +20,16 @@ std::string filterToString(const ProfileFilter &filter) {
 void getTime(ProfileFilter &filter, std::timespec &wallTime, std::timespec &cpuTime) {
 	switch (filter) {
 		case PROFILE_WALL: {
-			// clock_gettime(CLOCK_REALTIME, &wallTime);
+			clock_gettime(CLOCK_REALTIME, &wallTime);
 			return;
 		}
 		case PROFILE_CPU: {
-			// clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &cpuTime);
+			clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &cpuTime);
 			return;
 		}
 		case PROFILE_ALL: {
-			// clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &cpuTime);
-			// clock_gettime(CLOCK_REALTIME, &wallTime);
+			clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &cpuTime);
+			clock_gettime(CLOCK_REALTIME, &wallTime);
 			return;
 		}
 	}

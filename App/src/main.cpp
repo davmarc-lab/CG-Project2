@@ -460,6 +460,7 @@ int main(int argc, char *argv[]) {
 	auto left = factory::factoryCube(BasicInfo{{-3, 0, 0}, {0.1, 3, 3}, {0, -90, 0}}, {0, 1, 0, 1});
 	auto cl = em->addComponent<ColliderComponent>(left);
 	systems::collision::updateColliderType(left, ColliderType::COLLIDER_CUBE);
+    em->addComponent<PhysicComponent>(left);
 	pw.addEntity(left);
 	scene->addEntity(shader, left);
 	cl->normal = evaluateNormal(left);
@@ -467,6 +468,7 @@ int main(int argc, char *argv[]) {
 
 	auto right = factory::factoryCube(BasicInfo{{3, 0, 0}, {0.1, 3, 3}, {0, 90, 0}}, {0, 1, 0, 1});
 	auto cr = em->addComponent<ColliderComponent>(right);
+    em->addComponent<PhysicComponent>(right);
 	systems::collision::updateColliderType(left, ColliderType::COLLIDER_CUBE);
 	pw.addEntity(right);
 	scene->addEntity(shader, right);
@@ -475,6 +477,7 @@ int main(int argc, char *argv[]) {
 
 	auto back = factory::factoryCube(BasicInfo{{0, 0, -3}, {3, 3, 0.1}, {0, -180, 0}}, {0, 1, 0, 1});
 	auto cb = em->addComponent<ColliderComponent>(back);
+    em->addComponent<PhysicComponent>(back);
 	systems::collision::updateColliderType(back, ColliderType::COLLIDER_CUBE);
 	pw.addEntity(back);
 	scene->addEntity(shader, back);
@@ -483,6 +486,7 @@ int main(int argc, char *argv[]) {
 
 	auto front = factory::factoryCube(BasicInfo{{0, 0, 3}, {3, 3, 0.1}, {0, 0, 0}, false}, {0, 1, 0, 0});
 	auto cf = em->addComponent<ColliderComponent>(front);
+    em->addComponent<PhysicComponent>(front);
 	systems::collision::updateColliderType(front, ColliderType::COLLIDER_CUBE);
 	pw.addEntity(front);
 	scene->addEntity(shader, front);
@@ -546,9 +550,9 @@ int main(int argc, char *argv[]) {
 			ss->computation = LightComputation::NONE;
 			em->addComponent<MaterialComponent>(id);
 			em->addComponent<ColliderComponent>(id);
+			em->addComponent<PhysicComponent>(id);
 			pw.addEntity(id);
-			// scene->addEntity(shader, id);
-			systems::collision::updateCollider(id);
+			scene->addEntity(shader, id);
 			systems::collision::updateColliderType(id, ColliderType::COLLIDER_SPHERE);
 			systems::physic::updateVelocity(id, getRandVelocity(time));
 		}

@@ -107,11 +107,15 @@ namespace factory {
 		systems::transform::updatePosition(id, info.position);
 		systems::transform::updateScale(id, info.scale);
 		systems::transform::updateRotation(id, info.rotation);
-        systems::transform::updateModelMatrix(id);
+		systems::transform::updateModelMatrix(id);
+
+		vc->setNormalsCoords(coords.normals);
+		vc->setTexCoords(coords.texCoords);
 
 		ogl::Renderer::instance()->appendSphere(id, systems::transform::getModelMatrix(id), color);
 
 		em->addComponent<MaterialComponent>(id);
+		em->addComponent<ColliderComponent>(id);
 		em->addComponent<InstancedComponent>(id);
 		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
 
