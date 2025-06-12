@@ -13,6 +13,61 @@ namespace ogl {
 	// error callback
 	static void errorCallback(int code, const char *description) { std::cerr << "GLFW error (" << code << ") -> (" << description << ")\n"; }
 
+	const char *getErrorSource(const GLenum &source) {
+		switch (source) {
+			case GL_DEBUG_SOURCE_API:
+				return "API";
+			case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+				return "Window System";
+			case GL_DEBUG_SOURCE_SHADER_COMPILER:
+				return "Shader Compiler";
+			case GL_DEBUG_SOURCE_THIRD_PARTY:
+				return "Third Party";
+			case GL_DEBUG_SOURCE_APPLICATION:
+				return "Application";
+			default:
+				return "Other";
+		}
+	}
+
+	const char *getErrorType(const GLenum &type) {
+		switch (type) {
+			case GL_DEBUG_TYPE_ERROR:
+				return "Error";
+			case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+				return "Deprecated Behaviour";
+			case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+				return "Undefined Behaviour";
+			case GL_DEBUG_TYPE_PORTABILITY:
+				return "Portability";
+			case GL_DEBUG_TYPE_PERFORMANCE:
+				return "Performance";
+			case GL_DEBUG_TYPE_MARKER:
+				return "Marker";
+			case GL_DEBUG_TYPE_PUSH_GROUP:
+				return "Push Group";
+			case GL_DEBUG_TYPE_POP_GROUP:
+				return "Pop Group";
+			default:
+				return "Other";
+		}
+	}
+
+	// TODO : Try to implement a macro for the string created (or use streams)
+	void glDebugOutput(const GLenum source, const GLenum type, const unsigned int id, const GLenum severity, const GLsizei length, const char *message, const void *userParam) {
+		// ignore non-significant error/warning codes
+		if (id == 131169 || id == 131185 || id == 131218 || id == 131204)
+			return;
+
+		// It should be fine using a temporary string to print debug information.
+		{
+			const auto msg = "GLFW Debug Output:\n" + std::string("Code (") + std::to_string(id) + "): " + message + "\n" + "Source: " + getErrorSource(source) + "\n" + "Type: " + getErrorType(type) + "\n" + "File: " + __FILE_NAME__;
+
+			std::cout << "---" << severity << "---\n"
+					  << msg << "\n";
+		}
+	}
+
 	// resize Callback
 	static void resizeCallback(GLFWwindow *window, int width, int height) {
 		glViewport(0, 0, width, height);
@@ -120,6 +175,7 @@ namespace ogl {
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
+        // error callback
 		glfwSetErrorCallback(errorCallback);
 
 		this->m_context = glfwCreateWindow(this->m_settings.size.x, this->m_settings.size.y, this->m_settings.name.c_str(),
@@ -145,8 +201,6 @@ namespace ogl {
 		if (this->m_settings.vsync)
 			glfwSwapInterval(1);
 
-		// icon???
-
 		// init glad for this context
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 			/* BT_ERROR_CORE("Failed to initialize GLAD."); */
@@ -165,9 +219,18 @@ namespace ogl {
 		// cursor position callback
 		glfwSetCursorPosCallback(this->m_context, cursorPosCallback);
 
-		// error callback
-
 		// debug callback
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+
+		int debugFlags;
+		glGetIntegerv(GL_CONTEXT_FLAGS, &debugFlags);
+
+		if (debugFlags & GL_CONTEXT_FLAG_DEBUG_BIT) {
+			glEnable(GL_DEBUG_OUTPUT);
+			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+			glDebugMessageCallback(glDebugOutput, nullptr);
+			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+		}
 
 		// enable blend
 		glEnable(GL_BLEND);

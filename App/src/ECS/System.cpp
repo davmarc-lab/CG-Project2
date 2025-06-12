@@ -324,8 +324,8 @@ namespace systems {
 						}
 					}
 					if (isColliding(first, other)) {
-						if (std::find(ALL(coll), Pair<unsigned int>{first, other}) == coll.end() &&
-							std::find(ALL(coll), Pair<unsigned int>{other, first}) == coll.end()) {
+						if (!(std::find(ALL(coll), Pair<unsigned int>{first, other}) != coll.end() ||
+							std::find(ALL(coll), Pair<unsigned int>{other, first}) != coll.end())) {
 							coll.push_back({first, other});
 						}
 					}

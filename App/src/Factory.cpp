@@ -116,7 +116,7 @@ namespace factory {
 
 		em->addComponent<MaterialComponent>(id);
 		em->addComponent<ColliderComponent>(id);
-		em->addComponent<InstancedComponent>(id);
+		em->addComponent<InstancedComponent>(id, ogl::RenderPrimitiveType::PRIMITIVE_SPHERE);
 		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
 
 		return id;

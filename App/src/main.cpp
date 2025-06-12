@@ -545,7 +545,7 @@ int main(int argc, char *argv[]) {
 
 	ed->subscribe(event::loop::LOOP_UPDATE, [&shader, &pw]() {
 		auto time = glfwGetTime();
-		if (time - lastTime > 0.3 && time < 6) {
+		/* if (time - lastTime > 0.3 && time < 6) {
 			lastTime = time;
 			auto color = glm::vec4(getRandColor(), 1);
 			auto id = factory::factorySphereInstanced(BasicInfo{{}, glm::vec3{0.2}}, color);
@@ -560,7 +560,7 @@ int main(int argc, char *argv[]) {
 			scene->addEntity(shader, id);
 			systems::collision::updateColliderType(id, ColliderType::COLLIDER_SPHERE);
 			systems::physic::updateVelocity(id, getRandVelocity(time));
-		}
+		} */
 	});
 
 	ed->subscribe(event::loop::LOOP_RENDER, [&normalShader, &skyboxShader, &left, &skybox]() {

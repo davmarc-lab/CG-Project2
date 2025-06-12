@@ -158,6 +158,29 @@ namespace ogl {
 		glVertexAttribDivisor(8, 1);
 	}
 
+	void Renderer::appendCube(const unsigned int &id, const glm::mat4 &model, const glm::vec4 &color) {
+		ASSERT(this->m_init);
+		this->m_stats.numCubes++;
+		this->m_cube.index.push_back(id);
+		this->m_cube.modelOffset.push_back(model);
+		this->m_cube.colorOffset.push_back(color);
+        this->m_cube.vao.bind();
+		this->m_cube.vboco.bind();
+		this->m_cube.vboco.setup(this->m_cube.colorOffset.data(), this->m_cube.colorOffset.size(), GL_STATIC_DRAW);
+		this->m_cube.vao.linkAttribFast(4, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		glVertexAttribDivisor(4, 1);
+
+		this->m_cube.vbomo.setup(this->m_cube.modelOffset.data(), this->m_cube.modelOffset.size(), GL_STATIC_DRAW);
+		this->m_cube.vao.linkAttribFast(5, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void *)0);
+		this->m_cube.vao.linkAttribFast(6, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void *)(sizeof(glm::vec4)));
+		this->m_cube.vao.linkAttribFast(7, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void *)(2 * sizeof(glm::vec4)));
+		this->m_cube.vao.linkAttribFast(8, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(glm::vec4), (void *)(3 * sizeof(glm::vec4)));
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+		glVertexAttribDivisor(7, 1);
+		glVertexAttribDivisor(8, 1);
+	}
+
 	void Renderer::prepareBuffers(const std::vector<glm::mat4>& models, const std::vector<glm::vec4>& colors) {
 		ASSERT(this->m_init);
 		if (this->m_stats.numSpheres) {
@@ -165,6 +188,12 @@ namespace ogl {
 			this->m_sphere.vbomo.setup(models.data(), models.size(), GL_STATIC_DRAW);
 			this->m_sphere.vboco.bind();
 			this->m_sphere.vboco.setup(colors.data(), colors.size(), GL_STATIC_DRAW);
+		}
+		if (this->m_stats.numCubes) {
+			this->m_cube.vbomo.bind();
+			this->m_cube.vbomo.setup(models.data(), models.size(), GL_STATIC_DRAW);
+			this->m_cube.vboco.bind();
+			this->m_cube.vboco.setup(colors.data(), colors.size(), GL_STATIC_DRAW);
 		}
 	}
 

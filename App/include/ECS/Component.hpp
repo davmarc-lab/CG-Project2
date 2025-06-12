@@ -284,10 +284,11 @@ private:
 
 class InstancedComponent : public Component {
 public:
-	InstancedComponent() :
-		Component() {}
+	InstancedComponent(const ogl::RenderPrimitiveType &type) :
+		type(type), Component() {}
 
 	virtual ~InstancedComponent() override = default;
+	ogl::RenderPrimitiveType type;
 };
 
 class Outlined : public Component {

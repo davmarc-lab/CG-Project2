@@ -40,11 +40,21 @@ namespace ogl {
 		unsigned int numThorus = 0;
 	};
 
+	enum RenderPrimitiveType {
+		PRIMITIVE_CUBE,
+		PRIMITIVE_SPHERE,
+		PRIMITIVE_PYRAMID,
+		PRIMITIVE_THORUS,
+	};
+
 	class Renderer {
 	public:
 		void init();
 
 		void appendSphere(const unsigned int &id, const glm::mat4 &model, const glm::vec4 &color);
+		void appendCube(const unsigned int &id, const glm::mat4 &model, const glm::vec4 &color);
+		void appendPyramid(const unsigned int &id, const glm::mat4 &model, const glm::vec4 &color);
+		void appendThorus(const unsigned int &id, const glm::mat4 &model, const glm::vec4 &color);
 
 		void drawArrays(const unsigned int &vao, const unsigned int &mode, const int &first, const size_t &size);
 
@@ -52,7 +62,7 @@ namespace ogl {
 
 		void drawAllInstanced();
 
-		void prepareBuffers(const std::vector<glm::mat4>& models, const std::vector<glm::vec4>& colors);
+		void prepareBuffers(const std::vector<glm::mat4> &models, const std::vector<glm::vec4> &colors);
 
 		RendererStats getRendererStats() const { return this->m_stats; }
 
@@ -60,6 +70,7 @@ namespace ogl {
 			this->m_stats.numCubes = 0;
 			this->m_stats.numPyramids = 0;
 			this->m_stats.numSpheres = 0;
+			this->m_stats.numThorus = 0;
 		}
 
 		Renderer(Renderer &other) = delete;
