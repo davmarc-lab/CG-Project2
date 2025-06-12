@@ -61,7 +61,7 @@ namespace ogl {
 
 		// It should be fine using a temporary string to print debug information.
 		{
-			const auto msg = "GLFW Debug Output:\n" + std::string("Code (") + std::to_string(id) + "): " + message + "\n" + "Source: " + getErrorSource(source) + "\n" + "Type: " + getErrorType(type) + "\n" + "File: " + __FILE_NAME__;
+			const auto msg = "GLFW Debug Output:\n" + std::string("Code (") + std::to_string(id) + "): " + message + "\n" + "Source: " + getErrorSource(source) + "\n" + "Type: " + getErrorType(type) + "\n" + "File: " + __FILE__;
 
 			std::cout << "---" << severity << "---\n"
 					  << msg << "\n";

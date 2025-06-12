@@ -39,7 +39,12 @@ std::array<std::string, 3> names{"Input", "Update", "Render"};
 std::vector<glm::mat4> sphereModels{};
 std::vector<glm::vec4> sphereColors{};
 
-Profiler profiler{PROFILE_ALL};
+#ifdef _WIN32
+WProfiler profiler{PROFILE_ALL};
+#else
+LinuxProfiler profiler{PROFILE_ALL};
+#endif
+
 
 float lastTime = 0;
 unsigned int plane;
@@ -364,15 +369,17 @@ glm::vec3 evaluateNormal(const unsigned int &id) {
 }
 
 int main(int argc, char *argv[]) {
+	#ifndef _WIN32
 	std::cout << std::fixed << std::setprecision(10);
+	#endif
 	srand(time(NULL));
 	WindowSettings s{};
 	s.decorated = false;
 	s.size = {1366, 768};
 	s.position = {400, 12};
-#ifdef _WIN32
+	#ifdef _WIN32
 	s.position = {470, 50};
-#endif
+	#endif
 	s.focused = true;
 
 	Window w{s};
@@ -545,7 +552,7 @@ int main(int argc, char *argv[]) {
 
 	ed->subscribe(event::loop::LOOP_UPDATE, [&shader, &pw]() {
 		auto time = glfwGetTime();
-		/* if (time - lastTime > 0.3 && time < 6) {
+		if (time - lastTime > 0.3 && time < 6) {
 			lastTime = time;
 			auto color = glm::vec4(getRandColor(), 1);
 			auto id = factory::factorySphereInstanced(BasicInfo{{}, glm::vec3{0.2}}, color);
@@ -560,7 +567,7 @@ int main(int argc, char *argv[]) {
 			scene->addEntity(shader, id);
 			systems::collision::updateColliderType(id, ColliderType::COLLIDER_SPHERE);
 			systems::physic::updateVelocity(id, getRandVelocity(time));
-		} */
+		}
 	});
 
 	ed->subscribe(event::loop::LOOP_RENDER, [&normalShader, &skyboxShader, &left, &skybox]() {
