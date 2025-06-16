@@ -45,7 +45,6 @@ WProfiler profiler{PROFILE_ALL};
 LinuxProfiler profiler{PROFILE_ALL};
 #endif
 
-
 float lastTime = 0;
 unsigned int plane;
 
@@ -369,17 +368,17 @@ glm::vec3 evaluateNormal(const unsigned int &id) {
 }
 
 int main(int argc, char *argv[]) {
-	#ifndef _WIN32
+#ifndef _WIN32
 	std::cout << std::fixed << std::setprecision(10);
-	#endif
+#endif
 	srand(time(NULL));
 	WindowSettings s{};
 	s.decorated = false;
 	s.size = {1366, 768};
 	s.position = {400, 12};
-	#ifdef _WIN32
+#ifdef _WIN32
 	s.position = {470, 50};
-	#endif
+#endif
 	s.focused = true;
 
 	Window w{s};
