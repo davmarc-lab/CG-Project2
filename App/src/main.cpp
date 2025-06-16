@@ -470,64 +470,36 @@ int main(int argc, char *argv[]) {
 	scene->addEntity(shader, plane);
 	pw.addEntity(plane);
 
-	auto left = factory::factoryCube(BasicInfo{{-3, 0, 0}, {0.1, 3, 3}, {0, -90, 0}}, {0, 1, 0, 1});
-	auto cl = em->addComponent<ColliderComponent>(left);
-	systems::collision::updateColliderType(left, ColliderType::COLLIDER_CUBE);
-	em->addComponent<PhysicComponent>(left);
-	pw.addEntity(left);
-	scene->addEntity(shader, left);
-	cl->normal = evaluateNormal(left);
-	systems::collision::updateSimulated(left, false);
-
-	auto right = factory::factoryCube(BasicInfo{{3, 0, 0}, {0.1, 3, 3}, {0, 90, 0}}, {0, 1, 0, 1});
-	auto cr = em->addComponent<ColliderComponent>(right);
-	em->addComponent<PhysicComponent>(right);
-	systems::collision::updateColliderType(left, ColliderType::COLLIDER_CUBE);
-	pw.addEntity(right);
-	scene->addEntity(shader, right);
-	cr->normal = evaluateNormal(right);
-	systems::collision::updateSimulated(right, false);
-
-	auto back = factory::factoryCube(BasicInfo{{0, 0, -3}, {3, 3, 0.1}, {0, -180, 0}}, {0, 1, 0, 1});
-	auto cb = em->addComponent<ColliderComponent>(back);
-	em->addComponent<PhysicComponent>(back);
-	systems::collision::updateColliderType(back, ColliderType::COLLIDER_CUBE);
-	pw.addEntity(back);
-	scene->addEntity(shader, back);
-	cb->normal = evaluateNormal(back);
-	systems::collision::updateSimulated(back, false);
-
-	auto front = factory::factoryCube(BasicInfo{{0, 0, 3}, {3, 3, 0.1}, {0, 0, 0}, false}, {0, 1, 0, 0});
-	auto cf = em->addComponent<ColliderComponent>(front);
-	em->addComponent<PhysicComponent>(front);
-	systems::collision::updateColliderType(front, ColliderType::COLLIDER_CUBE);
-	pw.addEntity(front);
-	scene->addEntity(shader, front);
-	cf->normal = evaluateNormal(front);
-	systems::collision::updateSimulated(front, false);
-
 	auto shape = factory::factorySphere(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
-	em->addComponent<MaterialComponent>(shape);
+	systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_EMERALD));
 	em->addComponent<ColliderComponent>(shape);
-	systems::ecs::updateEntityName(shape, "Cube");
+	em->addComponent<TextureComponent>(shape, "./resources/texture/grass.png");
+
+	TextureParams tp{};
+	tp.format = GL_RGBA;
+	tp.internalFormat = GL_RGBA;
+	tp.border = 0;
+	tp.dataType = GL_UNSIGNED_BYTE;
+	tp.level = 0;
+	tp.target = GL_TEXTURE_2D;
+
+	int width, height, nC;
+	auto data = readImageData("./resources/texture/grass.png", width, height, nC);
+	ogl::Texture t{tp, (unsigned int)width, (unsigned int)height};
+	t.onAttach();
+	t.createTexture2D(data);
+	t.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+	t.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+	t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	t.generateMipmap();
+
+	systems::texture::setTexture(shape, t);
+	systems::ecs::updateEntityName(shape, "Sphere");
 	auto sc = em->getComponentFromId<ShaderComponent>(shape);
 	sc->computation = LightComputation::PHONG;
-	sc->reflective = true;
-
-	// auto inst = factory::factorySphereInstanced(BasicInfo{});
-
-	// auto tree = factory::factoryTree(BasicInfo{{0, 1, 4}});
-	// scene->addEntity(lightShader, tree);
-	// {
-	// 	auto sc = em->getComponentFromId<ShaderComponent>(tree);
-	//        sc->computation = LightComputation::NONE;
-	// }
-
-	// auto obj = factory::factoryObjMesh(BasicInfo{}, "./resources/models/car/car.obj");
-	// em->addComponent<ColliderComponent>(obj);
-	// systems::ecs::updateEntityName(obj, "Car");
-	// scene->addEntity(modelShader, obj);
+	sc->reflective = false;
 
 	auto id = factory::light::factoryDirectional({1, 0, 0});
 
@@ -541,35 +513,11 @@ int main(int argc, char *argv[]) {
 		ub.update(0, sizeof(glm::mat4), glm::value_ptr(vp));
 	});
 
-	// ed->subscribe(event::loop::LOOP_UPDATE, [&pyr]() {
-	// systems::transform::addRotation(pyr, {2, 1, 0});
-	// });
-
 	ed->subscribe(ENTITY_ELECTED_CHANGED, [&igEttModel]() {
 		igEttModel->setSelectedEntity(ettSelected);
 	});
 
-	ed->subscribe(event::loop::LOOP_UPDATE, [&shader, &pw]() {
-		auto time = glfwGetTime();
-		if (time - lastTime > 0.3 && time < 6) {
-			lastTime = time;
-			auto color = glm::vec4(getRandColor(), 1);
-			auto id = factory::factorySphereInstanced(BasicInfo{{}, glm::vec3{0.2}}, color);
-			sphereModels.push_back(systems::transform::getModelMatrix(id));
-			sphereColors.push_back(color);
-			auto ss = em->getComponentFromId<ShaderComponent>(id);
-			ss->computation = LightComputation::NONE;
-			em->addComponent<MaterialComponent>(id);
-			em->addComponent<ColliderComponent>(id);
-			em->addComponent<PhysicComponent>(id);
-			pw.addEntity(id);
-			scene->addEntity(shader, id);
-			systems::collision::updateColliderType(id, ColliderType::COLLIDER_SPHERE);
-			systems::physic::updateVelocity(id, getRandVelocity(time));
-		}
-	});
-
-	ed->subscribe(event::loop::LOOP_RENDER, [&normalShader, &skyboxShader, &left, &skybox]() {
+	ed->subscribe(event::loop::LOOP_RENDER, [&normalShader, &skyboxShader, &skybox]() {
 		// render skybox
 		systems::render::renderSkybox(skybox, skyboxShader);
 		// render other meshes

@@ -104,6 +104,7 @@ namespace systems {
 
 	namespace material {
 		Material getMaterial(const unsigned int &id);
+        std::string getMaterialName(const unsigned int &id);
 		void updateAmbient(const unsigned int &id, const glm::vec3 &val);
 		void updateDiffuse(const unsigned int &id, const glm::vec3 &val);
 		void updateSpecular(const unsigned int &id, const glm::vec3 &val);

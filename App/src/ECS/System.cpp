@@ -325,7 +325,7 @@ namespace systems {
 					}
 					if (isColliding(first, other)) {
 						if (!(std::find(ALL(coll), Pair<unsigned int>{first, other}) != coll.end() ||
-							std::find(ALL(coll), Pair<unsigned int>{other, first}) != coll.end())) {
+							  std::find(ALL(coll), Pair<unsigned int>{other, first}) != coll.end())) {
 							coll.push_back({first, other});
 						}
 					}
@@ -481,6 +481,13 @@ namespace systems {
 			return c->material;
 		}
 
+		std::string getMaterialName(const unsigned int &id) {
+			auto c = em->getComponentFromId<MaterialComponent>(id);
+			ASSERT(c != nullptr);
+
+			return c->material.name;
+		}
+
 		void updateAmbient(const unsigned int &id, const glm::vec3 &val) {
 			auto c = em->getComponentFromId<MaterialComponent>(id);
 			ASSERT(c != nullptr);
@@ -622,7 +629,7 @@ namespace systems {
 			stencil.createShaderProgram();
 		}
 
-		void prepareInstancedMesh(const std::vector<glm::mat4>& models, const std::vector<glm::vec4>& colors) {
+		void prepareInstancedMesh(const std::vector<glm::mat4> &models, const std::vector<glm::vec4> &colors) {
 			ogl::Renderer::instance()->prepareBuffers(models, colors);
 		}
 
@@ -881,7 +888,6 @@ namespace systems {
 
 				defaultShader.vboc.setup(defaultShader.colors.data(), defaultShader.colors.size(), GL_STATIC_DRAW);
 				defaultShader.vao.linkAttribFast(1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-
 			}
 
 			defaultShader.program.use();

@@ -17,6 +17,9 @@ public:
 	}
 
 	virtual ~ImGuiEntityTree() override = default;
+
+private:
+	unsigned int m_selectedMaterial = 0;
 };
 
 class ImGuiEntityModel : public ImGuiPanel {
@@ -34,4 +37,3 @@ public:
 private:
 	int m_ett = -1;
 };
-

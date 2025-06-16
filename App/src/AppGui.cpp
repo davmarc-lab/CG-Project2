@@ -65,6 +65,28 @@ void ImGuiEntityTree::onRender() {
 			if (em->entityHasComponent<MaterialComponent>(id)) {
 				if (ImGui::CollapsingHeader("Material##1")) {
 					auto m = systems::material::getMaterial(id);
+					static char matName[256] = "";
+
+                    // Input Text for new material name
+					ImGui::InputText("", matName, IM_ARRAYSIZE(matName));
+					if (ImGui::Button("Create##1")) {
+						if (!std::string(matName).empty()) {
+							auto nm = Material();
+							nm.name = matName;
+							systems::material::updateMaterial(id, nm);
+						}
+					}
+                    ImGui::SameLine();
+					// Save current Material with the `matName` given
+					if (ImGui::Button("Save##1")) {
+						if (std::find(ALL(material::defaultMaterials), m) == material::defaultMaterials.end()) {
+							material::defaultMaterials.push_back(m);
+							material::materialTypes.push_back(material::defaultMaterials.size() - 1);
+						}
+					}
+
+					// Material Name OUT
+					ImGui::Text("Name: %s", m.name.c_str());
 					if (ImGui::SliderFloat3("Ambient##1", &m.ambient.x, 0.f, 1.f)) {
 						systems::material::updateAmbient(id, m.ambient);
 					}
@@ -76,6 +98,22 @@ void ImGuiEntityTree::onRender() {
 					}
 					if (ImGui::DragFloat("Shininess##1", &m.shininess, 0.5f)) {
 						systems::material::updateShininess(id, m.shininess);
+					}
+
+					if (ImGui::BeginCombo("Choose##1", "Materials")) {
+						// Opens a list of default materials, and apply changes when one is clicked.
+						for (int i = 0; i < material::defaultMaterials.size(); i++) {
+							if (ImGui::Selectable(material::defaultMaterials[i].name.c_str(), (this->m_selectedMaterial == i))) {
+								this->m_selectedMaterial = i;
+								systems::material::updateMaterial(id, material::getMaterialFromPool((material::MaterialType)this->m_selectedMaterial));
+							}
+
+							// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+							if (this->m_selectedMaterial == i) {
+								ImGui::SetItemDefaultFocus();
+							}
+						}
+						ImGui::EndCombo();
 					}
 				}
 			}

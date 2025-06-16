@@ -305,17 +305,56 @@ struct Material {
 	glm::vec3 diffuse{0.55f};
 	glm::vec3 specular{0.7f};
 	float shininess = 32.f;
+	std::string name{"New Material"};
+
+	Material() = default;
+	Material(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular, const float shininess, const std::string &name) :
+		ambient(ambient), diffuse(diffuse), specular(specular), shininess(shininess), name(std::move(name)) {}
+
+	bool operator==(const Material &other) {
+		return this->name == other.name;
+	}
 };
+
+namespace material {
+
+	enum MaterialType : unsigned int {
+		MATERIAL_NONE = 0,
+		MATERIAL_RPLASTIC,
+		MATERIAL_YPLASTIC,
+		MATERIAL_SLATE,
+		MATERIAL_BRASS,
+		MATERIAL_EMERALD,
+	};
+
+	inline std::vector<unsigned int> materialTypes{MATERIAL_NONE, MATERIAL_RPLASTIC, MATERIAL_YPLASTIC, MATERIAL_SLATE, MATERIAL_BRASS, MATERIAL_EMERALD};
+
+	inline std::vector<Material> defaultMaterials = {
+		Material(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 32.0f, "None"),
+		Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.7f, 0.6f, 0.6f), 32.0f, "Red Plastic"),
+		Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(0.60f, 0.60f, 0.50f), 32.0f, "Yellow Plastic"),
+		Material(glm::vec3(0.02f, 0.02f, 0.02f), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.4f, 0.4f, 0.4f), 1.78125f, "Slate"),
+		Material(glm::vec3(0.329412f, 0.223529f, 0.027451f), glm::vec3(0.780392f, 0.568627f, 0.113725f), glm::vec3(0.992157f, 0.941176f, 0.807843f), 27.8974f, "Brass"),
+		Material(glm::vec3(0.0215f, 0.1745f, 0.0215f), glm::vec3(0.07568f, 0.61424f, 0.07568f), glm::vec3(0.633f, 0.727811f, 0.633f), 76.8f, "Emerald"),
+	};
+
+	inline Material getMaterialFromPool(const MaterialType &index) { return defaultMaterials[index]; }
+
+} // namespace material
 
 class MaterialComponent : public Component {
 public:
-	MaterialComponent() :
-		Component() {
+	MaterialComponent(const Material &material = material::defaultMaterials[0]) :
+		Component(), material(material) {
+	}
+
+	MaterialComponent(const material::MaterialType &type) :
+		Component(), material(material::getMaterialFromPool(type)) {
 	}
 
 	virtual ~MaterialComponent() = default;
 
-	Material material{};
+	Material material;
 };
 
 class LightComponent : public Component {
