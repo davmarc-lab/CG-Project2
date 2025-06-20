@@ -71,6 +71,9 @@ namespace ogl {
 			return elem;
 		}
 
+		bool removePanel() {
+		}
+
 		std::vector<Shared<ImGuiPanel>> getPanels(const unsigned short &priority) { return {this->m_panels.at(priority)}; }
 
 		virtual void onAttach() override;

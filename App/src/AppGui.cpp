@@ -67,7 +67,7 @@ void ImGuiEntityTree::onRender() {
 					auto m = systems::material::getMaterial(id);
 					static char matName[256] = "";
 
-                    // Input Text for new material name
+					// Input Text for new material name
 					ImGui::InputText("", matName, IM_ARRAYSIZE(matName));
 					if (ImGui::Button("Create##1")) {
 						if (!std::string(matName).empty()) {
@@ -76,7 +76,7 @@ void ImGuiEntityTree::onRender() {
 							systems::material::updateMaterial(id, nm);
 						}
 					}
-                    ImGui::SameLine();
+					ImGui::SameLine();
 					// Save current Material with the `matName` given
 					if (ImGui::Button("Save##1")) {
 						if (std::find(ALL(material::defaultMaterials), m) == material::defaultMaterials.end()) {
@@ -298,4 +298,9 @@ void ImGuiEntityModel::onRender() {
 
 		ImGui::End();
 	}
+}
+
+void ImGuiNormalView::onRender() {
+	ImGui::Begin("Normals");
+	ImGui::End();
 }

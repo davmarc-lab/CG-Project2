@@ -37,3 +37,13 @@ public:
 private:
 	int m_ett = -1;
 };
+
+class ImGuiNormalView : ImGuiPanel {
+public:
+	virtual void onRender() override;
+
+	ImGuiNormalView() = default;
+	virtual ~ImGuiNormalView() override = default;
+
+private:
+};
