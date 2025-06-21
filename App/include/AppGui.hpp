@@ -14,6 +14,8 @@ class ImGuiEntityTree : public ImGuiPanel {
 public:
 	virtual void onRender() override;
 
+	void setSelectedEntity(const int &ett) { this->m_inputEtt = ett; }
+
 	ImGuiEntityTree() :
 		ImGuiPanel("Entity Tree") {
 	}
@@ -21,30 +23,15 @@ public:
 	virtual ~ImGuiEntityTree() override = default;
 
 private:
+	int m_inputEtt = -1;
 	unsigned int m_selectedMaterial = 0;
-};
-
-class ImGuiEntityModel : public ImGuiPanel {
-public:
-	void setSelectedEntity(const int &ett) { this->m_ett = ett; }
-
-	virtual void onRender() override;
-
-	ImGuiEntityModel() :
-		ImGuiPanel("Entity Tree") {
-	}
-
-	virtual ~ImGuiEntityModel() override = default;
-
-private:
-	int m_ett = -1;
 };
 
 class ImGuiNormalView : public ImGuiPanel {
 public:
 	virtual void onRender() override;
 
-	void setInputCallbacks(ogl::Window &w);
+	void processInput();
 
 	ImGuiNormalView();
 	virtual ~ImGuiNormalView() override = default;
@@ -53,5 +40,6 @@ private:
 	Unique<ogl::FrameBuffer> m_fbo;
 	ogl::Texture m_text;
 	Unique<ogl::ShaderProgram> m_shader;
-	Unique<ogl::Camera> m_npcam;
+	Unique<ogl::ShaderProgram> m_nshader;
+    Unique<ogl::Camera> m_npcam;
 };

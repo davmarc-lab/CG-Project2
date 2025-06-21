@@ -294,33 +294,6 @@ void ImGuiEntityTree::onRender() {
 	ImGui::End();
 }
 
-void ImGuiEntityModel::onRender() {
-	if (this->m_ett >= 0) {
-		ImGui::Begin("Model", NULL, ImGuiWindowFlags_NoFocusOnAppearing);
-		ImGui::PushID(&this->m_ett);
-		ImGui::Text("(ECS) Entity Id: %s", std::to_string(this->m_ett).c_str());
-		auto pos = systems::transform::getPosition(this->m_ett);
-		if (ImGui::DragFloat3("Position", &pos.x, 0.2f)) {
-			systems::transform::updatePosition(this->m_ett, pos);
-			if (em->entityHasComponent<PhysicComponent>(this->m_ett))
-				systems::physic::resetGravitySolver(this->m_ett);
-		}
-
-		auto scale = systems::transform::getScale(this->m_ett);
-		if (ImGui::DragFloat3("Scale", &scale.x, 0.2f)) {
-			systems::transform::updateScale(this->m_ett, scale);
-		}
-
-		auto rot = glm::degrees(systems::transform::getRotation(this->m_ett));
-		if (ImGui::DragFloat3("Rotation", &rot.x)) {
-			systems::transform::updateRotation(this->m_ett, rot);
-		}
-		ImGui::PopID();
-
-		ImGui::End();
-	}
-}
-
 ImGuiNormalView::ImGuiNormalView() {
 	FBConfig fconf{};
 	fconf.height = 20;
@@ -359,52 +332,70 @@ ImGuiNormalView::ImGuiNormalView() {
 	ASSERT(res);
 
 	this->m_npcam = CreateUnique<ogl::Camera>();
+	this->m_npcam->setCameraVelocity(0.05f);
+	this->m_npcam->setCameraPosition(glm::vec3{0, 0, 3});
 
 	this->m_shader = CreateUnique<ogl::ShaderProgram>("basicVS.glsl", "basicFS.glsl");
 	this->m_shader->createShaderProgram();
+	this->m_nshader = CreateUnique<ShaderProgram>("normalVertShader.glsl", "normalFragShader.glsl", "normalGeomShader.glsl");
+	this->m_nshader->createShaderProgram();
 }
 
 double npxpos, npypos;
 bool npmfirst = true;
 
-void ImGuiNormalView::setInputCallbacks(ogl::Window &w) {
-	w.setCursorPosCallback([this, &w](GLFWwindow *window, double x, double y) {
-		if (npmfirst) {
-			npxpos = x;
-			npypos = y;
-			npmfirst = false;
-			return;
-		}
-		auto offset = glm::vec3(x - npxpos, this->m_fbo->getHeight() - (y - npxpos), 0);
-		// this->m_npcam->moveCamera(glm::normalize(offset));
-	});
+const auto im = InputManager::instance();
+
+void ImGuiNormalView::processInput() {
+	if (ImGui::IsKeyDown(ImGuiKey_W)) {
+		this->m_npcam->moveCamera(this->m_npcam->getCameraUp());
+	}
+	if (ImGui::IsKeyDown(ImGuiKey_S)) {
+		this->m_npcam->moveCamera(-this->m_npcam->getCameraUp());
+	}
+	if (ImGui::IsKeyDown(ImGuiKey_A)) {
+		this->m_npcam->moveCamera(-this->m_npcam->getCameraRight());
+	}
+	if (ImGui::IsKeyDown(ImGuiKey_D)) {
+		this->m_npcam->moveCamera(this->m_npcam->getCameraRight());
+	}
+
+	// w.setCursorPosCallback([this, &w](GLFWwindow *window, double x, double y) {
+	// 	if (npmfirst) {
+	// 		npxpos = x;
+	// 		npypos = y;
+	// 		npmfirst = false;
+	// 		return;
+	// 	}
+	// 	auto offset = glm::vec3(x - npxpos, this->m_fbo->getHeight() - (y - npxpos), 0);
+	// 	// this->m_npcam->moveCamera(glm::normalize(offset));
+	// });
 }
 
 ImVec2 npsize;
 glm::mat4 npmodel{};
-glm::vec3 npscale{0.5};
+glm::vec3 npscale{0.3};
 glm::vec3 nprot{};
 ImGuiTableFlags tflag = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInner | ImGuiTableFlags_BordersOuter;
 
 void ImGuiNormalView::onRender() {
 	// framebuffer space
-    if (InputManager::instance()->isKeyPressed(GLFW_KEY_W)) {
-        this->m_npcam->moveCamera(glm::vec3{0, 1, 0});
-    }
-    if (InputManager::instance()->isKeyPressed(GLFW_KEY_S)) {
-        this->m_npcam->moveCamera(glm::vec3{0, -1, 0});
-    }
+	if (InputManager::instance()->isKeyPressed(GLFW_KEY_W)) {
+		this->m_npcam->moveCamera(glm::vec3{0, 1, 0});
+	}
+	if (InputManager::instance()->isKeyPressed(GLFW_KEY_S)) {
+		this->m_npcam->moveCamera(glm::vec3{0, -1, 0});
+	}
 	ImGui::Begin("Normals");
 	ImGui::BeginChild("Render");
 	// resize the framebuffer
-	npsize = ImGui::GetContentRegionAvail();
+	npsize = ImGui::GetWindowSize();
 	this->m_fbo->rescaleFrameBuffer(npsize.x, npsize.y);
 	ImGui::Image((ImTextureID)this->m_text.getId(), npsize, ImVec2(0, 1), ImVec2(1, 0));
 	ImGui::EndChild();
 
 	auto rc = em->getComponentFromId<RenderComponent>(npent);
 	if (rc != nullptr) {
-		this->m_npcam->setCameraPosition(glm::vec3{0, 0, 3});
 		this->m_npcam->updatePerspProjection(45.f, npsize.x / npsize.y, 0.01f, 10.f);
 
 		npmodel = glm::translate(glm::mat4{1}, glm::vec3{0});
@@ -415,7 +406,11 @@ void ImGuiNormalView::onRender() {
 		this->m_shader->use();
 		this->m_shader->setMat4("viewProj", this->m_npcam->getViewProjMatrix());
 		this->m_shader->setMat4("model", npmodel);
-		this->m_shader->setFloat("ratio", npsize.x / npsize.y);
+		rc->call();
+		this->m_nshader->use();
+		this->m_nshader->setMat4("view", this->m_npcam->getViewMatrix());
+		this->m_nshader->setMat4("proj", this->m_npcam->getProjMatrix());
+		this->m_nshader->setMat4("model", npmodel);
 		rc->call();
 		this->m_fbo->unbind();
 	}

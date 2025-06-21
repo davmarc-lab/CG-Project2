@@ -1,4 +1,7 @@
+#include <utility>
 #include "../../Opengl-Core/include/Core.hpp"
+
+#define BIG
 
 #include "../include/ECS/EcsScene.hpp"
 #include "../include/ECS/EntityManager.hpp"
@@ -10,6 +13,7 @@
 #include "../include/PhysicWorld.hpp"
 #include "../include/Profiler.hpp"
 
+#include <GLFW/glfw3.h>
 #include <algorithm>
 #include <array>
 #include <functional>
@@ -27,6 +31,8 @@ const auto im = InputManager::instance();
 const auto em = EntityManager::instance();
 const auto scene = BasicScene::instance();
 
+const auto INPUT_NORMAL_VIEW_OPEN = Event("Input in Normal View Start");
+const auto INPUT_NORMAL_VIEW_CLOSE = Event("Input in Normal View Stop");
 const auto ENTITY_ELECTED_CHANGED = Event("Entity Selected Changed");
 const auto CAMERA_START_POSITION = glm::vec3{0, 1, 12};
 
@@ -393,6 +399,29 @@ void defaultKeyCallback(Window &w) {
 	});
 }
 
+class CustomLayer : public Layer {
+public:
+	virtual void onAttach() override {}
+	virtual void onDetach() override {}
+
+	virtual void onUpdate() override {
+		if (this->m_run)
+			this->m_updateFun();
+	}
+
+	void setRunnig(const bool &run) { this->m_run = run; }
+	void setUpdateFun(std::function<void()> &&fun) { this->m_updateFun = std::move(fun); }
+
+	CustomLayer() :
+		Layer("Custom Layer") {}
+
+	virtual ~CustomLayer() override = default;
+
+private:
+	bool m_run = false;
+	std::function<void()> m_updateFun{};
+};
+
 int main(int argc, char *argv[]) {
 #ifndef _WIN32
 	std::cout << std::fixed << std::setprecision(10);
@@ -402,6 +431,10 @@ int main(int argc, char *argv[]) {
 	s.decorated = false;
 	s.size = {1366, 768};
 	s.position = {400, 12};
+
+#ifdef BIG
+	s.position = {10, 606};
+#endif // BIG
 #ifdef _WIN32
 	s.position = {470, 50};
 #endif
@@ -425,8 +458,8 @@ int main(int argc, char *argv[]) {
 	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, [&igm]() { igm.begin(); });
 	ed->subscribe(event::loop::LOOP_END_RENDER, [&igm]() { igm.end(); });
 
-	igm.addPanel<ImGuiEntityTree>();
-	auto igEttModel = igm.addPanel<ImGuiEntityModel>();
+	auto igmTree = CreateShared<ImGuiEntityTree>();
+	igm.addPanel(igmTree);
 
 	// Setting up the camera
 	world.cameraId = em->createEntity();
@@ -464,8 +497,6 @@ int main(int argc, char *argv[]) {
 	modelShader->createShaderProgram();
 	Shared<ShaderProgram> lightShader = CreateShared<ShaderProgram>("lightVertShader.glsl", "lightFragShader.glsl");
 	lightShader->createShaderProgram();
-	Shared<ShaderProgram> normalShader = CreateShared<ShaderProgram>("normalVertShader.glsl", "normalFragShader.glsl", "normalGeomShader.glsl");
-	normalShader->createShaderProgram();
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
@@ -517,11 +548,11 @@ int main(int argc, char *argv[]) {
 		ub.update(0, sizeof(glm::mat4), glm::value_ptr(vp));
 	});
 
-	ed->subscribe(ENTITY_ELECTED_CHANGED, [&igEttModel]() {
-		igEttModel->setSelectedEntity(ettSelected);
+	ed->subscribe(ENTITY_ELECTED_CHANGED, [&igmTree]() {
+		igmTree->setSelectedEntity(ettSelected);
 	});
 
-	ed->subscribe(event::loop::LOOP_RENDER, [&normalShader, &skyboxShader, &skybox]() {
+	ed->subscribe(event::loop::LOOP_RENDER, [&skyboxShader, &skybox]() {
 		// render skybox
 		systems::render::renderSkybox(skybox, skyboxShader);
 		// render other meshes
@@ -529,14 +560,6 @@ int main(int argc, char *argv[]) {
 		if (renderBB)
 			systems::render::renderBoundingBox();
 		systems::render::renderInstancedMeshes();
-		// normalShader->use();
-		// auto p = world.camera->getProjMatrix();
-		// auto v = world.camera->getViewMatrix();
-		// normalShader->setMat4("view", v);
-		// normalShader->setMat4("proj", p);
-		// normalShader->setMat4("model", systems::transform::getModelMatrix(left));
-		// auto rc = em->getComponentFromId<RenderComponent>(left);
-		// rc->call();
 	});
 
 	systems::collision::updateAllColliders();
@@ -561,22 +584,30 @@ int main(int argc, char *argv[]) {
 		ImGui::End();
 	});
 
+	auto cl = CreateShared<CustomLayer>();
+	cl->onAttach();
+	ed->subscribe(event::loop::LOOP_INPUT, [&cl]() { cl->onUpdate(); });
+
 	auto np = CreateShared<ImGuiNormalView>();
-	ed->subscribe(NORMAL_VIEW_OPEN, [&w, np, &igm]() {
+	ed->subscribe(NORMAL_VIEW_OPEN, [&w, np, &igm, &cl]() {
 		igm.removePanel<ImGuiNormalView>(np);
 		igm.addPanel(np);
 		// disable main window movement
 
-		np->setInputCallbacks(w);
+		cl->setRunnig(true);
+		cl->setUpdateFun([&np]() {
+			np->processInput();
+		});
 
-		w.setKeysCallback([](auto, auto, auto, auto, auto) {});
 		w.setMouseButtonCallback([](auto, auto, auto, auto) {});
 	});
-	ed->subscribe(NORMAL_VIEW_CLOSE, [&w, np, &igm]() {
+	ed->subscribe(NORMAL_VIEW_CLOSE, [&w, np, &igm, &cl]() {
 		igm.removePanel<ImGuiNormalView>(np);
 		// enable main window movement
 		defaultKeyCallback(w);
 		changeInputState(w, InputState::MOUSE_ACTIVE);
+		cl->setRunnig(false);
+		std::cout << "stop\n";
 	});
 
 	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() {
