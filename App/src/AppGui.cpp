@@ -348,16 +348,22 @@ const auto im = InputManager::instance();
 
 void ImGuiNormalView::processInput() {
 	if (ImGui::IsKeyDown(ImGuiKey_W)) {
-		this->m_npcam->moveCamera(this->m_npcam->getCameraUp());
+		this->m_npcam->moveCamera(this->m_npcam->getCameraFront());
 	}
 	if (ImGui::IsKeyDown(ImGuiKey_S)) {
-		this->m_npcam->moveCamera(-this->m_npcam->getCameraUp());
+		this->m_npcam->moveCamera(-this->m_npcam->getCameraFront());
 	}
 	if (ImGui::IsKeyDown(ImGuiKey_A)) {
 		this->m_npcam->moveCamera(-this->m_npcam->getCameraRight());
 	}
 	if (ImGui::IsKeyDown(ImGuiKey_D)) {
 		this->m_npcam->moveCamera(this->m_npcam->getCameraRight());
+	}
+	if (ImGui::IsKeyDown(ImGuiKey_Space)) {
+		this->m_npcam->moveCamera(this->m_npcam->getCameraUp());
+	}
+	if (ImGui::IsKeyDown(ImGuiKey_LeftShift)) {
+		this->m_npcam->moveCamera(-this->m_npcam->getCameraUp());
 	}
 
 	// w.setCursorPosCallback([this, &w](GLFWwindow *window, double x, double y) {
@@ -380,12 +386,6 @@ ImGuiTableFlags tflag = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInner | I
 
 void ImGuiNormalView::onRender() {
 	// framebuffer space
-	if (InputManager::instance()->isKeyPressed(GLFW_KEY_W)) {
-		this->m_npcam->moveCamera(glm::vec3{0, 1, 0});
-	}
-	if (InputManager::instance()->isKeyPressed(GLFW_KEY_S)) {
-		this->m_npcam->moveCamera(glm::vec3{0, -1, 0});
-	}
 	ImGui::Begin("Normals");
 	ImGui::BeginChild("Render");
 	// resize the framebuffer

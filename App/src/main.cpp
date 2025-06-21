@@ -505,7 +505,7 @@ int main(int argc, char *argv[]) {
 	scene->addEntity(shader, plane);
 	pw.addEntity(plane);
 
-	auto shape = factory::factoryCube(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
+	auto shape = factory::factoryThorus(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
 	systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_EMERALD));
 	em->addComponent<ColliderComponent>(shape);
