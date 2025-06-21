@@ -7,6 +7,8 @@ using namespace ogl;
 
 const auto CAMERA_UPDATE_DATA = Event("Camera Update Data");
 const auto CAMERA_RESET_POSITION = Event("Camera Reset Position");
+const auto NORMAL_VIEW_OPEN = Event("Open Normal View");
+const auto NORMAL_VIEW_CLOSE = Event("Close Normal View");
 
 class ImGuiEntityTree : public ImGuiPanel {
 public:
@@ -38,12 +40,18 @@ private:
 	int m_ett = -1;
 };
 
-class ImGuiNormalView : ImGuiPanel {
+class ImGuiNormalView : public ImGuiPanel {
 public:
 	virtual void onRender() override;
 
-	ImGuiNormalView() = default;
+	void setInputCallbacks(ogl::Window &w);
+
+	ImGuiNormalView();
 	virtual ~ImGuiNormalView() override = default;
 
 private:
+	Unique<ogl::FrameBuffer> m_fbo;
+	ogl::Texture m_text;
+	Unique<ogl::ShaderProgram> m_shader;
+	Unique<ogl::Camera> m_npcam;
 };

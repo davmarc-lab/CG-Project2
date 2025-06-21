@@ -49,7 +49,7 @@ namespace ogl {
 		 *
 		 * @param *data Pointer to texture's data.
 		 */
-		inline void createTexture2D(unsigned char *data) {
+		inline void createTexture2D(void *data) {
 			this->bind();
 			this->fastCreateTexture2D(data);
 		}
@@ -135,13 +135,15 @@ namespace ogl {
 
 	private:
 		/// Rescales the texture with new width and height.
-		void rescaleTexture() const;
+		void rescaleTexture();
 
 		unsigned int m_id = 0;
 
 		TextureParams m_params{};
 
 		Pair<unsigned int> m_size{};
+
+		void *m_data = NULL;
 
 		bool m_attached = false;
 		bool m_created = false;

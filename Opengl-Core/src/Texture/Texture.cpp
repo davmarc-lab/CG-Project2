@@ -42,7 +42,8 @@ namespace ogl {
 
 	void Texture::fastCreateTexture2D(void *data) {
 		glTexImage2D(this->m_params.target, this->m_params.level, this->m_params.internalFormat, this->m_size.x, this->m_size.y, this->m_params.border,
-		             this->m_params.format, this->m_params.dataType, data);
+					 this->m_params.format, this->m_params.dataType, data);
+		this->m_data = data;
 		this->m_created = true;
 	}
 
@@ -58,10 +59,10 @@ namespace ogl {
 			std::cerr << "Error -> Mipmap not generated: this texture (ID => " << this->m_id << ") is not created.\n";
 	}
 
-	void Texture::rescaleTexture() const {
+	void Texture::rescaleTexture() {
 		ASSERT(this->m_id);
-
-		std::cerr << "Not implemented!\n";
+		this->bind();
+		this->createTexture2D(this->m_data);
 	}
 
 } // namespace ogl

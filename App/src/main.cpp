@@ -17,6 +17,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iomanip>
 #include <iterator>
+#include <memory>
 #include <vector>
 
 using namespace ogl;
@@ -367,22 +368,7 @@ glm::vec3 evaluateNormal(const unsigned int &id) {
 	return norm;
 }
 
-int main(int argc, char *argv[]) {
-#ifndef _WIN32
-	std::cout << std::fixed << std::setprecision(10);
-#endif
-	srand(time(NULL));
-	WindowSettings s{};
-	s.decorated = false;
-	s.size = {1366, 768};
-	s.position = {400, 12};
-#ifdef _WIN32
-	s.position = {470, 50};
-#endif
-	s.focused = true;
-
-	Window w{s};
-	w.onAttach();
+void defaultKeyCallback(Window &w) {
 	w.setKeysCallback([&w](GLFWwindow *window, int key, int code, int action, int mod) {
 		switch (action) {
 			case GLFW_REPEAT:
@@ -405,7 +391,25 @@ int main(int argc, char *argv[]) {
 			return;
 		}
 	});
+}
 
+int main(int argc, char *argv[]) {
+#ifndef _WIN32
+	std::cout << std::fixed << std::setprecision(10);
+#endif
+	srand(time(NULL));
+	WindowSettings s{};
+	s.decorated = false;
+	s.size = {1366, 768};
+	s.position = {400, 12};
+#ifdef _WIN32
+	s.position = {470, 50};
+#endif
+	s.focused = true;
+
+	Window w{s};
+	w.onAttach();
+	defaultKeyCallback(w);
 	changeInputState(w, MOUSE_ACTIVE);
 
 	glEnable(GL_CULL_FACE);
@@ -414,15 +418,15 @@ int main(int argc, char *argv[]) {
 
 	Renderer::instance()->init();
 
-	ImGuiManager im{"ImGui Manager", w, DEFAULT_IMGUI_CONFIGS | ImGuiConfigFlags_ViewportsEnable};
-	im.onAttach();
-	ed->subscribe(event::loop::LOOP_UPDATE, [&im]() { im.onUpdate(); });
-	ed->subscribe(event::loop::LOOP_RENDER, [&im]() { im.onRender(); });
-	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, [&im]() { im.begin(); });
-	ed->subscribe(event::loop::LOOP_END_RENDER, [&im]() { im.end(); });
+	ImGuiManager igm{"ImGui Manager", w, DEFAULT_IMGUI_CONFIGS | ImGuiConfigFlags_ViewportsEnable};
+	igm.onAttach();
+	ed->subscribe(event::loop::LOOP_UPDATE, [&igm]() { igm.onUpdate(); });
+	ed->subscribe(event::loop::LOOP_RENDER, [&igm]() { igm.onRender(); });
+	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, [&igm]() { igm.begin(); });
+	ed->subscribe(event::loop::LOOP_END_RENDER, [&igm]() { igm.end(); });
 
-	im.addPanel<ImGuiEntityTree>();
-	auto igEttModel = im.addPanel<ImGuiEntityModel>();
+	igm.addPanel<ImGuiEntityTree>();
+	auto igEttModel = igm.addPanel<ImGuiEntityModel>();
 
 	// Setting up the camera
 	world.cameraId = em->createEntity();
@@ -470,7 +474,7 @@ int main(int argc, char *argv[]) {
 	scene->addEntity(shader, plane);
 	pw.addEntity(plane);
 
-	auto shape = factory::factorySphere(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
+	auto shape = factory::factoryCube(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
 	systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_EMERALD));
 	em->addComponent<ColliderComponent>(shape);
@@ -542,7 +546,7 @@ int main(int argc, char *argv[]) {
 	pw.addSolver<CollisionSolver>();
 	pw.addSolver<PositionSolver>();
 
-	auto pp = im.addPanel<ImGuiPanel>("Profiler");
+	auto pp = igm.addPanel<ImGuiPanel>("Profiler");
 	pp->setRenderFunc([]() {
 		ImGui::Begin("Profiler");
 		auto maxwall = std::distance(walltimes.begin(), std::max_element(ALL(walltimes)));
@@ -555,6 +559,24 @@ int main(int argc, char *argv[]) {
 			ImGui::PopID();
 		}
 		ImGui::End();
+	});
+
+	auto np = CreateShared<ImGuiNormalView>();
+	ed->subscribe(NORMAL_VIEW_OPEN, [&w, np, &igm]() {
+		igm.removePanel<ImGuiNormalView>(np);
+		igm.addPanel(np);
+		// disable main window movement
+
+		np->setInputCallbacks(w);
+
+		w.setKeysCallback([](auto, auto, auto, auto, auto) {});
+		w.setMouseButtonCallback([](auto, auto, auto, auto) {});
+	});
+	ed->subscribe(NORMAL_VIEW_CLOSE, [&w, np, &igm]() {
+		igm.removePanel<ImGuiNormalView>(np);
+		// enable main window movement
+		defaultKeyCallback(w);
+		changeInputState(w, InputState::MOUSE_ACTIVE);
 	});
 
 	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() {

@@ -4,6 +4,7 @@
 #include "Utils.hpp"
 #include "Window.hpp"
 
+#include <algorithm>
 #include <functional>
 #include <map>
 #include <string>
@@ -71,7 +72,23 @@ namespace ogl {
 			return elem;
 		}
 
-		bool removePanel() {
+		template <typename T>
+		inline bool removePanel(const Shared<ImGuiPanel> &panel) {
+			auto prio = panel->getPriority();
+			auto elem = std::find(ALL(this->m_panels.at(prio)), panel);
+			if (elem != this->m_panels.at(prio).end()) {
+				this->m_panels.at(prio).erase(elem);
+				return true;
+			}
+			return false;
+		}
+
+		inline void addPanel(const Shared<ImGuiPanel> &panel) {
+			if (this->m_panels.find(panel->getPriority()) == this->m_panels.end()) {
+				this->m_panels.insert_or_assign(panel->getPriority(), std::vector<Shared<ImGuiPanel>>());
+			}
+
+			this->m_panels.at(panel->getPriority()).push_back(panel);
 		}
 
 		std::vector<Shared<ImGuiPanel>> getPanels(const unsigned short &priority) { return {this->m_panels.at(priority)}; }
