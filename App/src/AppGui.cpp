@@ -19,6 +19,9 @@ const auto em = EntityManager::instance();
 const auto ed = EventManager::instance();
 
 unsigned int npent = 0;
+Shared<RenderComponent> rc = nullptr;
+Shared<BufferComponent> bc = nullptr;
+Shared<VertexComponent> vc = nullptr;
 
 void ImGuiEntityTree::onRender() {
 	ImGui::Begin("Entities", NULL, ImGuiWindowFlags_NoFocusOnAppearing);
@@ -29,13 +32,19 @@ void ImGuiEntityTree::onRender() {
 			ImGui::PushID(&id);
 			ImGui::Text("(ECS) Entity Id: %s", std::to_string(id).c_str());
 
-			auto vc = em->getComponentFromId<VertexComponent>(id);
+			auto ivc = em->getComponentFromId<VertexComponent>(id);
 			// the entity has the component
-			if (vc != nullptr) {
-				if (!vc->getNormalsCoords().empty()) {
+			if (ivc != nullptr) {
+				if (!ivc->getNormalsCoords().empty()) {
 					if (ImGui::Button("Normals##0")) {
 						npent = id;
 						ed->post(NORMAL_VIEW_OPEN);
+						rc = em->getComponentFromId<RenderComponent>(id);
+						ASSERT(rc != nullptr);
+						bc = em->getComponentFromId<BufferComponent>(id);
+						ASSERT(bc != nullptr);
+						vc = em->getComponentFromId<VertexComponent>(id);
+						ASSERT(vc != nullptr);
 					}
 				}
 			}
@@ -388,6 +397,8 @@ glm::vec3 npscale{0.3};
 glm::vec3 nprot{};
 ImGuiTableFlags tflag = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInner | ImGuiTableFlags_BordersOuter;
 
+const auto rd = Renderer::instance();
+
 void ImGuiNormalView::onRender() {
 	// framebuffer space
 	ImGui::Begin("Normals");
@@ -398,7 +409,6 @@ void ImGuiNormalView::onRender() {
 	ImGui::Image((ImTextureID)this->m_text.getId(), npsize, ImVec2(0, 1), ImVec2(1, 0));
 	ImGui::EndChild();
 
-	auto rc = em->getComponentFromId<RenderComponent>(npent);
 	if (rc != nullptr) {
 		this->m_npcam->updatePerspProjection(45.f, npsize.x / npsize.y, 0.01f, 10.f);
 
@@ -410,7 +420,10 @@ void ImGuiNormalView::onRender() {
 		this->m_shader->use();
 		this->m_shader->setMat4("viewProj", this->m_npcam->getViewProjMatrix());
 		this->m_shader->setMat4("model", npmodel);
-		rc->call();
+
+		bc->vao.bind();
+		rd->drawElements(bc->vao.getId(), GL_LINE_STRIP, vc->getIndexCoords().size(), GL_UNSIGNED_INT);
+
 		this->m_nshader->use();
 		this->m_nshader->setMat4("view", this->m_npcam->getViewMatrix());
 		this->m_nshader->setMat4("proj", this->m_npcam->getProjMatrix());
@@ -425,6 +438,7 @@ void ImGuiNormalView::onRender() {
 	if (ImGui::Button("Close")) {
 		ed->post(NORMAL_VIEW_CLOSE);
 		this->resetCamera();
+		npmfirst = true;
 	}
 	auto nv = em->getComponentFromId<VertexComponent>(npent)->getNormalsCoords();
 	ImGui::Text("Normals Coords");
