@@ -505,7 +505,7 @@ int main(int argc, char *argv[]) {
 	scene->addEntity(shader, plane);
 	pw.addEntity(plane);
 
-	auto shape = factory::factoryThorus(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
+	auto shape = factory::factoryCube(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
 	systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_EMERALD));
 	em->addComponent<ColliderComponent>(shape);
@@ -607,7 +607,6 @@ int main(int argc, char *argv[]) {
 		defaultKeyCallback(w);
 		changeInputState(w, InputState::MOUSE_ACTIVE);
 		cl->setRunnig(false);
-		std::cout << "stop\n";
 	});
 
 	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() {

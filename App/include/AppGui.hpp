@@ -42,4 +42,6 @@ private:
 	Unique<ogl::ShaderProgram> m_shader;
 	Unique<ogl::ShaderProgram> m_nshader;
     Unique<ogl::Camera> m_npcam;
+
+    void resetCamera();
 };

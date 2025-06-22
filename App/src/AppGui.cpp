@@ -334,6 +334,7 @@ ImGuiNormalView::ImGuiNormalView() {
 	this->m_npcam = CreateUnique<ogl::Camera>();
 	this->m_npcam->setCameraVelocity(0.05f);
 	this->m_npcam->setCameraPosition(glm::vec3{0, 0, 3});
+	this->m_npcam->setMouseSensitivity(0.3f);
 
 	this->m_shader = CreateUnique<ogl::ShaderProgram>("basicVS.glsl", "basicFS.glsl");
 	this->m_shader->createShaderProgram();
@@ -343,8 +344,6 @@ ImGuiNormalView::ImGuiNormalView() {
 
 double npxpos, npypos;
 bool npmfirst = true;
-
-const auto im = InputManager::instance();
 
 void ImGuiNormalView::processInput() {
 	if (ImGui::IsKeyDown(ImGuiKey_W)) {
@@ -366,16 +365,21 @@ void ImGuiNormalView::processInput() {
 		this->m_npcam->moveCamera(-this->m_npcam->getCameraUp());
 	}
 
-	// w.setCursorPosCallback([this, &w](GLFWwindow *window, double x, double y) {
-	// 	if (npmfirst) {
-	// 		npxpos = x;
-	// 		npypos = y;
-	// 		npmfirst = false;
-	// 		return;
-	// 	}
-	// 	auto offset = glm::vec3(x - npxpos, this->m_fbo->getHeight() - (y - npxpos), 0);
-	// 	// this->m_npcam->moveCamera(glm::normalize(offset));
-	// });
+	auto nx = ImGui::GetMousePos().x;
+	auto ny = ImGui::GetMousePos().y;
+
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right, false) || ImGui::IsMouseClicked(ImGuiMouseButton_Right, true)) {
+		if (npmfirst) {
+			npmfirst = false;
+			npxpos = nx;
+			npypos = ny;
+		}
+		auto xo = nx - npxpos;
+		auto yo = ny - npypos;
+		this->m_npcam->processMouseMovement(xo, yo);
+	}
+	npxpos = nx;
+	npypos = ny;
 }
 
 ImVec2 npsize;
@@ -420,6 +424,7 @@ void ImGuiNormalView::onRender() {
 	ImGui::Begin("Coords");
 	if (ImGui::Button("Close")) {
 		ed->post(NORMAL_VIEW_CLOSE);
+		this->resetCamera();
 	}
 	auto nv = em->getComponentFromId<VertexComponent>(npent)->getNormalsCoords();
 	ImGui::Text("Normals Coords");
@@ -442,4 +447,11 @@ void ImGuiNormalView::onRender() {
 	}
 	ImGui::EndTable();
 	ImGui::End();
+}
+
+void ImGuiNormalView::resetCamera() {
+	this->m_npcam = CreateUnique<ogl::Camera>();
+	this->m_npcam->setCameraVelocity(0.05f);
+	this->m_npcam->setCameraPosition(glm::vec3{0, 0, 3});
+	this->m_npcam->setMouseSensitivity(0.1f);
 }
