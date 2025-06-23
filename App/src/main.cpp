@@ -1,8 +1,6 @@
 #include <utility>
 #include "../../Opengl-Core/include/Core.hpp"
 
-#define BIG
-
 #include "../include/ECS/EcsScene.hpp"
 #include "../include/ECS/EntityManager.hpp"
 #include "../include/ECS/System.hpp"
