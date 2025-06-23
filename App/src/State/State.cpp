@@ -3,7 +3,7 @@
 void StateManager::clean() {
     // detach the current state before everything
 	if (this->m_currentState != nullptr) {
-		if (!this->m_currentState->isAttached())
+		if (this->m_currentState->isAttached())
 			this->m_currentState->onDetach();
 		// remove it from cached states
 		this->m_cacheStates.erase(this->m_currentState->getName());
