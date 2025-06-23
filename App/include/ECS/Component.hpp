@@ -254,14 +254,22 @@ class ShaderComponent : public Component {
 public:
 	ShaderComponent() = delete;
 
-	ShaderComponent(const LightComputation &comp, const bool &reflective = false) :
-		computation(comp), reflective(reflective), Component() {}
+	ShaderComponent(const LightComputation &comp, const std::string &vert, const std::string &frag, const bool &reflective = false, const std::string &geom = "") :
+		computation(comp), vert(std::move(vert)), frag(std::move(vert)), reflective(reflective), geom(std::move(geom)), Component() {}
 
 	virtual ~ShaderComponent() override = default;
 
 	LightComputation computation = LightComputation::PHONG;
 	bool reflective = false;
+	std::string vert{};
+	std::string frag{};
+	std::string geom{};
 };
+
+namespace light {
+	inline std::vector<LightComputation> lightCompsEnm{NONE, PHONG, BLINN_PHONG, INT_PHONG, INT_BLINN_PHONG};
+	inline std::vector<std::string> lightCompStr = {"None", "Phong", "Blinn-Phong", "Int Phong", "Int Blinn-Phong"};
+} // namespace light
 
 class RenderComponent : public Component {
 public:

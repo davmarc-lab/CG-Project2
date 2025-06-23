@@ -617,6 +617,12 @@ namespace systems {
 			c->outerCutoff = outerCutoff;
 		}
 
+		void setLightComputation(const unsigned int &id, const LightComputation &comp) {
+			auto c = em->getComponentFromId<ShaderComponent>(id);
+			ASSERT(c != nullptr);
+			c->computation = comp;
+		}
+
 		LightComputation getLightComputation(const unsigned int &id) {
 			auto c = em->getComponentFromId<ShaderComponent>(id);
 			ASSERT(c != nullptr);

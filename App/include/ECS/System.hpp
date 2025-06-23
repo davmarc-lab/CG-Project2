@@ -104,7 +104,7 @@ namespace systems {
 
 	namespace material {
 		Material getMaterial(const unsigned int &id);
-        std::string getMaterialName(const unsigned int &id);
+		std::string getMaterialName(const unsigned int &id);
 		void updateAmbient(const unsigned int &id, const glm::vec3 &val);
 		void updateDiffuse(const unsigned int &id, const glm::vec3 &val);
 		void updateSpecular(const unsigned int &id, const glm::vec3 &val);
@@ -127,13 +127,14 @@ namespace systems {
 		void updateCutoff(const unsigned int &id, const float &cutoff);
 		void updateOuterCutoff(const unsigned int &id, const float &outerCutoff);
 
+		void setLightComputation(const unsigned int &id, const LightComputation &comp);
 		LightComputation getLightComputation(const unsigned int &id);
 	} // namespace light
 
 	namespace render {
 		void initStencilShader();
 
-		void prepareInstancedMesh(const std::vector<glm::mat4>& models, const std::vector<glm::vec4>& colors);
+		void prepareInstancedMesh(const std::vector<glm::mat4> &models, const std::vector<glm::vec4> &colors);
 
 		void renderSkybox(const unsigned int &id, const Shared<ogl::ShaderProgram> &shader);
 		void renderAllMeshes();

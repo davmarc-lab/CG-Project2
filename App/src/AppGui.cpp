@@ -23,6 +23,8 @@ Shared<RenderComponent> rc = nullptr;
 Shared<BufferComponent> bc = nullptr;
 Shared<VertexComponent> vc = nullptr;
 
+static unsigned int lightCompSel = 0;
+
 void ImGuiEntityTree::onRender() {
 	ImGui::Begin("Entities", NULL, ImGuiWindowFlags_NoFocusOnAppearing);
 	for (auto id : em->getEntities()) {
@@ -99,6 +101,8 @@ void ImGuiEntityTree::onRender() {
 
 					// Input Text for new material name
 					ImGui::InputText("", matName, IM_ARRAYSIZE(matName));
+					ImGui::SameLine();
+					ImGuiHelpMarker("To sotre new materials first click on create, choose a name and set the parameters, then click the save button");
 					if (ImGui::Button("Create##1")) {
 						if (!std::string(matName).empty()) {
 							auto nm = Material();
@@ -292,6 +296,32 @@ void ImGuiEntityTree::onRender() {
 				}
 			}
 
+			auto sc = em->getComponentFromId<ShaderComponent>(id);
+			if (sc != nullptr) {
+				if (ImGui::CollapsingHeader("Shader##7")) {
+					// shader files
+					ImGui::Text("Vertex: %s", sc->vert.c_str());
+					ImGui::Text("Frag: %s", sc->frag.c_str());
+					if (!sc->geom.empty())
+						ImGui::Text("Geom: %s", sc->geom.c_str());
+
+					// light computation
+                    if (ImGui::BeginCombo("Light Comp##7", "Opts")) {
+                        for (int i = 0; i < light::lightCompStr.size(); i++) {
+                            if (ImGui::Selectable(light::lightCompStr[i].c_str(), (sc->computation == light::lightCompsEnm[i]))) {
+                                systems::light::setLightComputation(id, light::lightCompsEnm[i]);
+                            }
+
+                            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                            if (sc->computation == light::lightCompsEnm[i]) {
+                                ImGui::SetItemDefaultFocus();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+				}
+			}
+
 			ImGui::PopID();
 			ImGui::TreePop();
 		}
@@ -440,6 +470,8 @@ void ImGuiNormalView::onRender() {
 		this->resetCamera();
 		npmfirst = true;
 	}
+	ImGui::SameLine();
+	ImGuiHelpMarker("This window shows all the normals of each point stored in the Buffers, also you can move the camera using WASD and while keeping the MOUSE2 button you can turn around");
 	auto nv = em->getComponentFromId<VertexComponent>(npent)->getNormalsCoords();
 	ImGui::Text("Normals Coords");
 	ImGui::BeginTable("Normal Coords", 4, tflag);

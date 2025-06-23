@@ -15,6 +15,11 @@
 const auto em = EntityManager::instance();
 const auto rd = ogl::Renderer::instance();
 
+const std::string SHADER_DEFAULT_VERT = "./resources/shader/lightVertShader.glsl";
+const std::string SHADER_DEFAULT_FRAG = "./resources/shader/lightFragShader.glsl";
+const std::string SHADER_INST_DEFAULT_VERT = "./resources/shader/instancedVertShader.glsl";
+const std::string SHADER_INST_DEFAULT_FRAG = "./resources/shader/instancedFragShader.glsl";
+
 namespace factory {
 	void fillBufferData(const unsigned int &id) {
 		ASSERT(em->entityHasComponent<VertexComponent>(id));
@@ -59,7 +64,7 @@ namespace factory {
 		fillBufferData(id);
 
 		em->addComponent<MaterialComponent>(id);
-		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
+		em->addComponent<ShaderComponent>(id, LightComputation::PHONG, SHADER_DEFAULT_VERT, SHADER_DEFAULT_FRAG);
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();
@@ -89,7 +94,7 @@ namespace factory {
 		fillBufferData(id);
 
 		em->addComponent<MaterialComponent>(id);
-		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
+		em->addComponent<ShaderComponent>(id, LightComputation::PHONG, SHADER_DEFAULT_VERT, SHADER_DEFAULT_FRAG);
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();
@@ -117,7 +122,7 @@ namespace factory {
 		em->addComponent<MaterialComponent>(id);
 		em->addComponent<ColliderComponent>(id);
 		em->addComponent<InstancedComponent>(id, ogl::RenderPrimitiveType::PRIMITIVE_SPHERE);
-		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
+		em->addComponent<ShaderComponent>(id, LightComputation::PHONG, SHADER_INST_DEFAULT_VERT, SHADER_INST_DEFAULT_FRAG);
 
 		return id;
 	}
@@ -136,7 +141,7 @@ namespace factory {
 		fillBufferData(id);
 
 		em->addComponent<MaterialComponent>(id);
-		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
+		em->addComponent<ShaderComponent>(id, LightComputation::PHONG, SHADER_DEFAULT_VERT, SHADER_DEFAULT_FRAG);
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();
@@ -161,7 +166,7 @@ namespace factory {
 		fillBufferData(id);
 
 		em->addComponent<MaterialComponent>(id);
-		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
+		em->addComponent<ShaderComponent>(id, LightComputation::PHONG, SHADER_DEFAULT_VERT, SHADER_DEFAULT_FRAG);
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();
@@ -187,7 +192,7 @@ namespace factory {
 		fillBufferData(id);
 
 		em->addComponent<MaterialComponent>(id);
-		em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
+		em->addComponent<ShaderComponent>(id, LightComputation::PHONG, SHADER_DEFAULT_VERT, SHADER_DEFAULT_FRAG);
 
 		auto rc = em->addComponent<RenderComponent>(id);
 		auto vaoid = bc->vao.getId();
