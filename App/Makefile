@@ -74,18 +74,22 @@ GENERATED :=
 OBJECTS :=
 
 GENERATED += $(OBJDIR)/AppGui.o
+GENERATED += $(OBJDIR)/DefaultState.o
 GENERATED += $(OBJDIR)/EcsScene.o
 GENERATED += $(OBJDIR)/Factory.o
 GENERATED += $(OBJDIR)/PhysicWorld.o
 GENERATED += $(OBJDIR)/Profiler.o
+GENERATED += $(OBJDIR)/State.o
 GENERATED += $(OBJDIR)/System.o
 GENERATED += $(OBJDIR)/Utils.o
 GENERATED += $(OBJDIR)/main.o
 OBJECTS += $(OBJDIR)/AppGui.o
+OBJECTS += $(OBJDIR)/DefaultState.o
 OBJECTS += $(OBJDIR)/EcsScene.o
 OBJECTS += $(OBJDIR)/Factory.o
 OBJECTS += $(OBJDIR)/PhysicWorld.o
 OBJECTS += $(OBJDIR)/Profiler.o
+OBJECTS += $(OBJDIR)/State.o
 OBJECTS += $(OBJDIR)/System.o
 OBJECTS += $(OBJDIR)/Utils.o
 OBJECTS += $(OBJDIR)/main.o
@@ -168,6 +172,12 @@ $(OBJDIR)/PhysicWorld.o: src/PhysicWorld.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Profiler.o: src/Profiler.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/DefaultState.o: src/State/DefaultState.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/State.o: src/State/State.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Utils.o: src/Utils.cpp

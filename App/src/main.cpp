@@ -10,6 +10,8 @@
 #include "../include/Factory.hpp"
 #include "../include/PhysicWorld.hpp"
 #include "../include/Profiler.hpp"
+#include "../include/State/DefaultState.hpp"
+#include "../include/State/State.hpp"
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
@@ -23,6 +25,8 @@
 #include <vector>
 
 using namespace ogl;
+
+#define BIG
 
 const auto ed = EventManager::instance();
 const auto im = InputManager::instance();
@@ -420,6 +424,8 @@ private:
 	std::function<void()> m_updateFun{};
 };
 
+const auto sm = StateManager::instance();
+
 int main(int argc, char *argv[]) {
 #ifndef _WIN32
 	std::cout << std::fixed << std::setprecision(10);
@@ -455,165 +461,176 @@ int main(int argc, char *argv[]) {
 	ed->subscribe(event::loop::LOOP_RENDER, [&igm]() { igm.onRender(); });
 	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, [&igm]() { igm.begin(); });
 	ed->subscribe(event::loop::LOOP_END_RENDER, [&igm]() { igm.end(); });
+	/*
+		auto igmTree = CreateShared<ImGuiEntityTree>();
+		igm.addPanel(igmTree);
 
-	auto igmTree = CreateShared<ImGuiEntityTree>();
-	igm.addPanel(igmTree);
-
-	// Setting up the camera
-	world.cameraId = em->createEntity();
-	systems::ecs::updateEntityName(world.cameraId, "Main Camera");
-	auto cam = em->addComponent<CameraComponent>(world.cameraId);
-	cam->camera = CreateShared<ogl::Camera>();
-	world.camera = systems::camera::getCamera(world.cameraId);
-	world.camera->setCameraPosition(CAMERA_START_POSITION);
-	em->addComponent<ColliderComponent>(world.cameraId, glm::vec3{4, 4, 4}, world.cameraSize);
-	ed->post(CAMERA_UPDATE_DATA);
-	enableDefaultCameraMovement();
-	world.camera->updatePerspProjection(world.camera->getCameraZoom(), w.getWidth(), w.getHeight(), 0.1f, 100.f);
-
-	ed->subscribe(CAMERA_UPDATE_DATA, []() {
-		systems::camera::updateCameraCollider(world.cameraId, world.camera->getCameraPosition(), world.cameraSize);
-	});
-
-	ed->subscribe(CAMERA_RESET_POSITION, []() {
+		// Setting up the camera
+		world.cameraId = em->createEntity();
+		systems::ecs::updateEntityName(world.cameraId, "Main Camera");
+		auto cam = em->addComponent<CameraComponent>(world.cameraId);
+		cam->camera = CreateShared<ogl::Camera>();
+		world.camera = systems::camera::getCamera(world.cameraId);
 		world.camera->setCameraPosition(CAMERA_START_POSITION);
+		em->addComponent<ColliderComponent>(world.cameraId, glm::vec3{4, 4, 4}, world.cameraSize);
 		ed->post(CAMERA_UPDATE_DATA);
-	});
+		enableDefaultCameraMovement();
+		world.camera->updatePerspProjection(world.camera->getCameraZoom(), w.getWidth(), w.getHeight(), 0.1f, 100.f);
 
-	PhysicWorld pw = PhysicWorld();
-	pw.onAttach();
-	ed->subscribe(event::loop::LOOP_UPDATE, [&pw]() { pw.onUpdate(); });
-
-	// Initializing Scene
-	scene->init(world.camera);
-
-	Shared<ShaderProgram> skyboxShader = CreateShared<ShaderProgram>("skyboxVertShader.glsl", "skyboxFragShader.glsl");
-	skyboxShader->createShaderProgram();
-	Shared<ShaderProgram> shader = CreateShared<ShaderProgram>("vertexShader.glsl", "fragmentShader.glsl");
-	shader->createShaderProgram();
-	Shared<ShaderProgram> modelShader = CreateShared<ShaderProgram>("modelVertShader.glsl", "modelFragShader.glsl");
-	modelShader->createShaderProgram();
-	Shared<ShaderProgram> lightShader = CreateShared<ShaderProgram>("lightVertShader.glsl", "lightFragShader.glsl");
-	lightShader->createShaderProgram();
-
-	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
-
-	plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
-	systems::ecs::updateEntityName(plane, "Basic Plane");
-	scene->addEntity(shader, plane);
-	pw.addEntity(plane);
-
-	auto shape = factory::factoryPyramid(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
-	scene->addEntity(lightShader, shape);
-	systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_EMERALD));
-	em->addComponent<ColliderComponent>(shape);
-	em->addComponent<TextureComponent>(shape, "./resources/texture/grass.png");
-
-	TextureParams tp{};
-	tp.format = GL_RGBA;
-	tp.internalFormat = GL_RGBA;
-	tp.border = 0;
-	tp.dataType = GL_UNSIGNED_BYTE;
-	tp.level = 0;
-	tp.target = GL_TEXTURE_2D;
-
-	int width, height, nC;
-	auto data = readImageData("./resources/texture/grass.png", width, height, nC);
-	ogl::Texture t{tp, (unsigned int)width, (unsigned int)height};
-	t.onAttach();
-	t.createTexture2D(data);
-	t.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
-	t.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
-	t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	t.generateMipmap();
-
-	systems::texture::setTexture(shape, t);
-	systems::ecs::updateEntityName(shape, "Sphere");
-	auto sc = em->getComponentFromId<ShaderComponent>(shape);
-	sc->computation = LightComputation::PHONG;
-	sc->reflective = false;
-
-	auto id = factory::light::factoryDirectional({1, 0, 0});
-
-	UniformBuffer ub("Matrices");
-	ub.onAttach();
-	ub.setup(sizeof(glm::mat4), 0, 0, 0);
-	auto viewProj = world.camera->getViewProjMatrix();
-	ub.update(0, sizeof(glm::mat4), glm::value_ptr(viewProj));
-	ed->subscribe(event::shader::SHADER_PROJECTION_CHANGED, [&ub]() {
-		auto vp = world.camera->getViewProjMatrix();
-		ub.update(0, sizeof(glm::mat4), glm::value_ptr(vp));
-	});
-
-	ed->subscribe(ENTITY_ELECTED_CHANGED, [&igmTree]() {
-		igmTree->setSelectedEntity(ettSelected);
-	});
-
-	ed->subscribe(event::loop::LOOP_RENDER, [&skyboxShader, &skybox]() {
-		// render skybox
-		systems::render::renderSkybox(skybox, skyboxShader);
-		// render other meshes
-		systems::render::renderAllMeshes();
-		if (renderBB)
-			systems::render::renderBoundingBox();
-		systems::render::renderInstancedMeshes();
-	});
-
-	systems::collision::updateAllColliders();
-	systems::collision::compressBoundingBox();
-
-	// std::cout << glm::to_string(glm::normalize(glm::vec3{0} - systems::transform::getPosition(plane))) << "\n";
-	pw.addSolver<CollisionSolver>();
-	pw.addSolver<PositionSolver>();
-
-	auto pp = igm.addPanel<ImGuiPanel>("Profiler");
-	pp->setRenderFunc([]() {
-		ImGui::Begin("Profiler");
-		auto maxwall = std::distance(walltimes.begin(), std::max_element(ALL(walltimes)));
-		auto maxcpu = std::distance(cputimes.begin(), std::max_element(ALL(cputimes)));
-		for (auto i = 0; i < names.size(); i++) {
-			ImGui::PushID(i);
-			ImGui::SeparatorText(names[i].c_str());
-			ImGui::TextColored((ImGui::GetIO().Framerate < 40 && maxwall == i) ? ImVec4{1, 1, 0, 1} : ImVec4{1, 1, 1, 1}, "Wall Time: %lf", walltimes[i].get());
-			ImGui::TextColored((ImGui::GetIO().Framerate < 40 && maxcpu == i) ? ImVec4{1, 1, 0, 1} : ImVec4{1, 1, 1, 1}, "CPU Time: %lf", cputimes[i].get());
-			ImGui::PopID();
-		}
-		ImGui::End();
-	});
-
-	auto cl = CreateShared<CustomLayer>();
-	cl->onAttach();
-	ed->subscribe(event::loop::LOOP_INPUT, [&cl]() { cl->onUpdate(); });
-
-	auto np = CreateShared<ImGuiNormalView>();
-	ed->subscribe(NORMAL_VIEW_OPEN, [&w, np, &igm, &cl]() {
-		igm.removePanel<ImGuiNormalView>(np);
-		igm.addPanel(np);
-		// disable main window movement
-
-		cl->setRunnig(true);
-		cl->setUpdateFun([&np]() {
-			np->processInput();
+		ed->subscribe(CAMERA_UPDATE_DATA, []() {
+			systems::camera::updateCameraCollider(world.cameraId, world.camera->getCameraPosition(), world.cameraSize);
 		});
 
-		w.setMouseButtonCallback([](auto, auto, auto, auto) {});
-	});
-	ed->subscribe(NORMAL_VIEW_CLOSE, [&w, np, &igm, &cl]() {
-		igm.removePanel<ImGuiNormalView>(np);
-		// enable main window movement
-		defaultKeyCallback(w);
-		changeInputState(w, InputState::MOUSE_ACTIVE);
-		cl->setRunnig(false);
-	});
+		ed->subscribe(CAMERA_RESET_POSITION, []() {
+			world.camera->setCameraPosition(CAMERA_START_POSITION);
+			ed->post(CAMERA_UPDATE_DATA);
+		});
 
-	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() {
-		sphereModels.clear();
-		for (auto e : em->getEntitiesFromComponent<InstancedComponent>()) {
-			sphereModels.push_back(systems::transform::getModelMatrix(e));
-		}
-		ogl::Renderer::instance()->prepareBuffers(sphereModels, sphereColors);
-	});
+		PhysicWorld pw = PhysicWorld();
+		pw.onAttach();
+		ed->subscribe(event::loop::LOOP_UPDATE, [&pw]() { pw.onUpdate(); });
+
+		// Initializing Scene
+		scene->init(world.camera);
+
+		Shared<ShaderProgram> skyboxShader = CreateShared<ShaderProgram>("skyboxVertShader.glsl", "skyboxFragShader.glsl");
+		skyboxShader->createShaderProgram();
+		Shared<ShaderProgram> shader = CreateShared<ShaderProgram>("vertexShader.glsl", "fragmentShader.glsl");
+		shader->createShaderProgram();
+		Shared<ShaderProgram> modelShader = CreateShared<ShaderProgram>("modelVertShader.glsl", "modelFragShader.glsl");
+		modelShader->createShaderProgram();
+		Shared<ShaderProgram> lightShader = CreateShared<ShaderProgram>("lightVertShader.glsl", "lightFragShader.glsl");
+		lightShader->createShaderProgram();
+
+		auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
+
+		plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
+		systems::ecs::updateEntityName(plane, "Basic Plane");
+		scene->addEntity(shader, plane);
+		pw.addEntity(plane);
+
+		auto shape = factory::factoryPyramid(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
+		scene->addEntity(lightShader, shape);
+		systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_EMERALD));
+		em->addComponent<ColliderComponent>(shape);
+		em->addComponent<TextureComponent>(shape, "./resources/texture/grass.png");
+
+		TextureParams tp{};
+		tp.format = GL_RGBA;
+		tp.internalFormat = GL_RGBA;
+		tp.border = 0;
+		tp.dataType = GL_UNSIGNED_BYTE;
+		tp.level = 0;
+		tp.target = GL_TEXTURE_2D;
+
+		int width, height, nC;
+		auto data = readImageData("./resources/texture/grass.png", width, height, nC);
+		ogl::Texture t{tp, (unsigned int)width, (unsigned int)height};
+		t.onAttach();
+		t.createTexture2D(data);
+		t.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+		t.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+		t.setTexParameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		t.setTexParameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		t.generateMipmap();
+
+		systems::texture::setTexture(shape, t);
+		systems::ecs::updateEntityName(shape, "Sphere");
+		auto sc = em->getComponentFromId<ShaderComponent>(shape);
+		sc->computation = LightComputation::PHONG;
+		sc->reflective = false;
+
+		auto id = factory::light::factoryDirectional({1, 0, 0});
+
+		UniformBuffer ub("Matrices");
+		ub.onAttach();
+		ub.setup(sizeof(glm::mat4), 0, 0, 0);
+		auto viewProj = world.camera->getViewProjMatrix();
+		ub.update(0, sizeof(glm::mat4), glm::value_ptr(viewProj));
+		ed->subscribe(event::shader::SHADER_PROJECTION_CHANGED, [&ub]() {
+			auto vp = world.camera->getViewProjMatrix();
+			ub.update(0, sizeof(glm::mat4), glm::value_ptr(vp));
+		});
+
+		ed->subscribe(ENTITY_ELECTED_CHANGED, [&igmTree]() {
+			igmTree->setSelectedEntity(ettSelected);
+		});
+
+		ed->subscribe(event::loop::LOOP_RENDER, [&skyboxShader, &skybox]() {
+			// render skybox
+			systems::render::renderSkybox(skybox, skyboxShader);
+			// render other meshes
+			systems::render::renderAllMeshes();
+			if (renderBB)
+				systems::render::renderBoundingBox();
+			systems::render::renderInstancedMeshes();
+		});
+
+		systems::collision::updateAllColliders();
+		systems::collision::compressBoundingBox();
+
+		// std::cout << glm::to_string(glm::normalize(glm::vec3{0} - systems::transform::getPosition(plane))) << "\n";
+		pw.addSolver<CollisionSolver>();
+		pw.addSolver<PositionSolver>();
+
+		auto pp = igm.addPanel<ImGuiPanel>("Profiler");
+		pp->setRenderFunc([]() {
+			ImGui::Begin("Profiler");
+			auto maxwall = std::distance(walltimes.begin(), std::max_element(ALL(walltimes)));
+			auto maxcpu = std::distance(cputimes.begin(), std::max_element(ALL(cputimes)));
+			for (auto i = 0; i < names.size(); i++) {
+				ImGui::PushID(i);
+				ImGui::SeparatorText(names[i].c_str());
+				ImGui::TextColored((ImGui::GetIO().Framerate < 40 && maxwall == i) ? ImVec4{1, 1, 0, 1} : ImVec4{1, 1, 1, 1}, "Wall Time: %lf", walltimes[i].get());
+				ImGui::TextColored((ImGui::GetIO().Framerate < 40 && maxcpu == i) ? ImVec4{1, 1, 0, 1} : ImVec4{1, 1, 1, 1}, "CPU Time: %lf", cputimes[i].get());
+				ImGui::PopID();
+			}
+			ImGui::End();
+		});
+
+		auto cl = CreateShared<CustomLayer>();
+		cl->onAttach();
+		ed->subscribe(event::loop::LOOP_INPUT, [&cl]() { cl->onUpdate(); });
+
+		auto np = CreateShared<ImGuiNormalView>();
+		ed->subscribe(NORMAL_VIEW_OPEN, [&w, np, &igm, &cl]() {
+			igm.removePanel<ImGuiNormalView>(np);
+			igm.addPanel(np);
+			// disable main window movement
+
+			cl->setRunnig(true);
+			cl->setUpdateFun([&np]() {
+				np->processInput();
+			});
+
+			w.setMouseButtonCallback([](auto, auto, auto, auto) {});
+		});
+		ed->subscribe(NORMAL_VIEW_CLOSE, [&w, np, &igm, &cl]() {
+			igm.removePanel<ImGuiNormalView>(np);
+			// enable main window movement
+			defaultKeyCallback(w);
+			changeInputState(w, InputState::MOUSE_ACTIVE);
+			cl->setRunnig(false);
+		});
+
+		ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() {
+			sphereModels.clear();
+			for (auto e : em->getEntitiesFromComponent<InstancedComponent>()) {
+				sphereModels.push_back(systems::transform::getModelMatrix(e));
+			}
+			ogl::Renderer::instance()->prepareBuffers(sphereModels, sphereColors);
+		});
+	*/
+
+	auto ds = CreateShared<DefaultState>();
+	ds->onAttach();
+	ds->onDetach();
+
+	std::cout << "Attaching to State Manager\n";
+	sm->changeState(ds->getName(), ds);
+
+	ed->subscribe(event::loop::LOOP_UPDATE, []() { sm->execUpdate(); });
+	ed->subscribe(event::loop::LOOP_RENDER, []() { sm->execRender(); });
 
 	while (!glfwWindowShouldClose(w.getContext())) {
 		profiler.start();
@@ -634,6 +651,10 @@ int main(int argc, char *argv[]) {
 		ed->post(event::loop::LOOP_END_RENDER);
 	}
 
+	// detach State Manager
+    sm->clean();
+
+	igm.onDetach();
 	w.onDetach();
 
 	return 0;
