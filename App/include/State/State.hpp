@@ -13,6 +13,8 @@ public:
 	virtual void onUpdate() {}
 	virtual void onRender() {}
 
+	virtual bool isCurrentStateEnd() { return true; }
+
 	std::string getName() const { return this->m_name; }
 	bool isAttached() const { return this->m_attached; }
 

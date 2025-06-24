@@ -50,10 +50,10 @@ namespace ogl {
 	public:
 		ImGuiManager() = delete;
 
-		ImGuiManager(const std::string &layerName, Window &window, const ImGuiConfigFlags &flags = 0) :
+		ImGuiManager(const std::string &layerName, Window *window, const ImGuiConfigFlags &flags = 0) :
 			Layer(std::move(layerName)), m_window(window), m_flags(flags) {}
 
-		ImGuiManager(Window &window, const ImGuiConfigFlags &flags) :
+		ImGuiManager(Window *window, const ImGuiConfigFlags &flags) :
 			Layer("ImGui Manager"), m_flags(flags), m_window(window) {}
 
 		template <typename T, typename... Args>
@@ -104,7 +104,7 @@ namespace ogl {
 
 	private:
 		ImGuiConfigFlags m_flags = DEFAULT_IMGUI_CONFIGS;
-		Window &m_window;
+		Window *m_window;
 
 		std::map<unsigned short, std::vector<Shared<ImGuiPanel>>> m_panels{};
 	};

@@ -10,6 +10,8 @@ public:
 	virtual void onUpdate() override;
 	virtual void onRender() override;
 
+    virtual bool isCurrentStateEnd() override;
+
 	DefaultState() :
 		State("Default State") {}
 
