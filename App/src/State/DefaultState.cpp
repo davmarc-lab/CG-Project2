@@ -14,50 +14,8 @@ const auto im = InputManager::instance();
 const auto ed = EventManager::instance();
 const auto scene = BasicScene::instance();
 
-const auto imgTree = CreateShared<ImGuiEntityTree>();
-
-double inputWalltime{}, inputCputime{};
-double updateWalltime{}, updateCputime{};
-double renderWalltime{}, renderCputime{};
-const std::array<std::reference_wrapper<double>, 3> walltimes{inputWalltime, updateWalltime, renderWalltime};
-const std::array<std::reference_wrapper<double>, 3> cputimes{inputCputime, updateCputime, renderCputime};
-const std::array<std::string, 3> names{"Input", "Update", "Render"};
-
-const auto INPUT_NORMAL_VIEW_OPEN = Event("Input in Normal View Start");
-const auto INPUT_NORMAL_VIEW_CLOSE = Event("Input in Normal View Stop");
-const auto ENTITY_ELECTED_CHANGED = Event("Entity Selected Changed");
-const auto CAMERA_START_POSITION = glm::vec3{0, 1, 12};
-
-float lastTime = 0;
-unsigned int plane;
-
-int ettSelected = -1;
-bool renderBB = false;
-
-Shared<UniformBuffer> ub;
-
-struct WorldCamera {
-	unsigned int cameraId;
-	Shared<Camera> camera;
-	glm::vec3 cameraSize = glm::vec3(1);
-	int tbBorderTolerance = 20;
-	float tbRadius = 1.f;
-} world;
-
-enum InputState {
-	MOUSE_PASSIVE,
-	MOUSE_ACTIVE
-};
-
-struct Mouse {
-	glm::vec2 pos{};
-	bool first = true;
-	bool trackState = false;
-	bool skipCursorPos = false;
-} mouse;
-
-void enableDefaultCameraMovement() {
-	ed->subscribe(event::loop::LOOP_INPUT, []() {
+void DefaultState::enableDefaultCameraMovement() {
+	ed->subscribe(event::loop::LOOP_INPUT, [this]() {
 		auto collider = em->getComponentFromId<ColliderComponent>(world.cameraId);
 		ASSERT(collider != nullptr);
 
@@ -143,7 +101,7 @@ void enableDefaultCameraMovement() {
 	});
 }
 
-glm::vec3 getTrackballPoint(const Pair<float> &viewpSize, const glm::vec2 &pos) {
+glm::vec3 DefaultState::getTrackballPoint(const Pair<float> &viewpSize, const glm::vec2 &pos) {
 	glm::vec3 point{};
 	glm::vec3 offset{};
 	point.x = (2 * (pos.x) - viewpSize.x) / viewpSize.x;
@@ -154,7 +112,7 @@ glm::vec3 getTrackballPoint(const Pair<float> &viewpSize, const glm::vec2 &pos) 
 	return glm::normalize(point);
 }
 
-glm::vec3 getRayFromMouse(const Pair<float> &size, int mouse_x, int mouse_y) {
+glm::vec3 DefaultState::getRayFromMouse(const Pair<float> &size, int mouse_x, int mouse_y) {
 	mouse_y = size.y - mouse_y;
 
 	float ndc_x = (2.0f * mouse_x) / size.x - 1.0f;
@@ -171,7 +129,7 @@ glm::vec3 getRayFromMouse(const Pair<float> &size, int mouse_x, int mouse_y) {
 	return glm::normalize(glm::vec3(pw) - glm::vec3(world.camera->getCameraPosition()));
 }
 
-bool isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const float &sphere_radius, float *id) {
+bool DefaultState::isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const float &sphere_radius, float *id) {
 	glm::vec3 d = world.camera->getCameraPosition() - sphere_pos;
 	float b = dot(d, ray);
 	float cc = dot(d, d) - sphere_radius * sphere_radius;
@@ -197,7 +155,7 @@ bool isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const floa
 	}
 }
 
-void changeInputState(Window *w, const InputState &state) {
+void DefaultState::changeInputState(Window *w, const InputState &state) {
 	switch (state) {
 		case MOUSE_PASSIVE: {
 			mouse.first = true;
@@ -206,7 +164,7 @@ void changeInputState(Window *w, const InputState &state) {
 			glfwSetInputMode(w->getContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 			w->setMouseButtonCallback([](GLFWwindow *, int, int, int) {
 			});
-			w->setCursorPosCallback([](GLFWwindow *window, double x, double y) {
+			w->setCursorPosCallback([this](GLFWwindow *window, double x, double y) {
 				if (mouse.first) {
 					mouse.first = false;
 					mouse.pos = {x, y};
@@ -227,7 +185,7 @@ void changeInputState(Window *w, const InputState &state) {
 			if (glfwRawMouseMotionSupported())
 				glfwSetInputMode(w->getContext(), GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
 			glfwSetInputMode(w->getContext(), GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
-			w->setCursorPosCallback([w](GLFWwindow *window, double x, double y) {
+			w->setCursorPosCallback([this, w](GLFWwindow *window, double x, double y) {
 				if (mouse.skipCursorPos) {
 					mouse.skipCursorPos = false;
 					return;
@@ -241,8 +199,8 @@ void changeInputState(Window *w, const InputState &state) {
 					return;
 				}
 
-				auto pre = getTrackballPoint(w->getSize(), mouse.pos);
-				auto current = getTrackballPoint(w->getSize(), {x, y});
+				auto pre = this->getTrackballPoint(w->getSize(), mouse.pos);
+				auto current = this->getTrackballPoint(w->getSize(), {x, y});
 
 				auto dpos = current - pre;
 				if (dpos.x || dpos.y || dpos.z) {
@@ -282,7 +240,7 @@ void changeInputState(Window *w, const InputState &state) {
 					glfwSetCursorPos(window, mouse.pos.x, mouse.pos.y);
 				}
 			});
-			w->setMouseButtonCallback([w](GLFWwindow *window, int button, int action, int mods) {
+			w->setMouseButtonCallback([this, w](GLFWwindow *window, int button, int action, int mods) {
 				switch (button) {
 					case GLFW_MOUSE_BUTTON_3: {
 						mouse.trackState = (action == GLFW_PRESS);
@@ -326,8 +284,8 @@ void changeInputState(Window *w, const InputState &state) {
 	}
 }
 
-void defaultKeyCallback(Window *w) {
-	w->setKeysCallback([w](GLFWwindow *window, int key, int code, int action, int mod) {
+void DefaultState::defaultKeyCallback(Window *w) {
+	w->setKeysCallback([this, w](GLFWwindow *window, int key, int code, int action, int mod) {
 		switch (action) {
 			case GLFW_REPEAT:
 			case GLFW_PRESS: {
@@ -428,11 +386,11 @@ void DefaultState::onAttach() {
 	enableDefaultCameraMovement();
 	world.camera->updatePerspProjection(world.camera->getCameraZoom(), w->getWidth(), w->getHeight(), 0.1f, 100.f);
 
-	ed->subscribe(CAMERA_UPDATE_DATA, []() {
+	ed->subscribe(CAMERA_UPDATE_DATA, [this]() {
 		systems::camera::updateCameraCollider(world.cameraId, world.camera->getCameraPosition(), world.cameraSize);
 	});
 
-	ed->subscribe(CAMERA_RESET_POSITION, []() {
+	ed->subscribe(CAMERA_RESET_POSITION, [this]() {
 		world.camera->setCameraPosition(CAMERA_START_POSITION);
 		ed->post(CAMERA_UPDATE_DATA);
 	});
@@ -488,22 +446,22 @@ void DefaultState::onAttach() {
 
 	auto id = factory::light::factoryDirectional({1, 0, 0});
 
-	ub = CreateShared<UniformBuffer>("Matrices");
+	ub = CreateUnique<UniformBuffer>("Matrices");
 	ub->onAttach();
 	ub->setup(sizeof(glm::mat4), 0, 0, 0);
 	auto viewProj = world.camera->getViewProjMatrix();
 	ub->update(0, sizeof(glm::mat4), glm::value_ptr(viewProj));
 
-	ed->subscribe(event::shader::SHADER_PROJECTION_CHANGED, []() {
+	ed->subscribe(event::shader::SHADER_PROJECTION_CHANGED, [this]() {
 		auto vp = world.camera->getViewProjMatrix();
 		ub->update(0, sizeof(glm::mat4), glm::value_ptr(vp));
 	});
 
-	ed->subscribe(ENTITY_ELECTED_CHANGED, [igmTree]() {
+	ed->subscribe(ENTITY_ELECTED_CHANGED, [this, igmTree]() {
 		igmTree->setSelectedEntity(ettSelected);
 	});
 
-	ed->subscribe(event::loop::LOOP_RENDER, [skybox, skyboxShader]() {
+	ed->subscribe(event::loop::LOOP_RENDER, [this, skybox, skyboxShader]() {
 		// render skybox
 		systems::render::renderSkybox(skybox, skyboxShader);
 		// render other meshes
@@ -517,7 +475,7 @@ void DefaultState::onAttach() {
 	systems::collision::compressBoundingBox();
 
 	auto pp = igm->addPanel<ImGuiPanel>("Profiler");
-	pp->setRenderFunc([]() {
+	pp->setRenderFunc([this]() {
 		ImGui::Begin("Profiler");
 		auto maxwall = std::distance(walltimes.begin(), std::max_element(ALL(walltimes)));
 		auto maxcpu = std::distance(cputimes.begin(), std::max_element(ALL(cputimes)));
@@ -548,7 +506,7 @@ void DefaultState::onAttach() {
 
 		w->setMouseButtonCallback([](auto, auto, auto, auto) {});
 	});
-	ed->subscribe(NORMAL_VIEW_CLOSE, [np, cl]() {
+	ed->subscribe(NORMAL_VIEW_CLOSE, [this, np, cl]() {
 		igm->removePanel<ImGuiNormalView>(np);
 		// enable main window movement
 		defaultKeyCallback(w.get());
@@ -559,7 +517,12 @@ void DefaultState::onAttach() {
 
 void DefaultState::onDetach() {
 	State::onDetach();
-    std::cout << "Detaching \"" << this->getName() << "\" from StateManager\n";
+	std::cout << "Detaching \"" << this->getName() << "\" from StateManager\n";
+	// delete all buffers
+	// delete all textures
+	// delete all shaders
+	igm->onDetach();
+	w->onDetach();
 }
 
 void DefaultState::onUpdate() {

@@ -32,16 +32,11 @@ const auto ed = EventManager::instance();
 const auto im = InputManager::instance();
 const auto em = EntityManager::instance();
 const auto scene = BasicScene::instance();
+const auto sm = StateManager::instance();
 
-// double inputWalltime{}, inputCputime{};
-// double updateWalltime{}, updateCputime{};
-// double renderWalltime{}, renderCputime{};
-// std::array<std::reference_wrapper<double>, 3> walltimes{inputWalltime, updateWalltime, renderWalltime};
-// std::array<std::reference_wrapper<double>, 3> cputimes{inputCputime, updateCputime, renderCputime};
-// std::array<std::string, 3> names{"Input", "Update", "Render"};
-
-std::vector<glm::mat4> sphereModels{};
-std::vector<glm::vec4> sphereColors{};
+// To be used with instanced meshes
+// std::vector<glm::mat4> sphereModels{};
+// std::vector<glm::vec4> sphereColors{};
 
 #ifdef _WIN32
 WProfiler profiler{PROFILE_ALL};
@@ -49,6 +44,8 @@ WProfiler profiler{PROFILE_ALL};
 LinuxProfiler profiler{PROFILE_ALL};
 #endif
 
+// Some Utilities
+/*
 float randf() {
 	return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 }
@@ -74,33 +71,11 @@ glm::vec3 evaluateNormal(const unsigned int &id) {
 
 	return norm;
 }
-
-class CustomLayer : public Layer {
-public:
-	virtual void onAttach() override {}
-	virtual void onDetach() override {}
-
-	virtual void onUpdate() override {
-		if (this->m_run)
-			this->m_updateFun();
-	}
-
-	void setRunnig(const bool &run) { this->m_run = run; }
-	void setUpdateFun(std::function<void()> &&fun) { this->m_updateFun = std::move(fun); }
-
-	CustomLayer() :
-		Layer("Custom Layer") {}
-
-	virtual ~CustomLayer() override = default;
-
-private:
-	bool m_run = false;
-	std::function<void()> m_updateFun{};
-};
-
-const auto sm = StateManager::instance();
+*/
 
 int main(int argc, char *argv[]) {
+    // for instancing rendering
+	/*
 	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() {
 		sphereModels.clear();
 		for (auto e : em->getEntitiesFromComponent<InstancedComponent>()) {
@@ -108,6 +83,7 @@ int main(int argc, char *argv[]) {
 		}
 		ogl::Renderer::instance()->prepareBuffers(sphereModels, sphereColors);
 	});
+	*/
 
 	auto ds = CreateShared<DefaultState>();
 
@@ -119,7 +95,7 @@ int main(int argc, char *argv[]) {
 
 	// #define C_DBG
 
-	while (!ds->isCurrentStateEnd()) {
+	while (!sm->shouldExit()) {
 #ifdef C_DBG
 		std::cout << "\n---START---\n";
 #endif
@@ -167,9 +143,6 @@ int main(int argc, char *argv[]) {
 
 	// detach State Manager
 	sm->clean();
-
-	// igm.onDetach();
-	// w.onDetach();
 
 	return 0;
 }

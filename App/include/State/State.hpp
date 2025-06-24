@@ -46,6 +46,11 @@ public:
 		return s_pointer;
 	}
 
+	bool shouldExit() const {
+		ASSERT(this->m_currentState != nullptr);
+		return this->m_currentState->isCurrentStateEnd();
+	}
+
 	void execUpdate() { this->m_currentState->onUpdate(); }
 	void execRender() { this->m_currentState->onRender(); }
 
