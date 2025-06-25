@@ -10,7 +10,10 @@ namespace ogl {
 			glDeleteBuffers(1, &this->m_id);
 	}
 
-	void UniformBuffer::onAttach() { glGenBuffers(1, &this->m_id); }
+	void UniformBuffer::onAttach() {
+		if (!this->m_id)
+			glGenBuffers(1, &this->m_id);
+	}
 
 	void UniformBuffer::onDetach() { glDeleteBuffers(1, &this->m_id); }
 

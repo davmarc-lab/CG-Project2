@@ -31,6 +31,8 @@ namespace ogl {
 
 		void subscribe(const Event &event, std::function<void()> &&func);
 
+		void cleanAll();
+
 		EventManager(EventManager &other) = delete;
 
 		void operator=(const EventManager &other) = delete;

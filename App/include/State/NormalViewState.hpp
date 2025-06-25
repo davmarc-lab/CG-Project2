@@ -3,7 +3,7 @@
 #include "../../include/AppGui.hpp"
 #include "../../include/State/State.hpp"
 
-class DefaultState : public State {
+class NormalViewState : public State {
 public:
 	virtual void onAttach() override;
 	virtual void onDetach() override;
@@ -13,10 +13,10 @@ public:
 
 	virtual bool isCurrentStateEnd() override;
 
-	DefaultState() :
+	NormalViewState() :
 		State("Default State") {}
 
-	virtual ~DefaultState() override = default;
+	virtual ~NormalViewState() override = default;
 
 private:
 	struct WorldCamera {

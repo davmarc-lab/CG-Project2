@@ -1,4 +1,4 @@
-#include "../../include/State/DefaultState.hpp"
+#include "../../include/State/NormalViewState.hpp"
 
 #include "../../include/AppGui.hpp"
 #include "../../include/ECS/EcsScene.hpp"
@@ -14,7 +14,7 @@ const auto im = InputManager::instance();
 const auto ed = EventManager::instance();
 const auto scene = BasicScene::instance();
 
-void DefaultState::enableDefaultCameraMovement() {
+void NormalViewState::enableDefaultCameraMovement() {
 	ed->subscribe(event::loop::LOOP_INPUT, [this]() {
 		auto collider = em->getComponentFromId<ColliderComponent>(world.cameraId);
 		ASSERT(collider != nullptr);
@@ -101,7 +101,7 @@ void DefaultState::enableDefaultCameraMovement() {
 	});
 }
 
-glm::vec3 DefaultState::getTrackballPoint(const Pair<float> &viewpSize, const glm::vec2 &pos) {
+glm::vec3 NormalViewState::getTrackballPoint(const Pair<float> &viewpSize, const glm::vec2 &pos) {
 	glm::vec3 point{};
 	glm::vec3 offset{};
 	point.x = (2 * (pos.x) - viewpSize.x) / viewpSize.x;
@@ -112,7 +112,7 @@ glm::vec3 DefaultState::getTrackballPoint(const Pair<float> &viewpSize, const gl
 	return glm::normalize(point);
 }
 
-glm::vec3 DefaultState::getRayFromMouse(const Pair<float> &size, int mouse_x, int mouse_y) {
+glm::vec3 NormalViewState::getRayFromMouse(const Pair<float> &size, int mouse_x, int mouse_y) {
 	mouse_y = size.y - mouse_y;
 
 	float ndc_x = (2.0f * mouse_x) / size.x - 1.0f;
@@ -129,7 +129,7 @@ glm::vec3 DefaultState::getRayFromMouse(const Pair<float> &size, int mouse_x, in
 	return glm::normalize(glm::vec3(pw) - glm::vec3(world.camera->getCameraPosition()));
 }
 
-bool DefaultState::isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const float &sphere_radius, float *id) {
+bool NormalViewState::isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const float &sphere_radius, float *id) {
 	glm::vec3 d = world.camera->getCameraPosition() - sphere_pos;
 	float b = dot(d, ray);
 	float cc = dot(d, d) - sphere_radius * sphere_radius;
@@ -155,7 +155,7 @@ bool DefaultState::isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_p
 	}
 }
 
-void DefaultState::changeInputState(Window *w, const InputState &state) {
+void NormalViewState::changeInputState(Window *w, const InputState &state) {
 	switch (state) {
 		case MOUSE_PASSIVE: {
 			mouse.first = true;
@@ -284,7 +284,7 @@ void DefaultState::changeInputState(Window *w, const InputState &state) {
 	}
 }
 
-void DefaultState::defaultKeyCallback(Window *w) {
+void NormalViewState::defaultKeyCallback(Window *w) {
 	w->setKeysCallback([this, w](GLFWwindow *window, int key, int code, int action, int mod) {
 		switch (action) {
 			case GLFW_REPEAT:
@@ -335,7 +335,7 @@ private:
 	std::function<void()> m_updateFun{};
 };
 
-void DefaultState::onAttach() {
+void NormalViewState::onAttach() {
 	State::onAttach();
 	srand(time(NULL));
 	WindowSettings s{};
@@ -343,7 +343,6 @@ void DefaultState::onAttach() {
 	s.size = {1366, 768};
 	s.position = {400, 12};
 
-#define BIG
 #ifdef BIG
 	s.position = {10, 606};
 #endif // BIG
@@ -515,7 +514,7 @@ void DefaultState::onAttach() {
 	});
 }
 
-void DefaultState::onDetach() {
+void NormalViewState::onDetach() {
 	State::onDetach();
 	std::cout << "Detaching \"" << this->getName() << "\" from StateManager\n";
 	// delete all buffers
@@ -523,14 +522,15 @@ void DefaultState::onDetach() {
 	// delete all shaders
 	igm->onDetach();
 	w->onDetach();
+#undef BIG
 }
 
-void DefaultState::onUpdate() {
+void NormalViewState::onUpdate() {
 }
 
-void DefaultState::onRender() {
+void NormalViewState::onRender() {
 }
 
-bool DefaultState::isCurrentStateEnd() {
+bool NormalViewState::isCurrentStateEnd() {
 	return glfwWindowShouldClose(w->getContext());
 }

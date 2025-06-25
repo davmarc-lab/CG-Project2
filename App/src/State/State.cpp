@@ -1,7 +1,7 @@
 #include "../../include/State/State.hpp"
 
 void StateManager::clean() {
-    // detach the current state before everything
+	// detach the current state before everything
 	if (this->m_currentState != nullptr) {
 		if (this->m_currentState->isAttached())
 			this->m_currentState->onDetach();
@@ -14,6 +14,7 @@ void StateManager::clean() {
 		if (state->isAttached())
 			state->onDetach();
 	}
+	ogl::EventManager::instance()->cleanAll();
 }
 
 void StateManager::changeState(const std::string &name, const Shared<State> &state) {
@@ -26,6 +27,7 @@ void StateManager::changeState(const std::string &name, const Shared<State> &sta
 	}
 	ASSERT(this->m_cacheStates.count(name));
 	ASSERT(this->m_cacheStates.at(name) != nullptr);
+	ogl::EventManager::instance()->cleanAll();
 
 	this->m_currentState = this->m_cacheStates.at(name);
 	this->m_currentState->onAttach();

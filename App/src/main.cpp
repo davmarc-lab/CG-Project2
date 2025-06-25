@@ -1,28 +1,18 @@
-#include <utility>
 #include "../../Opengl-Core/include/Core.hpp"
 
 #include "../include/ECS/EcsScene.hpp"
 #include "../include/ECS/EntityManager.hpp"
-#include "../include/ECS/System.hpp"
 
-#include "../include/AppGui.hpp"
-
-#include "../include/Factory.hpp"
-#include "../include/PhysicWorld.hpp"
 #include "../include/Profiler.hpp"
-#include "../include/State/DefaultState.hpp"
+#include "../include/State/BootstrapState.hpp"
+#include "../include/State/NormalViewState.hpp"
 #include "../include/State/State.hpp"
 
 #include <GLFW/glfw3.h>
-#include <algorithm>
-#include <array>
+
 #include <functional>
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <iomanip>
-#include <iterator>
-#include <memory>
-#include <vector>
 
 using namespace ogl;
 
@@ -74,7 +64,7 @@ glm::vec3 evaluateNormal(const unsigned int &id) {
 */
 
 int main(int argc, char *argv[]) {
-    // for instancing rendering
+	// for instancing rendering
 	/*
 	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() {
 		sphereModels.clear();
@@ -85,13 +75,13 @@ int main(int argc, char *argv[]) {
 	});
 	*/
 
-	auto ds = CreateShared<DefaultState>();
+	auto ds = CreateShared<NormalViewState>();
 
 	std::cout << "Attaching \"" << ds->getName() << "\" to State Manager\n";
 	sm->changeState(ds->getName(), ds);
 
-	ed->subscribe(event::loop::LOOP_UPDATE, []() { sm->execUpdate(); });
-	ed->subscribe(event::loop::LOOP_RENDER, []() { sm->execRender(); });
+	auto bs = CreateShared<BootstrapState>();
+	sm->changeState(bs->getName(), bs);
 
 	// #define C_DBG
 

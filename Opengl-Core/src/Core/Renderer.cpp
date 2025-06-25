@@ -18,8 +18,10 @@ namespace ogl {
 	ShaderProgram instancedShader = ShaderProgram("instancedVertShader.glsl", "instancedFragShader.glsl");
 
 	void Renderer::init() {
-		rendShader.createShaderProgram();
-		instancedShader.createShaderProgram();
+		if (rendShader.getId() <= 0)
+			rendShader.createShaderProgram();
+		if (instancedShader.getId() <= 0)
+			instancedShader.createShaderProgram();
 
 		// cube
 		this->m_cube.vao.onAttach();
@@ -141,7 +143,7 @@ namespace ogl {
 		this->m_sphere.index.push_back(id);
 		this->m_sphere.modelOffset.push_back(model);
 		this->m_sphere.colorOffset.push_back(color);
-        this->m_sphere.vao.bind();
+		this->m_sphere.vao.bind();
 		this->m_sphere.vboco.bind();
 		this->m_sphere.vboco.setup(this->m_sphere.colorOffset.data(), this->m_sphere.colorOffset.size(), GL_STATIC_DRAW);
 		this->m_sphere.vao.linkAttribFast(4, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
@@ -164,7 +166,7 @@ namespace ogl {
 		this->m_cube.index.push_back(id);
 		this->m_cube.modelOffset.push_back(model);
 		this->m_cube.colorOffset.push_back(color);
-        this->m_cube.vao.bind();
+		this->m_cube.vao.bind();
 		this->m_cube.vboco.bind();
 		this->m_cube.vboco.setup(this->m_cube.colorOffset.data(), this->m_cube.colorOffset.size(), GL_STATIC_DRAW);
 		this->m_cube.vao.linkAttribFast(4, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
@@ -181,7 +183,7 @@ namespace ogl {
 		glVertexAttribDivisor(8, 1);
 	}
 
-	void Renderer::prepareBuffers(const std::vector<glm::mat4>& models, const std::vector<glm::vec4>& colors) {
+	void Renderer::prepareBuffers(const std::vector<glm::mat4> &models, const std::vector<glm::vec4> &colors) {
 		ASSERT(this->m_init);
 		if (this->m_stats.numSpheres) {
 			this->m_sphere.vbomo.bind();
