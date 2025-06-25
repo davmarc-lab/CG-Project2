@@ -14,7 +14,7 @@ class EntityManager {
 public:
 	using Index = unsigned int;
 
-	Index createEntity() {
+	inline Index createEntity() {
 		auto id = this->m_currentId;
 		this->m_currentId++;
 
@@ -22,6 +22,10 @@ public:
 		this->m_ettComponent.emplace(id, std::vector<Shared<Component>>{});
 
 		return id;
+	}
+
+	inline void resetIndex() {
+		this->m_currentId = 0;
 	}
 
 	inline std::vector<Index> getEntities() const {

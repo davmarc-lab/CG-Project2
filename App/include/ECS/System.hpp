@@ -20,6 +20,7 @@ namespace systems {
 		bool removeEntityFromManager(const unsigned int &id);
 		void removeEntityFromScene(const unsigned int &id);
 		bool removeEntityFromAll(const unsigned int &id);
+		void cleanAll();
 
 		std::string getEntityName(const unsigned int &id);
 		void updateEntityName(const unsigned int &id, const std::string &name);

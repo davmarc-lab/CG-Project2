@@ -58,6 +58,15 @@ namespace systems {
 			return em->removeEntity(id);
 		}
 
+		void cleanAll() {
+            // remove all entities from memory
+			for (const auto e : em->getEntities()) {
+				removeEntityFromAll(e);
+			}
+			// reset ecs index
+			em->resetIndex();
+		}
+
 		std::string getEntityName(const unsigned int &id) {
 			return em->isEntityValid(id) ? em->getEntityName(id) : "INVALID";
 		}

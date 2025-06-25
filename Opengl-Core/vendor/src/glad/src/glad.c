@@ -39,7 +39,7 @@ void _post_call_callback_default_gl(const char *name, void *funcptr, int len_arg
 
     if (error_code != GL_NO_ERROR) {
     	// Needs to test the wrapper debug callback
-        fprintf(stderr, "ERROR %d in %s\n", error_code, name);
+        // fprintf(stderr, "ERROR %d in %s\n", error_code, name);
     }
 }
 

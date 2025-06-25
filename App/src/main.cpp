@@ -77,11 +77,12 @@ int main(int argc, char *argv[]) {
 
 	auto ds = CreateShared<NormalViewState>();
 
-	std::cout << "Attaching \"" << ds->getName() << "\" to State Manager\n";
 	sm->changeState(ds->getName(), ds);
+	sm->sync();
 
 	auto bs = CreateShared<BootstrapState>();
 	sm->changeState(bs->getName(), bs);
+	sm->sync();
 
 	// #define C_DBG
 
@@ -110,6 +111,7 @@ int main(int argc, char *argv[]) {
 		std::cout << "ER\n";
 		std::cout << "---END---\n";
 #endif
+		sm->sync();
 	}
 
 	// while (!glfwWindowShouldClose(w.getContext())) {

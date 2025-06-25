@@ -12,8 +12,8 @@ public:
 
 	virtual bool isCurrentStateEnd() override;
 
-	BootstrapState() :
-		State("Bootstrap State") {}
+	BootstrapState(const std::string& name = "Bootstrap State") :
+		State(name) {}
 
 	virtual ~BootstrapState() override = default;
 

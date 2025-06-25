@@ -336,6 +336,7 @@ private:
 };
 
 void NormalViewState::onAttach() {
+    ASSERT(!this->m_attached);
 	State::onAttach();
 	srand(time(NULL));
 	WindowSettings s{};
@@ -515,8 +516,9 @@ void NormalViewState::onAttach() {
 }
 
 void NormalViewState::onDetach() {
+    ASSERT(this->m_attached);
 	State::onDetach();
-	std::cout << "Detaching \"" << this->getName() << "\" from StateManager\n";
+    systems::ecs::cleanAll();
 	// delete all buffers
 	// delete all textures
 	// delete all shaders
