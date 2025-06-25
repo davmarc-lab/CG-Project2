@@ -175,7 +175,7 @@ namespace ogl {
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-        // error callback
+		// error callback
 		glfwSetErrorCallback(errorCallback);
 
 		this->m_context = glfwCreateWindow(this->m_settings.size.x, this->m_settings.size.y, this->m_settings.name.c_str(),
@@ -222,14 +222,16 @@ namespace ogl {
 		// debug callback
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
-		int debugFlags;
-		glGetIntegerv(GL_CONTEXT_FLAGS, &debugFlags);
+		if (this->m_settings.debugMode) {
+			int debugFlags;
+			glGetIntegerv(GL_CONTEXT_FLAGS, &debugFlags);
 
-		if (debugFlags & GL_CONTEXT_FLAG_DEBUG_BIT) {
-			glEnable(GL_DEBUG_OUTPUT);
-			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-			glDebugMessageCallback(glDebugOutput, nullptr);
-			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+			if (debugFlags & GL_CONTEXT_FLAG_DEBUG_BIT) {
+				glEnable(GL_DEBUG_OUTPUT);
+				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+				glDebugMessageCallback(glDebugOutput, nullptr);
+				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+			}
 		}
 
 		// enable blend

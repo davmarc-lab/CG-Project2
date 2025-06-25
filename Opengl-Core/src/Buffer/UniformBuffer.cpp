@@ -6,8 +6,10 @@ namespace ogl {
 		m_variable(std::move(variable)) {}
 
 	UniformBuffer::~UniformBuffer() {
-		if (this->m_id)
+		if (this->m_id) {
 			glDeleteBuffers(1, &this->m_id);
+			this->m_id = 0;
+		}
 	}
 
 	void UniformBuffer::onAttach() {

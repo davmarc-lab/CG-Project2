@@ -17,7 +17,6 @@ namespace ogl {
 			return;
 
 		// Delete operations
-
 		glDeleteTextures(1, &this->m_id);
 		this->m_id = 0;
 	}

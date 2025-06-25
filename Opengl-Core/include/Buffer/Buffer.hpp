@@ -14,7 +14,7 @@ namespace ogl {
 		inline virtual void unbind() const {}
 
 		Buffer() = default;
-		virtual ~Buffer() { this->onDetach(); }
+		virtual ~Buffer() = default;
 
 	protected:
 		unsigned int m_id = 0;

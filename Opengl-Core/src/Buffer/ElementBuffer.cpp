@@ -3,8 +3,10 @@
 
 namespace ogl {
 	ElementBuffer::~ElementBuffer() {
-		if (this->m_id)
+		if (this->m_id) {
 			glDeleteBuffers(1, &this->m_id);
+			this->m_id = 0;
+		}
 	}
 
 	void ElementBuffer::onAttach() {

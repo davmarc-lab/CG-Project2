@@ -102,6 +102,17 @@ namespace ogl {
 		}
 	}
 
+	ShaderProgram::~ShaderProgram() {
+		if (this->m_id) {
+			glDeleteProgram(this->m_id);
+			this->m_id = 0;
+			this->m_vert.reset();
+			this->m_frag.reset();
+			if (this->m_geom != nullptr)
+				this->m_geom.reset();
+		}
+	}
+
 	void ShaderProgram::use() const { glUseProgram(this->m_id); }
 
 	void ShaderProgram::setBool(const std::string &name, bool value) const {

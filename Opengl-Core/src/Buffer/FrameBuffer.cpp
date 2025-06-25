@@ -3,8 +3,10 @@
 
 namespace ogl {
 	FrameBuffer::~FrameBuffer() {
-		if (this->m_id)
+		if (this->m_id) {
 			glDeleteFramebuffers(1, &this->m_id);
+			this->m_id = 0;
+		}
 	}
 
 	void FrameBuffer::setRenderBuffer(const RBConfig &config) {
@@ -38,11 +40,11 @@ namespace ogl {
 
 	void FrameBuffer::rescaleFrameBuffer(const unsigned int &width, const unsigned int &height) {
 		// calls rescaleTexture()
-        this->bind();
+		this->bind();
 		this->m_texture.setSize({width, height});
 		this->m_rbo.rescaleRenderBuffer(width, height);
 		glFramebufferRenderbuffer(this->m_config.operation, this->m_rbo.getAttachmentType(), GL_RENDERBUFFER, this->m_rbo.getId());
-        this->unbind();
+		this->unbind();
 	}
 
 	void FrameBuffer::onAttach() {
@@ -56,8 +58,8 @@ namespace ogl {
 
 	void FrameBuffer::bind() const {
 		glBindFramebuffer(this->m_config.operation, this->m_id);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(.3, .3, .3, 1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(.3, .3, .3, 1);
 	}
 
 	void FrameBuffer::unbind() const {

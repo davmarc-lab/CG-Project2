@@ -40,8 +40,11 @@ public:
 
 	inline void setEntityName(const Index &id, const std::string &name) { this->m_entities.at(id) = std::move(name); }
 
-	bool removeEntity(const Index &id) {
+	inline bool removeEntity(const Index &id) {
 		this->m_entities.erase(id);
+		for (auto c : this->m_ettComponent.at(id)) {
+			c.reset();
+		}
 		this->m_ettComponent.erase(id);
 		for (auto it = this->m_compEntity.begin(); it != this->m_compEntity.end();) {
 			auto &ids = it->second;
