@@ -6,6 +6,10 @@
 
 #include "../../../Opengl-Core/include/Core.hpp"
 
+/**
+ * @brief This class is used to manage a scene with meshes that will be rendered.
+ * It's implemented using Singleton.
+ */
 class BasicScene {
 public:
 	void init(const Shared<ogl::Camera> &mainCamera) { this->mainCamera = mainCamera; }
@@ -23,10 +27,10 @@ public:
 	void operator=(const BasicScene &other) = delete;
 
 	/*
-	 * Retrieves the instance of the BasicScene if it's not created.
-	 * This function is thread safe using a simple `std::mutex`.
+	 * @brief Retrieves the instance of the BasicScene.
+	 * If it's not instanced, it will be instanced automatically.
 	 *
-	 * @return `BasicScene` unique object.
+	 * @return a `Shared<BasicScene>` object
 	 */
 	inline static Shared<BasicScene> instance() {
 		if (s_pointer == nullptr) {

@@ -5,6 +5,10 @@
 
 #include "Utils.hpp"
 
+/**
+ * @brief Simple data structure to store mesh information: position,
+ * scale, rotation and if it needs to be rendered.
+ */
 struct BasicInfo {
 	glm::vec3 position{};
 	glm::vec3 scale{1, 1, 1};

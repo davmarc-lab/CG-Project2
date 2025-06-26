@@ -116,7 +116,7 @@ public:
 
 	/**
 	 * This method works like a barrier: after calling `StateManager::changeState()`,
-	 * detach the current state; clear the `@see EventManager`, attach the queued `State`,
+	 * detach the current state; clear the `EventManager`, attach the queued `State`,
 	 * defines new event listeners.
 	 * It needs to be called after every `StateManager::changeState()` or at the end
 	 * of a loop before calling `StateManager::shouldExit()`.
@@ -147,7 +147,7 @@ public:
 	 * If the given `State` is not in the cache system, the `StateManager` will cache the `State`
 	 * with the state's name.
 	 * To make it work the method `StateManager::sync()` needs to be called
-	 * (read `@see StateManager::sync()` for further informations).
+	 * (read `StateManager::sync()` for further informations).
 	 *
 	 * @param State a shared pointer to the `State`
 	 */
