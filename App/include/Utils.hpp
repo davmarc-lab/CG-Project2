@@ -3,21 +3,52 @@
 #include <glm/glm.hpp>
 #include <string>
 
-enum LightType {
-	LIGHT_DIRECTIONAL,
-	LIGHT_POINT,
-	LIGHT_SPOT,
-};
+/**
+ * @namespace light
+ * Desc.
+ *
+ * TODO put everything of this file in the namespace light.
+ */
+namespace light {
+	/*!
+	 * @enum LightType
+	 * @brief Lights type used in shader programs.
+	 *
+	 * This enum is needed to distinguish the lights in shader computation.
+	 */
+	enum LightType {
+		LIGHT_DIRECTIONAL,
+		LIGHT_POINT,
+		LIGHT_SPOT,
+	};
+} // namespace light
+
+// REMOVE THIS LINE
+using namespace light;
 
 #define SHADER_MAX_LIGHTS 32
 
+/**
+ * @brief Lights attenuation data structure.
+ */
 struct LightConstraint {
-	float constant = 1.f, linear = .09f, quadratic = .032f;
+	/// light constant value
+	float constant = 1.f;
+	/// light linear value
+	float linear = .09f;
+	/// light quadratic value
+	float quadratic = .032f;
 };
 
+/**
+ * @brief Light vectors for light component.
+ */
 struct LightVectors {
+	/// light ambient vector
 	glm::vec3 ambient{.1f, .1f, .1f};
+	/// light diffuse vector
 	glm::vec3 diffuse{.8f, .8f, .8f};
+	/// light specular vector
 	glm::vec3 specular{1, 1, 1};
 };
 

@@ -449,80 +449,130 @@ private:
 };
 
 /**
- * @brief Component to store data.
+ * @brief Component to store mesh `ogl::Texture` data.
+ *
+ * @see ogl::Texture
  */
 class TextureComponent : public Component {
 public:
+	/**
+	 * @brief Instance an empty Component.
+	 */
 	TextureComponent() :
 		Component() {
 	}
 
+	/**
+	 * @brief Instance a Component with the given path.
+	 *
+	 * @params path texture's file path
+	 */
 	TextureComponent(std::string path) :
 		Component(), path(std::move(path)) {
 	}
 
 	virtual ~TextureComponent() override = default;
 
+	/// texture object
 	ogl::Texture texture{};
+	/// texture file path
 	std::string path{};
 };
 
 /**
- * @brief Component to store data.
+ * @brief This Component is used like MultiMesh, but it create a sort of tree
+ * structure where each mesh has children. Each children mesh can also
+ * have children etc.
+ *
+ * @note An Entity with MultiMesh component means that each mesh stored
+ * in that component follow the anchor transformation. In this component
+ * if a children mesh is transformed the parent mesh isn't affected. But
+ * if the parent node is transformed all his children are affected.
  */
 class ParentComponent : public Component {
 public:
+	/**
+	 * @brief Instance basic Component.
+	 */
 	ParentComponent() :
 		Component() {
 	}
 
 	virtual ~ParentComponent() = default;
 
+	/// vector containing children ids.
 	std::vector<unsigned int> children{};
 };
 
 /**
- * @brief Component to store data.
+ * @brief Component to store mesh shader data and some mesh information like
+ * light computation and the capability to reflect the skybox texture.
  */
 class ShaderComponent : public Component {
 public:
+	/// Can't use an empty constructor
 	ShaderComponent() = delete;
 
+	/**
+	 * @brief Instances the Component by giving shaders path and light computation.
+	 * The light computation might be used in `systems` while sending data
+	 * to shaders.
+	 *
+	 * @param comp mesh light computation
+	 * @param vert vertex shader path
+	 * @param frag fragment shader path
+	 * @param geom geometry shader path (default none)
+	 * @param reflective true if the mesh reflects the skybox (if present)
+	 *
+	 * @note LightComputation tell to the `ogl::ShaderProgram` which alghoritm
+	 * will be used while shading that mesh.
+	 */
 	ShaderComponent(const LightComputation &comp, const std::string &vert, const std::string &frag, const bool &reflective = false, const std::string &geom = "") :
 		computation(comp), vert(std::move(vert)), frag(std::move(vert)), reflective(reflective), geom(std::move(geom)), Component() {}
 
 	virtual ~ShaderComponent() override = default;
 
+	/// mesh light computation @see ShaderComponent(const LightComputation &comp, const std::string &vert, const std::string &frag, const bool &reflective = false, const std::string &geom = "")
 	LightComputation computation = LightComputation::PHONG;
+	/// mesh reflectiveness
 	bool reflective = false;
+	/// vertex shader path
 	std::string vert{};
+	/// fragment shader path
 	std::string frag{};
+	/// geometry shader path
 	std::string geom{};
 };
 
 namespace light {
-	/**
-	 * @brief
-	 */
 	inline std::vector<LightComputation> lightCompsEnm{NONE, PHONG, BLINN_PHONG, INT_PHONG, INT_BLINN_PHONG};
-	/**
-	 * @brief
-	 */
 	inline std::vector<std::string> lightCompStr = {"None", "Phong", "Blinn-Phong", "Int Phong", "Int Blinn-Phong"};
 } // namespace light
 
 /**
- * @brief Component to store data.
+ * @brief This Component is used to render a mesh in the ogl::Window.
+ * It stores the render call that will be called by `systems`.
  */
 class RenderComponent : public Component {
 public:
+	/**
+	 * @brief Sets the render call that will be used.
+	 *
+	 * @param func a callback function
+	 */
 	void setRenderCall(const std::function<void()> &func) { this->m_renderCall = std::move(func); }
 
+	/**
+	 * @brief This method calls the render callback if is defined.
+	 */
 	void call() {
 		if (this->m_renderCall != nullptr)
 			this->m_renderCall();
 	}
 
+	/**
+	 * @brief Instance basic Component.
+	 */
 	RenderComponent() :
 		Component() {
 	}
@@ -530,26 +580,41 @@ public:
 	virtual ~RenderComponent() override = default;
 
 private:
+	/// render call function
 	std::function<void()> m_renderCall = nullptr;
 };
 
 /**
- * @brief Component to store data.
+ * @brief This component is used to query the ECS for all primitives that
+ * are rendered using instanced rendering.
  */
 class InstancedComponent : public Component {
 public:
+	/**
+	 * @brief Instance a Component that will render the given primitive type.
+	 *
+	 * @params type primitive type to render
+	 *
+	 * @see ogl::RenderPrimitiveType
+	 */
 	InstancedComponent(const ogl::RenderPrimitiveType &type) :
 		type(type), Component() {}
 
 	virtual ~InstancedComponent() override = default;
+
+	/// primitive type of the mesh
 	ogl::RenderPrimitiveType type;
 };
 
 /**
- * @brief Component to store data.
+ * @brief Component used to query all meshes that needs to be outlined
+ * using a simple stencil buffer.
  */
 class Outlined : public Component {
 public:
+	/**
+	 * @brief Instances basic Component.
+	 */
 	Outlined() :
 		Component() {
 	}
@@ -557,24 +622,61 @@ public:
 	virtual ~Outlined() = default;
 };
 
-struct Material {
+/**
+ * @brief Basic class to store material information for texturing and light computation.
+ */
+class Material {
+public:
+	/// ambient vector
 	glm::vec3 ambient{0.f};
+	/// diffuse vector
 	glm::vec3 diffuse{0.55f};
+	/// specular vector
 	glm::vec3 specular{0.7f};
+	/// material shininess
 	float shininess = 32.f;
+	/// material name
 	std::string name{"New Material"};
 
+	/**
+	 * @brief Instances basic material.
+	 */
 	Material() = default;
+
+	/**
+	 * @brief Instances a material with the given data.
+	 *
+	 * @param ambient a `glm::vec3` vector
+	 * @param diffuse a `glm::vec3` vector
+	 * @param specular a `glm::vec3` vector
+	 * @param shininess material' shininess value
+	 * @param name material's name
+	 */
 	Material(const glm::vec3 &ambient, const glm::vec3 &diffuse, const glm::vec3 &specular, const float shininess, const std::string &name) :
 		ambient(ambient), diffuse(diffuse), specular(specular), shininess(shininess), name(std::move(name)) {}
 
+	/**
+	 * @brief Overrides the equal operator, two materials are equal if they have
+	 * the same name.
+	 *
+	 * @param other other material
+	 */
 	bool operator==(const Material &other) {
 		return this->name == other.name;
 	}
 };
 
+/**
+ * @namespace material
+ *
+ * Namespace containing all material utilities.
+ */
 namespace material {
 
+	/**
+	 * @brief In this enum each value is an `unsigned int` so it can be used like index
+	 * to select an element from materials pool.
+	 */
 	enum MaterialType : unsigned int {
 		MATERIAL_NONE = 0,
 		MATERIAL_RPLASTIC,
@@ -584,14 +686,10 @@ namespace material {
 		MATERIAL_EMERALD,
 	};
 
-	/**
-	 * @brief
-	 */
+	/// initial material types @see MaterialType
 	inline std::vector<unsigned int> materialTypes{MATERIAL_NONE, MATERIAL_RPLASTIC, MATERIAL_YPLASTIC, MATERIAL_SLATE, MATERIAL_BRASS, MATERIAL_EMERALD};
 
-	/**
-	 * @brief
-	 */
+	/// vector containing defaults start materials
 	inline std::vector<Material> defaultMaterials = {
 		Material(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 32.0f, "None"),
 		Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.7f, 0.6f, 0.6f), 32.0f, "Red Plastic"),
@@ -602,66 +700,132 @@ namespace material {
 	};
 
 	/**
-	 * @brief
+	 * @brief Retrieves the material by the given type or from a simple
+	 * index from the defaultMaterials vector.
+	 *
+	 * @param index the index or MaterialType
+	 *
+	 * @see MaterialType
 	 */
 	inline Material getMaterialFromPool(const MaterialType &index) { return defaultMaterials[index]; }
 
 } // namespace material
 
 /**
- * @brief Component to store data.
+ * @brief Component to store the mesh Material data.
+ *
+ * @see Material
+ * @see material::getMaterialFromPool()
  */
 class MaterialComponent : public Component {
 public:
+	/**
+	 * @brief Instances a Component with the given material.
+	 *
+	 * @param material a Material object
+	 */
 	MaterialComponent(const Material &material = material::defaultMaterials[0]) :
 		Component(), material(material) {
 	}
 
+	/**
+	 * @brief Instances a Component by using the given materila type to retrieve
+	 * the Material object.
+	 *
+	 * @param type a material type or index
+	 *
+	 * @see material::MaterialType
+	 * @see material::getMaterialFromPool()
+	 */
 	MaterialComponent(const material::MaterialType &type) :
 		Component(), material(material::getMaterialFromPool(type)) {
 	}
 
 	virtual ~MaterialComponent() = default;
 
+	/// mesh material
 	Material material;
 };
 
 /**
- * @brief Component to store data.
+ * @brief Component to store light data. A light is an emitting mesh, rendered or not,
+ * that for each ogl::ShaderProgram used in the scene, its data will be sent to the shader
  */
 class LightComponent : public Component {
 public:
 	LightComponent() = delete;
 
-	// Directional Light
+	/**
+	 * @brief Instances a directional light with the given direction.
+	 *
+	 * @params direction light direction
+	 */
 	LightComponent(const glm::vec3 &direction) :
 		type(LightType::LIGHT_DIRECTIONAL), direction(direction), Component() {
 	}
 
-	// Point Light
+	/**
+	 * @brief Instances a point light with the given position and LightConstraint.
+	 *
+	 * @params position light position
+	 * @params constraint light attenuation parameter
+	 *
+	 * @see LightConstraint
+	 */
 	LightComponent(const glm::vec3 &position, const LightConstraint &constraint) :
 		type(LightType::LIGHT_POINT), position(position), attenuation(constraint), Component() {
 	}
 
-	// Spot Light
+	/**
+	 * @brief Instances a spot light with the given position, direction,
+	 * LightConstraint, light cutoff and outer cutoof.
+	 *
+	 * @params position light position
+	 * @params direction light direction
+	 * @params constraint light attenuation parameter
+	 * @params cutOff light cutoff parameter
+	 * @params outerCutoff light outer cutoff parameter
+	 *
+	 * @see LightConstraint
+	 */
 	LightComponent(const glm::vec3 &position, const glm::vec3 &direction, const LightConstraint &constraint, const float &cutOff = 12.5f, const float &outerCutoff = 17.5f) :
 		type(LightType::LIGHT_SPOT), position(position), direction(direction), attenuation(constraint), cutOff(cutOff), outerCutoff(outerCutoff), Component() {
 	}
 
 	virtual ~LightComponent() override = default;
 
+	/// light color, default white
 	glm::vec3 color{1, 1, 1};
+	/// light intensity
 	float intensity = 1.f;
+	/**
+     * @brief Light type for shader programs.
+     * This member is mainly used to create shader data blocks.
+     *
+     * @see LightType
+     */
 	LightType type = LightType::LIGHT_DIRECTIONAL;
+	/**
+	 * @brief Light components vectors
+	 *
+	 * @see LightVectors
+	 */
 	LightVectors vectors{};
 
+	/// light direction
 	glm::vec3 direction{1, -1, -1};
 
+	/// light position
 	glm::vec3 position{};
+	/// light attenuation
 	LightConstraint attenuation{};
 
-	float cutOff = 12.5f, outerCutoff = 17.5f;
+	/// light cutoff
+	float cutOff = 12.5f;
+	/// light outer cutoff
+	float outerCutoff = 17.5f;
 
+	/// light caster
 	bool caster = true;
 };
 
