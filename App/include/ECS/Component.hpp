@@ -465,7 +465,7 @@ public:
 	/**
 	 * @brief Instance a Component with the given path.
 	 *
-	 * @params path texture's file path
+	 * @param path texture's file path
 	 */
 	TextureComponent(std::string path) :
 		Component(), path(std::move(path)) {
@@ -545,7 +545,9 @@ public:
 };
 
 namespace light {
+	/// list of light algorithms for shader programs
 	inline std::vector<LightComputation> lightCompsEnm{NONE, PHONG, BLINN_PHONG, INT_PHONG, INT_BLINN_PHONG};
+	/// list of strings for each LightComputation
 	inline std::vector<std::string> lightCompStr = {"None", "Phong", "Blinn-Phong", "Int Phong", "Int Blinn-Phong"};
 } // namespace light
 
@@ -593,7 +595,7 @@ public:
 	/**
 	 * @brief Instance a Component that will render the given primitive type.
 	 *
-	 * @params type primitive type to render
+	 * @param type primitive type to render
 	 *
 	 * @see ogl::RenderPrimitiveType
 	 */
@@ -758,7 +760,7 @@ public:
 	/**
 	 * @brief Instances a directional light with the given direction.
 	 *
-	 * @params direction light direction
+	 * @param direction light direction
 	 */
 	LightComponent(const glm::vec3 &direction) :
 		type(LightType::LIGHT_DIRECTIONAL), direction(direction), Component() {
@@ -767,8 +769,8 @@ public:
 	/**
 	 * @brief Instances a point light with the given position and LightConstraint.
 	 *
-	 * @params position light position
-	 * @params constraint light attenuation parameter
+	 * @param position light position
+	 * @param constraint light attenuation parameter
 	 *
 	 * @see LightConstraint
 	 */
@@ -780,11 +782,11 @@ public:
 	 * @brief Instances a spot light with the given position, direction,
 	 * LightConstraint, light cutoff and outer cutoof.
 	 *
-	 * @params position light position
-	 * @params direction light direction
-	 * @params constraint light attenuation parameter
-	 * @params cutOff light cutoff parameter
-	 * @params outerCutoff light outer cutoff parameter
+	 * @param position light position
+	 * @param direction light direction
+	 * @param constraint light attenuation parameter
+	 * @param cutOff light cutoff parameter
+	 * @param outerCutoff light outer cutoff parameter
 	 *
 	 * @see LightConstraint
 	 */
@@ -799,11 +801,11 @@ public:
 	/// light intensity
 	float intensity = 1.f;
 	/**
-     * @brief Light type for shader programs.
-     * This member is mainly used to create shader data blocks.
-     *
-     * @see LightType
-     */
+	 * @brief Light type for shader programs.
+	 * This member is mainly used to create shader data blocks.
+	 *
+	 * @see LightType
+	 */
 	LightType type = LightType::LIGHT_DIRECTIONAL;
 	/**
 	 * @brief Light components vectors
@@ -830,26 +832,38 @@ public:
 };
 
 /**
- * @brief Component to store data.
+ * @brief This Component stores one callback for each input key pressed.
+ * When a key is pressed if there are callback linked to that key, the callback
+ * will be executed.
+ *
+ * @note While using with GLFW before calling a callback a `ogl::Window` must
+ * be attached.
  */
 class InputComponent : public Component {
 public:
 	/**
-	 * @brief
+	 * @brief Registers a callback to a specific key.
+	 *
+	 * @param key an `unsigned int` key code
+	 * @param callback a function to be called
 	 */
 	inline void registerAction(const unsigned int &key, const std::function<void()> &callback) {
 		this->callbacks.emplace(key, std::move(callback));
 	}
 
 	/**
-	 * @brief
+	 * @brief Calls the function in the map at key index.
+	 *
+	 * @param key an `unsigned int` key code
 	 */
 	inline void call(const unsigned int &key) {
 		this->callbacks.at(key)();
 	}
 
 	/**
-	 * @brief
+	 * @brief Retrieves all the key that are linked to a callback.
+	 *
+	 * @return a `std::vector<unsigned int>` object containing all the key registered
 	 */
 	inline std::vector<unsigned int> getAllKeys() const {
 		std::vector<unsigned int> keys{};
@@ -862,18 +876,31 @@ public:
 		// return std::vector<unsigned int>{kv.begin(), kv.end()};
 	}
 
+	/**
+	 * @brief Instances basic Component.
+	 */
 	InputComponent() = default;
 
 	~InputComponent() override = default;
 
+	/// map containing a callback for a specified key
 	std::map<unsigned int, std::function<void()>> callbacks;
 };
 
 /**
- * @brief Component to store data.
+ * @brief This Component allow to execute an action at every frame for a specified time.
+ *
+ * @note TimeAnimation::updateTick() must be called at every frame to work.
  */
 class TimeAnimation : public Component {
 public:
+	/**
+	 * @brief Updates the current state of the animation by calling the callback.
+	 * It uses a `startTime` and a `currentTime` allowing to stop the action after
+	 * specified time.
+	 *
+	 * @param currentTime
+	 */
 	void updateTick(const float &currentTime) {
 		if (this->startTime + this->timeToLive >= currentTime)
 			this->func();
@@ -883,80 +910,155 @@ public:
 
 	TimeAnimation() = delete;
 
+	/**
+	 * @brief Instances an animation that will live `timeToLive` seconds after it has
+	 * been created `startTime` and at every frame is needed to execute the callback.
+	 *
+	 * @param startTime the time when animation starts
+	 * @param timeToLive the duration in seconds of the animation
+	 * @param func the animation action
+	 */
 	TimeAnimation(const float &startTime, const float &timeToLive, std::function<void()> &&func) :
 		startTime(startTime), timeToLive(timeToLive), func(func), Component() {
 	}
 
 	virtual ~TimeAnimation() override = default;
 
+	/// callback function
 	std::function<void()> func{};
+	/// start time of the animation
 	float startTime;
+	/// duration of the animation
 	float timeToLive;
+	/// determines if the animation is finished, if it's true the callback will be called
 	bool dead = false;
 };
 
 /**
- * @brief Component to store data.
+ * @brief This Component is very similar to TimeAnimation, the only difference is that
+ * this "animation" has not an end but it defines a behaviour of a mesh (like an AI).
  */
 class BehaviourComponent : public Component {
 public:
+	/**
+	 * @brief Instances basic Component to query the ECS when it needs to update
+	 * a mesh position or color or scale etc.
+	 */
 	BehaviourComponent() :
 		Component() {
 	}
 
 	virtual ~BehaviourComponent() = default;
 
+	/// function called every frame to update the mesh
 	std::function<void()> func = nullptr;
 };
 
 /**
- * @brief Component to store data.
+ * @brief Component to store data of a ogl::Camera.
+ *
+ * It allows the ECS to interact with the camera in the scene.
+ * For example it can be showed in an ImGuiPanel and the user can modify
+ * the internal parameters from there.
  */
 class CameraComponent : public Component {
 public:
+	/// shared pointer to the ogl::Camera object
 	Shared<ogl::Camera> camera{};
 
+	/**
+	 * @brief Instances basic Component to query the ECS when needed.
+	 */
 	CameraComponent() = default;
 	virtual ~CameraComponent() override = default;
 };
 
 /**
- * @brief Component to store data.
+ * @brief This Component stores all the mesh data regarding basic physics like
+ * velocity, force, acceleration.
+ *
+ * All the meshes with this Component must be added to a PhysicWorld to simulate
+ * the physics.
+ *
+ * @see PhysicWorld
  */
 class PhysicComponent : public Component {
 public:
+	/// mesh velocity
 	glm::vec3 velocity{};
+	/// mesh acceleration
 	glm::vec3 a{};
+	/// mesh force
 	glm::vec3 force{};
 
+	/// mesh mass
 	float mass = 1;
+	/// mesh restitution factor
 	float restitution = 1;
 
+	/**
+	 * @brief Instances basic Component to query the ECS.
+	 */
 	PhysicComponent() :
 		Component() {}
+
 	virtual ~PhysicComponent() override = default;
 };
 
+// TODO: put it in a namespace
+/**
+ * @enum ColliderType
+ * @brief Types of collider to handle collision response in a PhysicWorld.
+ *
+ * @note All kind of collision response in a PhysicWorld are defined
+ * in Solvers and after they need to be attached to the PhysicWorld.
+ *
+ * @see Solver
+ */
 enum ColliderType : unsigned int {
 	COLLIDER_SPHERE = 0,
 	COLLIDER_CUBE,
 };
 
 /**
- * @brief Component to store data.
+ * @brief Component to store mesh collider data to solve collision in a PhysicWorld.
+ *
+ * @note It is also possible to use a default system of collision detection
+ * integrated with ECS systems, it uses a simple AABB detection.
+ *
+ * @see systems::collision::getCollisions()
  */
 class ColliderComponent : public Component {
 public:
+	/// collider type
 	ColliderType type = COLLIDER_CUBE;
+	/// collider center position
 	glm::vec3 position{};
+	/// collider normal vector (in case is a plane)
 	glm::vec3 normal{};
+	/// collider size
+	/// @note It need to follow the projection: in case the projection is ortho
+	/// the size should be different from perspective projection.
 	glm::vec3 size{};
+	/// bottom left corner coords
 	glm::vec3 botLeft{};
+	/// top right corner coords
 	glm::vec3 topRight{};
 
+	/// define if the mesh is simulated in the PhsyicWorld or not
 	bool isStatic = false;
 
-	// optimized bounding box
+	/**
+	 * @brief This method updates the collider cornders coords by iterating over all
+	 * mesh vertices.
+	 * It will find the minimum and the maximum corner in World Space
+	 * Coordinates, the corresponding vertex coords are the new bottom left and
+	 * top right corners.
+	 *
+	 * @note This is also called in this project: Optimized Bounding Box.
+	 * This means that the collider "perfectly" contains the mesh in the most
+	 * efficient single square.
+	 */
 	void updateCollider(const std::vector<glm::vec3> &coords, const glm::mat4 &model) {
 		auto bot = glm::vec3(0);
 		bool first = true;
@@ -990,20 +1092,46 @@ public:
 		this->position = model[3];
 	}
 
-	// not optimized bounding box
+	/**
+	 * @brief This method update a non Optimized Bounding Box by summing the given size
+	 * with the given position.
+	 * This kind of update is generally used for colliders where doesn't matter
+	 * the precision of collision detection.
+	 *
+	 * @param position collider center position
+	 * @param size collider size
+	 *
+	 * @see ColliderComponent::size
+	 */
 	void updateCollider(const glm::vec3 &position, const glm::vec3 &size) {
 		this->botLeft = position - size;
 		this->topRight = position + size;
 	}
 
+	/**
+	 * @brief Checks if the given collider is overlapping with the current one.
+	 *
+	 * @param other collider of the other mesh
+	 *
+	 * @return true if other and this colliders are overlapping
+	 */
 	bool isColliding(const ColliderComponent &other) const {
 		return (this->botLeft.x <= other.topRight.x && this->topRight.x >= other.botLeft.x) &&
 			(this->botLeft.y <= other.topRight.y && this->topRight.y >= other.botLeft.y) &&
 			(this->botLeft.z <= other.topRight.z && this->topRight.z >= other.botLeft.z);
 	}
 
+	/**
+	 * @brief Instances a basic Component.
+	 */
 	ColliderComponent() = default;
 
+	/**
+	 * @brief Instances a non Optimized Bounding Box collider.
+	 *
+	 * @param position collider center position
+	 * @param size collider size (center-right)
+	 */
 	ColliderComponent(const glm::vec3 &position, const glm::vec3 &size) {
 		this->botLeft = position - size;
 		this->topRight = position + size;
@@ -1015,42 +1143,70 @@ public:
 };
 
 /**
- * @brief Component to store data.
+ * @brief Component to store SkyBox texture data.
+ *
+ * It's only purpos is to keep track in the ECS of the Skybox texture id.
+ * It coul be implemented some methods to change the skybox texture by
+ * changing the texture id and clean the previous one.
+ *
+ * @see ogl::Texture
  */
 class SkyboxComponent : public Component {
 public:
 	SkyboxComponent() = delete;
 
+	/**
+	 * @brief Instances basic Component and stores the texture id of the skybox.
+	 *
+	 * @param textureId the skybox texture id
+	 */
 	SkyboxComponent(const unsigned int &textureId) :
 		textureId(textureId), Component() {}
 
 	virtual ~SkyboxComponent() override = default;
 
+	/// skybox texture id
 	unsigned int textureId;
 };
 
+/**
+ * @brief This structure stores data from an imported mesh texture.
+ */
 struct ImportedTexture {
+	/// texture id
 	unsigned int id;
+	/// texture type (diffuse, normal, specular, etc.)
 	std::string type{};
+	/// texture file path
 	std::string path{};
 };
 
 /**
- * @brief Component to store data.
+ * @brief Component to store assimp imported mesh data.
  */
 class ImportedMeshTextures : public Component {
 public:
+	/// imported texture list of the mesh
 	std::vector<ImportedTexture> textures{};
 
+	/**
+	 * @brief Instances basic Component to query the ECS.
+	 */
 	ImportedMeshTextures() = default;
 	virtual ~ImportedMeshTextures() override = default;
 };
 
 /**
- * @brief Component to store data.
+ * @brief This Component allow to hide some entity while rendering the
+ * ImGuiEntityTree panel.
+ *
+ * @see ImGuiEntityTree
  */
 class HideTreeComponent : public Component {
 public:
+	/**
+	 * @brief Instances basic Component to query the ECS.
+	 */
 	HideTreeComponent() = default;
 	virtual ~HideTreeComponent() override = default;
 };

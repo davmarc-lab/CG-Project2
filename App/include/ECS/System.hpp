@@ -15,6 +15,11 @@ struct InstanceData {
 	std::vector<glm::mat4> spheresModel{};
 } inline data;
 
+/**
+ * @namespace systems
+ *
+ * @brief It contains all the ECS systems.
+ */
 namespace systems {
 	namespace ecs {
 		bool removeEntityFromManager(const unsigned int &id);
@@ -46,6 +51,13 @@ namespace systems {
 
 	} // namespace transform
 
+	/**
+	 * @namespace systems::collision
+	 *
+	 * @brief It contains all utilities to retrieve, handle and update mesh ColliderComponent.
+	 *
+	 * @see ColliderComponent
+	 */
 	namespace collision {
 		void updateParentCollider(const unsigned int &id);
 		void updateCollider(const unsigned int &id);
@@ -66,6 +78,12 @@ namespace systems {
 		void updateEnemyLastHit(const unsigned int &id, const float &time);
 		void updatePlayerLastHit(const unsigned int &id, const float &time);
 
+		/**
+		 * @brief Retrieves all entities overlapping each other using simple
+		 * AABB detection.
+		 *
+		 * @return a `std::vector<Pair<unsigned int>>` containing all overlapping entities
+		 */
 		std::vector<Pair<unsigned int>> getCollisions();
 	} // namespace collision
 
