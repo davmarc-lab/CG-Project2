@@ -79,7 +79,7 @@ void BootstrapState::onRender() {
 			ImGui::Text("%s", name.c_str());
 			ImGui::TableNextColumn();
 			if (ImGui::Button("Open")) {
-				sm->changeState(name, state);
+				sm->changeState(state);
 			}
 			ImGui::PopID();
 		}

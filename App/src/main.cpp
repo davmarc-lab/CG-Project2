@@ -77,11 +77,11 @@ int main(int argc, char *argv[]) {
 
 	auto ds = CreateShared<NormalViewState>();
 
-	sm->changeState(ds->getName(), ds);
+	sm->changeState(ds);
 	sm->sync();
 
 	auto bs = CreateShared<BootstrapState>();
-	sm->changeState(bs->getName(), bs);
+	sm->changeState(bs);
 	sm->sync();
 
 	// #define C_DBG

@@ -11,6 +11,11 @@ void StateManager::clean() {
 		this->m_cacheStates.erase(this->m_currentState->getName());
 	}
 
+	if (this->m_queueState != nullptr) {
+		this->m_cacheStates.erase(this->m_queueState->getName());
+		this->m_queueState = nullptr;
+	}
+
 	// detach all cached states
 	for (auto [_, state] : this->m_cacheStates) {
 		if (state->isAttached())
@@ -49,7 +54,6 @@ void StateManager::changeState(const std::string &name) {
 
 void StateManager::changeState(const std::string &name, const Shared<State> &state) {
 	// if there is a state clean that
-
 	if (!this->m_cacheStates.count(name)) {
 		this->m_cacheStates.insert_or_assign(name, state);
 	}
@@ -71,9 +75,4 @@ void StateManager::cacheState(const std::string &name, const Shared<State> &stat
 void StateManager::uncacheState(const std::string &name) {
 	if (this->m_cacheStates.count(name))
 		this->m_cacheStates.erase(name);
-}
-
-void StateManager::uncacheState(const Shared<State> &state) {
-	std::cerr << "USE THE OTHER ONE, MORE EFFICIENT\n";
-	ASSERT(false);
 }
