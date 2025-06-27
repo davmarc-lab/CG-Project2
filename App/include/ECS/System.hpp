@@ -652,23 +652,81 @@ namespace systems {
 		void prepareInstancedMesh(const std::vector<glm::mat4> &models, const std::vector<glm::vec4> &colors);
 
 		/**
+		 * @brief Retrieves all the light data and stores them in a shader block.
+		 *
+		 * It prepares a single light data for sending to the shader program.
+		 *
+		 * @param block[out] the shader light block
+		 * @param light[in] the light in the scene
+		 */
+		void getOtherLightData(LightShaderBlock &block, const Shared<LightComponent> &light);
+
+		/**
+		 * @brief Prepares data of all lights in the scene and put them in an array with
+		 * defined size.
+		 *
+		 * @return an array containing all the lights data prepared to be sent to shader programs.
+		 */
+		std::array<LightShaderBlock, SHADER_MAX_LIGHTS> prepareLightData();
+
+		/**
+		 * @brief This method sends to the used shader program the specific data for
+		 * that light caster.
+		 *
+		 * @warning It doesn't send common light data.
+		 * The method systems::render::sendOtherLightData() should be called anyway.
+		 *
+		 * @param shader the shader program shared pointer
+		 * @param data the array processed with systems::render::preparedLightData()
+		 *
+		 * @see systems::render::preparedLightData()
+		 */
+		void sendOtherLightData(const Shared<ogl::ShaderProgram> &shader, LightShaderBlock &data, size_t &index);
+
+		/**
+		 * @brief This method sends to the used shader program the common lights data.
+		 *
+		 * @warning It doesn't send data for specific casters.
+		 * The method systems::render::sendOtherLightData() should be called anyway.
+		 *
+		 * @param shader the shader program shared pointer
+		 * @param data the array processed with systems::render::preparedLightData()
+		 *
+		 * @see systems::render::preparedLightData()
+		 */
+		void sendLightDataShader(const Shared<ogl::ShaderProgram> &shader, std::array<LightShaderBlock, SHADER_MAX_LIGHTS> data);
+
+		/**
 		 * @brief This method draws the Skybox of the scene
+		 *
 		 * @param id the entity id
+		 * @param shader the skybox shader program
 		 */
 		void renderSkybox(const unsigned int &id, const Shared<ogl::ShaderProgram> &shader);
 
 		/**
-		 * @brief
+		 * @brief Renders all the entities in the scene.
+		 *
+		 * It renderes all the entities with RenderComponent.
 		 */
 		void renderAllMeshes();
 
 		/**
-		 * @brief
+		 * @brief Renders all entities with instanced rendering available.
 		 */
 		void renderInstancedMeshes();
 
 		/**
-		 * @brief
+		 * @brief This method calculates the lines to be drawn from two corners
+		 * of a ColliderComponent.
+		 *
+		 * @param botLeft the bot left corner position
+		 * @param topRight the top right corner position
+		 */
+		std::vector<glm::vec3> getBoxLines(glm::vec3 &botLeft, glm::vec3 &topRight);
+
+		/**
+		 * @brief Renders all bounding box of the entities with a ColliderComponent.
 		 */
 		void renderBoundingBox();
 	} // namespace render

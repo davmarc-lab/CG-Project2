@@ -19,13 +19,23 @@ const auto scene = BasicScene::instance();
 
 const auto BOUNDING_BOX_COLOR = glm::vec4{1, 0, 0, 1};
 
+/**
+ * @brief Data structure to store bounding box information for rendering purpose.
+ */
 struct BoundingBox {
+	/// bounding box shader program
 	ogl::ShaderProgram program = ogl::ShaderProgram("vertexShader.glsl", "fragmentShader.glsl");
+	/// bounding box vao
 	ogl::VertexArray vao{};
+	/// bounding box geometry vbo
 	ogl::VertexBuffer vbog{};
+	/// bounding box colors vbo
 	ogl::VertexBuffer vboc{};
+	/// bounding box vertex coords
 	std::vector<glm::vec3> coords{};
+	/// bounding box colors
 	std::vector<glm::vec4> colors{};
+	/// tells if the bounding box shaders is created
 	bool init = false;
 } defaultShader;
 
