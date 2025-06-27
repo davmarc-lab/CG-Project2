@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{a2b29ff7-14cc-4e44-b783-194b49c24987}</ProjectGuid>
+    <RootNamespace>App</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)bin\int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Opengl-Core\vendor\include\;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\$(Configuration)-$(Platform)\lib\;$(SolutionDir)\Opengl-Core\vendor\include\GLFW\;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Opengl-Core.lib;glfw3.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Opengl-Core\vendor\include\;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\$(Configuration)-$(Platform)\lib\;$(SolutionDir)\Opengl-Core\vendor\include\GLFW\;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Opengl-Core.lib;glfw3.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Opengl-Core\vendor\include\;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\$(Configuration)-$(Platform)\lib\;$(SolutionDir)\Opengl-Core\vendor\include\GLFW\;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Opengl-Core.lib;glfw3.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Opengl-Core\vendor\include\;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\$(Configuration)-$(Platform)\lib\;$(SolutionDir)\Opengl-Core\vendor\include\GLFW\;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Opengl-Core.lib;glfw3.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="include\AppGui.hpp" />
+    <ClInclude Include="include\ECS\Component.hpp" />
+    <ClInclude Include="include\ECS\EcsScene.hpp" />
+    <ClInclude Include="include\ECS\EntityManager.hpp" />
+    <ClInclude Include="include\ECS\System.hpp" />
+    <ClInclude Include="include\Factory.hpp" />
+    <ClInclude Include="include\PhysicWorld.hpp" />
+    <ClInclude Include="include\Profiler.hpp" />
+    <ClInclude Include="include\stb_image.hpp" />
+    <ClInclude Include="include\Utils.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\AppGui.cpp" />
+    <ClCompile Include="src\ECS\EcsScene.cpp" />
+    <ClCompile Include="src\ECS\System.cpp" />
+    <ClCompile Include="src\Factory.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\PhysicWorld.cpp" />
+    <ClCompile Include="src\Profiler.cpp" />
+    <ClCompile Include="src\Utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="resources\models\backpack\ao.jpg" />
+    <Content Include="resources\models\backpack\backpack.mtl" />
+    <Content Include="resources\models\backpack\backpack.obj" />
+    <Content Include="resources\models\backpack\diffuse.jpg" />
+    <Content Include="resources\models\backpack\normal.png" />
+    <Content Include="resources\models\backpack\roughness.jpg" />
+    <Content Include="resources\models\backpack\source_attribution.txt" />
+    <Content Include="resources\models\backpack\specular.jpg" />
+    <Content Include="resources\models\car\car.mtl" />
+    <Content Include="resources\models\car\car.obj" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship Ao_Blender.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship_color_4.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship_curvature.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship_emi.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship_metalness.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship_nmap_2_Tris.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic Spaceship_rough.jpg" />
+    <Content Include="resources\models\spaceship\Intergalactic_Spaceship-(Wavefront).mtl" />
+    <Content Include="resources\shader\fragmentShader.glsl" />
+    <Content Include="resources\shader\instancedFragShader.glsl" />
+    <Content Include="resources\shader\instancedVertShader.glsl" />
+    <Content Include="resources\shader\lightFragShader.glsl" />
+    <Content Include="resources\shader\lightVertShader.glsl" />
+    <Content Include="resources\shader\modelFragShader.glsl" />
+    <Content Include="resources\shader\modelVertShader.glsl" />
+    <Content Include="resources\shader\normalFragShader.glsl" />
+    <Content Include="resources\shader\normalGeomShader.glsl" />
+    <Content Include="resources\shader\normalVertShader.glsl" />
+    <Content Include="resources\shader\skyboxFragShader.glsl" />
+    <Content Include="resources\shader\skyboxVertShader.glsl" />
+    <Content Include="resources\shader\stencilShader.glsl" />
+    <Content Include="resources\shader\vertexShader.glsl" />
+    <Content Include="resources\texture\dirt.jpg" />
+    <Content Include="resources\texture\grass.png" />
+    <Content Include="resources\texture\skybox\sea\back.jpg" />
+    <Content Include="resources\texture\skybox\sea\bottom.jpg" />
+    <Content Include="resources\texture\skybox\sea\front.jpg" />
+    <Content Include="resources\texture\skybox\sea\left.jpg" />
+    <Content Include="resources\texture\skybox\sea\right.jpg" />
+    <Content Include="resources\texture\skybox\sea\top.jpg" />
+    <Content Include="resources\texture\skybox\space\back.jpg" />
+    <Content Include="resources\texture\skybox\space\bottom.jpg" />
+    <Content Include="resources\texture\skybox\space\front.jpg" />
+    <Content Include="resources\texture\skybox\space\left.jpg" />
+    <Content Include="resources\texture\skybox\space\right.jpg" />
+    <Content Include="resources\texture\skybox\space\top.jpg" />
+    <Content Include="resources\texture\web-dirt.png" />
+    <Content Include="resources\texture\woddenContainer.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Opengl-Core\Opengl-Core.vcxproj">
+      <Project>{12e0fe4a-6d54-4ee3-aba2-3695f8764c39}</Project>
+      <Name>Opengl-Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\freetype2.2.6.0.1\build\native\freetype2.targets" Condition="Exists('..\packages\freetype2.2.6.0.1\build\native\freetype2.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\freetype2.2.6.0.1\build\native\freetype2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freetype2.2.6.0.1\build\native\freetype2.targets'))" />
+  </Target>
+</Project>
