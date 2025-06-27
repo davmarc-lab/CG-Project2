@@ -197,6 +197,12 @@ public:
 	 * @param State a shared pointer to the `State`
 	 */
 	void cacheState(const std::string &name, const Shared<State> &state);
+
+	/**
+	 * @brief Caches the given State, his name will be used in the cached states.
+	 *
+	 * @param state state to be cached
+	 */
 	inline void cacheState(const Shared<State> &state) { this->cacheState(state->getName(), state); }
 
 	/**
@@ -216,7 +222,7 @@ public:
 	~StateManager() = default;
 
 private:
-	/// static pointer for Singleton
+	/// static shared pointer for Singleton
 	inline static Shared<StateManager> s_pointer = nullptr;
 
 	/// pointer to the current state

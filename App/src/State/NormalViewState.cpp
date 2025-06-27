@@ -129,7 +129,7 @@ glm::vec3 NormalViewState::getRayFromMouse(const Pair<float> &size, int mouse_x,
 	return glm::normalize(glm::vec3(pw) - glm::vec3(world.camera->getCameraPosition()));
 }
 
-bool NormalViewState::isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const float &sphere_radius, float *id) {
+bool NormalViewState::isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const float &sphere_radius, float *dist) {
 	glm::vec3 d = world.camera->getCameraPosition() - sphere_pos;
 	float b = dot(d, ray);
 	float cc = dot(d, d) - sphere_radius * sphere_radius;
@@ -140,7 +140,7 @@ bool NormalViewState::isRayInSphere(const glm::vec3 &ray, const glm::vec3 &spher
 	else if (delta > 0.0f) {
 		float t_a = -b + sqrt(delta);
 		float t_b = -b - sqrt(delta);
-		*id = t_b;
+		*dist = t_b;
 
 		if (t_a < 0.0f && t_b < 0.0f)
 			return false;
@@ -150,7 +150,7 @@ bool NormalViewState::isRayInSphere(const glm::vec3 &ray, const glm::vec3 &spher
 		float t = -b + sqrt(delta);
 		if (t < 0)
 			return false;
-		*id = t;
+		*dist = t;
 		return true;
 	}
 }
@@ -271,7 +271,7 @@ void NormalViewState::changeInputState(Window *w, const InputState &state) {
 									}
 								}
 							}
-							ed->post(ENTITY_ELECTED_CHANGED);
+							ed->post(ENTITY_SELECTED_CHANGED);
 						}
 						break;
 					}
@@ -457,7 +457,7 @@ void NormalViewState::onAttach() {
 		ub->update(0, sizeof(glm::mat4), glm::value_ptr(vp));
 	});
 
-	ed->subscribe(ENTITY_ELECTED_CHANGED, [this, igmTree]() {
+	ed->subscribe(ENTITY_SELECTED_CHANGED, [this, igmTree]() {
 		igmTree->setSelectedEntity(ettSelected);
 	});
 

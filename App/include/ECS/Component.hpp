@@ -16,6 +16,11 @@
 
 /**
  * @brief Base class for every entity component.
+ *
+ * A component is basically a structure where some data or callbacks are stored.
+ * It's possible to query components using the EntityManager.
+ *
+ * @see EntityManager
  */
 class Component {
 public:
