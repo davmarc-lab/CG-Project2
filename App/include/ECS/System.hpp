@@ -33,7 +33,7 @@ namespace systems {
 	/**
 	 * @namespace systems::ecs
 	 *
-	 * @brief Utility methods to manage the entities in the EntityManager.
+	 * @brief All utilities to manage the entities in the EntityManager.
 	 * @see EntityManager
 	 */
 	namespace ecs {
@@ -87,7 +87,7 @@ namespace systems {
 
 	/**
 	 * @namespace systems::transform
-	 * @brief This namespace contains all the methods to manipulate the Transform component.
+	 * @brief All the methods to manipulate the Transform component.
 	 *
 	 * @note It calls the Transform component methods already defined.
 	 * @see Transform
@@ -295,7 +295,7 @@ namespace systems {
 
 	/**
 	 * @namespace systems::camera
-	 * @brief This namespace contains all utilities to manage the world camera.
+	 * @brief All utilities to manage the world camera.
 	 */
 	namespace camera {
 		/**
@@ -318,7 +318,7 @@ namespace systems {
 
 	/**
 	 * @namespace systems::parent
-	 * @brief This namespace contains utilities for a parent entity.
+	 * @brief All utilities for a parent entity.
 	 */
 	namespace parent {
 		/**
@@ -340,7 +340,7 @@ namespace systems {
 
 	/**
 	 * @namespace systems::input
-	 * @brief This namespace contains utilities to manage user input to interact
+	 * @brief All utilities to manage user input to interact
 	 * whith meshes.
 	 */
 	namespace input {
@@ -365,7 +365,7 @@ namespace systems {
 
 	/**
 	 * @namespace systems::animation
-	 * @brief This namespace contains utilities to handle animations.
+	 * @brief All utilities to handle animations.
 	 */
 	namespace animation {
 		/**
@@ -382,7 +382,7 @@ namespace systems {
 
 	/**
 	 * @namespace systems::texture
-	 * @brief This namespace contains utilities to manage entities texture.
+	 * @brief All utilities to manage entities texture.
 	 * @see TextureComponent
 	 * @see ogl::Texture
 	 */
@@ -440,7 +440,7 @@ namespace systems {
 
 	/**
 	 * @namespace systems::material
-	 * @brief This namespace contains utilities to manage entity material.
+	 * @brief All utilities to manage entity material.
 	 * @see MaterialComponent
 	 * @see Material
 	 */
@@ -504,7 +504,7 @@ namespace systems {
 
 	/**
 	 * @namespace systems::light
-	 * @brief This namespace contains utilities for lights and shader data.
+	 * @brief All utilities for lights and shader data.
 	 */
 	namespace light {
 		/**
@@ -520,23 +520,23 @@ namespace systems {
 		 * @brief Updates the light color vector.
 		 *
 		 * @param id the light id
-		 * @param color the light color
+		 * @param color the light new color
 		 */
 		void updateColor(const unsigned int &id, const glm::vec3 &color);
 
 		/**
-		 * @brief Updates the light color vector.
+		 * @brief Updates the light intensity value.
 		 *
 		 * @param id the light id
-		 * @param color the light color
+		 * @param intensity the light new intensity
 		 */
 		void updateIntensity(const unsigned int &id, const float &intensity);
 
 		/**
-		 * @brief Updates the light color vector.
+		 * @brief Updates the light ambient vector.
 		 *
 		 * @param id the light id
-		 * @param color the light color
+		 * @param ambient the light new ambient
 		 */
 		void updateAmbient(const unsigned int &id, const glm::vec3 &ambient);
 
@@ -544,7 +544,7 @@ namespace systems {
 		 * @brief Updates the light diffuse vector.
 		 *
 		 * @param id the light id
-		 * @param diffuse the light diffuse
+		 * @param diffuse the light new diffuse
 		 */
 		void updateDiffuse(const unsigned int &id, const glm::vec3 &diffuse);
 
@@ -552,7 +552,7 @@ namespace systems {
 		 * @brief Updates the light specular vector.
 		 *
 		 * @param id the light id
-		 * @param specular the light specular
+		 * @param specular the light new specular
 		 */
 		void updateSpecular(const unsigned int &id, const glm::vec3 &specular);
 
@@ -560,7 +560,7 @@ namespace systems {
 		 * @brief Updates the light direction vector.
 		 *
 		 * @param id the light id
-		 * @param direction the light direction
+		 * @param direction the light new direction
 		 */
 		void updateDirection(const unsigned int &id, const glm::vec3 &direction);
 
@@ -568,7 +568,7 @@ namespace systems {
 		 * @brief Updates the light position vector.
 		 *
 		 * @param id the light id
-		 * @param position the light position
+		 * @param position the light new position
 		 */
 		void updatePosition(const unsigned int &id, const glm::vec3 &position);
 
@@ -576,7 +576,7 @@ namespace systems {
 		 * @brief Updates the light constant value.
 		 *
 		 * @param id the light id
-		 * @param constant the light constant
+		 * @param constant the light new constant
 		 */
 		void updateConstant(const unsigned int &id, const float &constant);
 
@@ -584,7 +584,7 @@ namespace systems {
 		 * @brief Updates the light linear value.
 		 *
 		 * @param id the light id
-		 * @param linear the light linear
+		 * @param linear the light new linear
 		 */
 		void updateLinear(const unsigned int &id, const float &linear);
 
@@ -592,7 +592,7 @@ namespace systems {
 		 * @brief Updates the light quadratic value.
 		 *
 		 * @param id the light id
-		 * @param quadratic the light quadratic
+		 * @param quadratic the light new quadratic
 		 */
 		void updateQuadratic(const unsigned int &id, const float &quadratic);
 
@@ -600,7 +600,7 @@ namespace systems {
 		 * @brief Updates the light cutoff value.
 		 *
 		 * @param id the light id
-		 * @param cutoff the light cutoff
+		 * @param cutoff the light new cutoff
 		 */
 		void updateCutoff(const unsigned int &id, const float &cutoff);
 
@@ -608,7 +608,7 @@ namespace systems {
 		 * @brief Updates the light outer cutoff value.
 		 *
 		 * @param id the light id
-		 * @param outerCutoff the light outer cutoff
+		 * @param outerCutoff the light new outer cutoff
 		 */
 		void updateOuterCutoff(const unsigned int &id, const float &outerCutoff);
 
@@ -616,7 +616,7 @@ namespace systems {
 		 * @brief Updates the light computaion of an entity.
 		 *
 		 * @param id the light id
-		 * @param color the light color
+		 * @param comp the new entity light computation
 		 */
 		void setLightComputation(const unsigned int &id, const LightComputation &comp);
 
@@ -631,7 +631,7 @@ namespace systems {
 
 	/**
 	 * @namespace systems::render
-	 * @brief This namespace contains utilities for rendering entities.
+	 * @brief All utilities for rendering entities.
 	 */
 	namespace render {
 		/**
@@ -656,8 +656,8 @@ namespace systems {
 		 *
 		 * It prepares a single light data for sending to the shader program.
 		 *
-		 * @param block[out] the shader light block
-		 * @param light[in] the light in the scene
+		 * @param[out] block the shader light block
+		 * @param[in] light the light in the scene
 		 */
 		void getOtherLightData(LightShaderBlock &block, const Shared<LightComponent> &light);
 
@@ -677,7 +677,8 @@ namespace systems {
 		 * The method systems::render::sendOtherLightData() should be called anyway.
 		 *
 		 * @param shader the shader program shared pointer
-		 * @param data the array processed with systems::render::preparedLightData()
+		 * @param data the array processed with systems::render::prepareLightData()
+		 * @param index the current light index in the array from systems::render::prepareLightData()
 		 *
 		 * @see systems::render::preparedLightData()
 		 */

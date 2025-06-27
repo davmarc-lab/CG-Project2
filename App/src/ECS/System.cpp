@@ -282,7 +282,7 @@ namespace systems {
 				auto c = em->getComponentFromId<ParentComponent>(id);
 				auto pv = em->getComponentFromId<VertexComponent>(id);
 				auto box = em->getComponentFromId<ColliderComponent>(id);
-				// remove ColliderComponent component from each children and update the parent
+				// remove ColliderComponent component from each child and update the parent
 				for (auto child : c->children) {
 					if (em->entityHasComponent<ColliderComponent>(child)) {
 						auto cv = em->getComponentFromId<VertexComponent>(child);

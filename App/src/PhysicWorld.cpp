@@ -17,11 +17,20 @@ float mass{}, dt{};
 
 const float zfighting = 0.01f;
 
+/**
+ * @brief Data structure to store collision point in the CollisionSolver and
+ * in collision detection phase.
+ */
 struct CollisionPoints {
+	/// first entity collision point
 	glm::vec3 A{};
+	/// second entity collision point
 	glm::vec3 B{};
+	/// normalized direction of the collision
 	glm::vec3 normal{};
+	/// depth of the collision
 	float depth{};
+	/// tells if the entities are colliding
 	bool colliding = false;
 };
 
@@ -230,6 +239,7 @@ namespace systems {
 			auto c = em->getComponentFromId<PhysicComponent>(id);
 			ASSERT(c != nullptr);
 
+			// this could lead to problems further
 			c->velocity *= glm::vec3{1, 0, 1};
 			c->a = {};
 			c->force = {};
@@ -241,12 +251,14 @@ namespace systems {
 
 			return c->velocity;
 		}
+
 		void updateVelocity(const unsigned int &id, const glm::vec3 velocity) {
 			auto c = em->getComponentFromId<PhysicComponent>(id);
 			ASSERT(c != nullptr);
 
 			c->velocity = velocity;
 		}
+
 		void addVelocity(const unsigned int &id, const glm::vec3 offset) {
 			auto c = em->getComponentFromId<PhysicComponent>(id);
 			ASSERT(c != nullptr);
@@ -267,12 +279,14 @@ namespace systems {
 
 			return c->a;
 		}
+
 		void updateAcceleration(const unsigned int &id, const glm::vec3 acceleration) {
 			auto c = em->getComponentFromId<PhysicComponent>(id);
 			ASSERT(c != nullptr);
 
 			c->a = acceleration;
 		}
+
 		void addAcceleration(const unsigned int &id, const glm::vec3 offset) {
 			auto c = em->getComponentFromId<PhysicComponent>(id);
 			ASSERT(c != nullptr);
@@ -286,12 +300,14 @@ namespace systems {
 
 			return c->force;
 		}
+
 		void updateForce(const unsigned int &id, const glm::vec3 force) {
 			auto c = em->getComponentFromId<PhysicComponent>(id);
 			ASSERT(c != nullptr);
 
 			c->force = force;
 		}
+
 		void addForce(const unsigned int &id, const glm::vec3 offset) {
 			auto c = em->getComponentFromId<PhysicComponent>(id);
 			ASSERT(c != nullptr);
@@ -305,6 +321,7 @@ namespace systems {
 
 			return c->mass;
 		}
+
 		void updateMass(const unsigned int &id, const float &mass) {
 			auto c = em->getComponentFromId<PhysicComponent>(id);
 			ASSERT(c != nullptr);

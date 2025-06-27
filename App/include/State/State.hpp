@@ -63,13 +63,13 @@ public:
 	 */
 	virtual bool isCurrentStateEnd() { return true; }
 
-	/* @brief Retrieves the `State` name.*
+	/** @brief Retrieves the `State` name.
 	 *
-	 * @return `std::string` state's name
+	 * @return a strng with the state's name
 	 */
 	std::string getName() const { return this->m_name; }
 
-	/* @brief Retrieves if the state is attached.*
+	/** @brief Retrieves if the state is attached.
 	 *
 	 * @return `true` if the state is attached
 	 */
@@ -124,9 +124,8 @@ public:
 
 	/**
 	 * @brief Retrieves `true` if the current state should exit.
-	 * If the current state is detached, this will throw an error.
 	 *
-	 * @reutrn `bool`
+	 * @return true if the current state is finished or changed
 	 */
 	bool shouldExit() const {
 		ASSERT(this->m_currentState != nullptr);

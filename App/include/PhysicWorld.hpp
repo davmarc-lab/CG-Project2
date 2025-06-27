@@ -11,7 +11,7 @@ inline glm::vec3 GRAVITY = {0, -9.82f, 0};
 class PhysicWorld;
 
 /**
- * @brief A Solver is a
+ * @brief A Solver defines behaviour 
  */
 class Solver {
 public:
@@ -155,15 +155,25 @@ public:
 	virtual ~PhysicWorld() override = default;
 
 private:
+	/// list of entities to be simulated
 	std::vector<unsigned int> m_entities{};
+	/// list of solvers
 	std::vector<Shared<Solver>> m_solvers{};
 
+	/// timestamp in seconds of last frame
 	float m_lastFrame = 0;
+	/// timestamp in seconds of current frame
 	float m_currentFrame = 0;
+	/// difference between current and last frame timestamps in seconds
 	float m_deltaTime = 0;
 };
 
 namespace systems {
+	/**
+	 * @namespace systems::physic
+	 * @brief This namespaces contains all utilities for entities affected
+	 * by physic.
+	 */
 	namespace physic {
 		void resetGravitySolver(const unsigned int &id);
 

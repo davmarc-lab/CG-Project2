@@ -486,7 +486,7 @@ public:
 
 /**
  * @brief This Component is used like MultiMesh, but it create a sort of tree
- * structure where each mesh has children. Each children mesh can also
+ * structure where each mesh has children. Each child mesh can also
  * have children etc.
  *
  * @note An Entity with MultiMesh component means that each mesh stored
@@ -681,7 +681,9 @@ public:
 namespace material {
 
 	/**
-	 * @brief In this enum each value is an `unsigned int` so it can be used like index
+	 * @brief Enum for materials declared as `unsigned int`.
+	 *
+	 * In this enum each value is an `unsigned int` so it can be used like index
 	 * to select an element from materials pool.
 	 */
 	enum MaterialType : unsigned int {
@@ -696,7 +698,7 @@ namespace material {
 	/// initial material types @see MaterialType
 	inline std::vector<unsigned int> materialTypes{MATERIAL_NONE, MATERIAL_RPLASTIC, MATERIAL_YPLASTIC, MATERIAL_SLATE, MATERIAL_BRASS, MATERIAL_EMERALD};
 
-	/// vector containing defaults start materials
+	/// vector containing default start materials
 	inline std::vector<Material> defaultMaterials = {
 		Material(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), 32.0f, "None"),
 		Material(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.7f, 0.6f, 0.6f), 32.0f, "Red Plastic"),
@@ -736,7 +738,7 @@ public:
 	}
 
 	/**
-	 * @brief Instances a Component by using the given materila type to retrieve
+	 * @brief Instances a Component by using the given material type to retrieve
 	 * the Material object.
 	 *
 	 * @param type a material type or index
