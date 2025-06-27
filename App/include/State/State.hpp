@@ -94,7 +94,13 @@ protected:
 };
 
 /**
- * @brief
+ * @brief This class manages the current State running in the application and
+ * also provides a simple cache system.
+ *
+ * It allow to change state while executing for one iteration or in a loop using
+ * a simple barrier system.
+ *
+ * It's implemented with singleton so there only be one instance of this class.
  */
 class StateManager {
 public:
