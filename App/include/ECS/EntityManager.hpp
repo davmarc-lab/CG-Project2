@@ -253,6 +253,3 @@ private:
 };
 
 #include "../../../Opengl-Core/include/Core.hpp"
-
-/// event dispatched when player dies
-const auto PLAYER_DEAD_EVENT = ogl::Event("Player Dead");

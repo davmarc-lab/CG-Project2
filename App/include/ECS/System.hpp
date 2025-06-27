@@ -41,7 +41,7 @@ namespace systems {
 		 * @brief Removes an entity from the EntityManager, if the entity has children
 		 * they will be removed too.
 		 *
-		 * @param id entity id
+		 * @param id the entity id
 		 * @return true if the entity is removed
 		 */
 		bool removeEntityFromManager(const unsigned int &id);
@@ -50,14 +50,14 @@ namespace systems {
 		 * @brief Removes the given entity from the BasicScene, if entity has children
 		 * they will be removed too.
 		 *
-		 * @param id entity id
+		 * @param id the entity id
 		 */
 		void removeEntityFromScene(const unsigned int &id);
 
 		/**
 		 * @brief Removes an entity from the EntityManager and from the BasicScene.
 		 *
-		 * @param id entity id
+		 * @param id the entity id
 		 * @return true if the entity is removed
 		 */
 		bool removeEntityFromAll(const unsigned int &id);
@@ -71,7 +71,7 @@ namespace systems {
 		/**
 		 * @brief Retrieves the name of the given entity.
 		 *
-		 * @param id entity id
+		 * @param id the entity id
 		 * @return the name of the entity
 		 */
 		std::string getEntityName(const unsigned int &id);
@@ -79,8 +79,8 @@ namespace systems {
 		/**
 		 * @brief Updates the name of the given entity.
 		 *
-		 * @param id entity id
-		 * @param name entity new name
+		 * @param id the entity id
+		 * @param name the entity new name
 		 */
 		void updateEntityName(const unsigned int &id, const std::string &name);
 	} // namespace ecs
@@ -96,16 +96,16 @@ namespace systems {
 		/**
 		 * @brief Updates the position of the given entity.
 		 *
-		 * @param id entity id
-		 * @param position entity new position
+		 * @param id the entity id
+		 * @param position the entity new position
 		 */
 		void updatePosition(const unsigned int &id, const glm::vec3 &position);
 
 		/**
 		 * @brief Updates the scale of the given entity.
 		 *
-		 * @param id entity id
-		 * @param scale entity new scale
+		 * @param id the entity id
+		 * @param scale the entity new scale
 		 */
 		void updateScale(const unsigned int &id, const glm::vec3 &scale);
 
@@ -115,24 +115,24 @@ namespace systems {
 		 * It takes an Euler angle `glm::vec3` in degrees and it will be converted in
 		 * radians by the component.
 		 *
-		 * @param id entity id
-		 * @param rotation entity new rotation in degrees
+		 * @param id the entity id
+		 * @param rotation the entity new rotation in degrees
 		 */
 		void updateRotation(const unsigned int &id, const glm::vec3 &rotation);
 
 		/**
 		 * @brief Adds an offset to the position of the given entity
 		 *
-		 * @param id entity id
-		 * @param offset position offset to be added
+		 * @param id the entity id
+		 * @param offset the position offset to be added
 		 */
 		void addPosition(const unsigned int &id, const glm::vec3 &offset);
 
 		/**
 		 * @brief Adds an offset to the scale of the given entity
 		 *
-		 * @param id entity id
-		 * @param offset scale offset to be added
+		 * @param id the entity id
+		 * @param offset the scale offset to be added
 		 */
 		void addScale(const unsigned int &id, const glm::vec3 &offset);
 
@@ -142,15 +142,15 @@ namespace systems {
 		 * It works the same way of `updateRotation`.
 		 * @see systems::transform::updateRotation()
 		 *
-		 * @param id entity id
-		 * @param offset rotation offset to be added
+		 * @param id the entity id
+		 * @param offset the rotation offset to be added
 		 */
 		void addRotation(const unsigned int &id, const glm::vec3 &offset);
 
 		/**
 		 * @brief Retrieves the position of the given entity.
 		 *
-		 * @param id entity id
+		 * @param id the entity id
 		 * @return the entity position
 		 */
 		glm::vec3 getPosition(const unsigned int &id);
@@ -158,7 +158,7 @@ namespace systems {
 		/**
 		 * @brief Retrieves the scale of the given entity.
 		 *
-		 * @param id entity id
+		 * @param id the entity id
 		 * @return the entity scale
 		 */
 
@@ -167,7 +167,7 @@ namespace systems {
 		/**
 		 * @brief Retrieves the rotation of the given entity.
 		 *
-		 * @param id entity id
+		 * @param id the entity id
 		 * @return the entity rotation in Euler angle.
 		 */
 		glm::vec3 getRotation(const unsigned int &id);
@@ -177,7 +177,7 @@ namespace systems {
 		 *
 		 * If the model matrix is dirty it will be updated by the component automatically.
 		 *
-		 * @param id entity id
+		 * @param id the entity id
 		 * @return the entity model matrix
 		 */
 		glm::mat4 getModelMatrix(const unsigned int &id);
@@ -188,7 +188,7 @@ namespace systems {
 		 * If the model matrix is dirty it will update the model matrix and also the entity
 		 * collider if it has one.
 		 *
-		 * @param id entity id
+		 * @param id the entity id
 		 */
 		void updateModelMatrix(const unsigned int &id);
 
@@ -207,78 +207,82 @@ namespace systems {
 	 */
 	namespace collision {
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the collider of a parent mesh.
+		 *
+		 * @note This method only updates the collider of the father entity and
+		 * not his children.
+		 *
+		 * @param id the parent entity id
 		 */
 		void updateParentCollider(const unsigned int &id);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the collider of the given entity.
+		 * If this entity is a parent entity (an entity with a ParentComponent),
+		 * it will call systems::collision::updateParentCollider() instead.
+		 *
+		 * In the other case it will normally update the collider using an
+		 * Optimized Bounding Box.
+		 *
+		 * @see ColliderComponent
+		 *
+		 * @param id the entity id
 		 */
 		void updateCollider(const unsigned int &id);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates all the entities collider by calling systems::collision::updateCollider().
 		 */
 		void updateAllColliders();
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Retrieves the type of the entity collider.
+		 *
+		 * @param id the entity id
+		 * @return the collider type
 		 */
 		ColliderType getColliderType(const unsigned int &id);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the collider type of the given entity.
+		 *
+		 * @param id the entity id
+		 * @param type the collider type
 		 */
 		void updateColliderType(const unsigned int &id, const ColliderType &type);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the simulation of the entity in a PhysicWorld.
+		 *
+		 * @note If an entity is not simulated means that it's a static entity.
+		 *
+		 * @param id the entity id
+		 * @param simulated if true the entity is simulated
 		 */
 		void updateSimulated(const unsigned int &id, const bool &simulated);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief This method optimize children bounding box of all parent entities in a
+		 * single square/cube bounding box.
 		 */
 		void compressBoundingBox();
 
 		/**
-		 * @brief
-		 * @param id entity id
-		 * @return
-		 */
-		float getEnemyLastHit(const unsigned int &id);
-		/**
-		 * @brief
-		 * @param id entity id
-		 * @return
-		 */
-		float getPlayerLastHit(const unsigned int &id);
-
-		/**
-		 * @brief
-		 * @param id entity id
-		 * @return
+		 * @brief Retrieves the collider corners of the entity given.
+		 *
+		 * @param id the entity id
+		 * @return a pair of (botLeft, topRight) corner
 		 */
 		Pair<glm::vec3> getCollider(const unsigned int &id);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Calculate if two entities are colliding or not.
+		 *
+		 * @param first the first entity id
+		 * @param second the second entity id
+		 * @return true if the two entities are colliding
 		 */
-		void updateEnemyLastHit(const unsigned int &id, const float &time);
-
-		/**
-		 * @brief
-		 * @param id entity id
-		 */
-		void updatePlayerLastHit(const unsigned int &id, const float &time);
+		bool isColliding(const unsigned int &first, const unsigned int &second);
 
 		/**
 		 * @brief Retrieves all entities overlapping each other using simple
@@ -289,243 +293,367 @@ namespace systems {
 		std::vector<Pair<unsigned int>> getCollisions();
 	} // namespace collision
 
+	/**
+	 * @namespace systems::camera
+	 * @brief This namespace contains all utilities to manage the world camera.
+	 */
 	namespace camera {
+		/**
+		 * @brief Retrieves a pointer to the camera given.
+		 *
+		 * @param id the camera id
+		 * @return a shared pointer to the camera
+		 */
 		Shared<ogl::Camera> getCamera(const unsigned int &id);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the collider of the camera given.
+		 *
+		 * @param id the camera id
+		 * @param position the camera position
+		 * @param size the camera collider size
 		 */
 		void updateCameraCollider(const unsigned int &id, const glm::vec3 &position, const glm::vec3 &size);
 	} // namespace camera
 
+	/**
+	 * @namespace systems::parent
+	 * @brief This namespace contains utilities for a parent entity.
+	 */
 	namespace parent {
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Adds a child to the parent entity.
+		 *
+		 * @param parent the parent entity id
+		 * @param child the child entity id
 		 */
 		void addChild(const unsigned int &parent, const unsigned int &child);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Removes the given child from the parent entity.
+		 *
+		 * @param parent the parent entity id
+		 * @param child the child entity id
 		 */
 		void removeChild(const unsigned int &parent, const unsigned int &child);
 	} // namespace parent
 
+	/**
+	 * @namespace systems::input
+	 * @brief This namespace contains utilities to manage user input to interact
+	 * whith meshes.
+	 */
 	namespace input {
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Retrieves all the callback of a mesh to be called when the key is pressed.
+		 *
+		 * @param id the entity id
+		 * @return a vector of pair like (key, callback) where the key is an `unsigned int`
+		 * and the callback is a `std::funcion<void()>`
 		 */
 		std::vector<std::pair<unsigned int, std::function<void()>>> getKeysCallback(const unsigned int &id);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Sets a callback for the entity.
+		 *
+		 * @param id the entity id
+		 * @param key the key that execute the callback
+		 * @param func the callback to be executed
 		 */
 		void setKeyCallback(const unsigned int &id, const unsigned int &key, std::function<void()> func);
 	} // namespace input
 
+	/**
+	 * @namespace systems::animation
+	 * @brief This namespace contains utilities to handle animations.
+	 */
 	namespace animation {
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief This method updates all the TimeAnimation components, it needs
+		 * the curren time in seconds.
+		 *
+		 * The current time is used to stop dead animations.
+		 * @see TimeAnimation
+		 *
+		 * @param currentTime the current time in seconds
 		 */
 		void executeNextFrame(const float &currentTime);
-
-		/**
-		 * @brief
-		 * @param id entity id
-		 */
-		void updateDistanceAnimation();
 	} // namespace animation
 
+	/**
+	 * @namespace systems::texture
+	 * @brief This namespace contains utilities to manage entities texture.
+	 * @see TextureComponent
+	 * @see ogl::Texture
+	 */
 	namespace texture {
+		/**
+		 * @brief Retrieves the texture of the given entity.
+		 *
+		 * @param id the entity id
+		 *
+		 * @return an ogl::Texture object
+		 */
 		ogl::Texture getTexture(const unsigned int &id);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Sets the texture for the given entity.
+		 *
+		 * @param id the entity id
+		 * @param texture the entity texture
 		 */
 		void setTexture(const unsigned int &id, const ogl::Texture &texture);
 
 		/**
-		 * @brief
-		 * @param id entity id
-		 * @return
+		 * @brief Retrieves the entity texture path.
+		 *
+		 * @param id the entity id
+		 * @return a path to the texture file
 		 */
 		std::string getTexturePath(const unsigned int &id);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the entity texture path.
+		 *
+		 * @param id the entity id
+		 * @param path the new texture path
 		 */
 		void updateTexturePath(const unsigned int &id, const std::string &path);
 
 		/**
-		 * @brief
-		 * @param id entity id
-		 * @return
+		 * @brief This method sets the reflection of an entity.
+		 * If the entity is reflective it will reflect the skybox texture.
+		 *
+		 * @param id the entity id
+		 * @return true if the entity is reflective
 		 */
 		bool isMeshReflective(const unsigned int &id);
+
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Sets the reflectiveness of an entity.
+		 *
+		 * @param id the entity id
+		 * @param val if `true` the entity is reflective
 		 */
 		void setMeshReflective(const unsigned int &id, const bool &val);
 	} // namespace texture
 
+	/**
+	 * @namespace systems::material
+	 * @brief This namespace contains utilities to manage entity material.
+	 * @see MaterialComponent
+	 * @see Material
+	 */
 	namespace material {
 		/**
-		 * @brief
-		 * @param id entity id
-		 * @return
+		 * @brief Retrieves the material of the given entity.
+		 *
+		 * @param id the entity id
+		 * @return the material of the entity
 		 */
 		Material getMaterial(const unsigned int &id);
 
 		/**
-		 * @brief
-		 * @param id entity id
-		 * @return
+		 * @brief Retrieves the material name of the entity given.
+		 *
+		 * @param id the entity id
+		 * @return the name of the material
 		 */
 		std::string getMaterialName(const unsigned int &id);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the ambient vector of a material.
+		 *
+		 * @param id the entity id
+		 * @param val the ambient value
 		 */
 		void updateAmbient(const unsigned int &id, const glm::vec3 &val);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the diffuse vector of a material.
+		 *
+		 * @param id the entity id
+		 * @param val the diffuse value
 		 */
 		void updateDiffuse(const unsigned int &id, const glm::vec3 &val);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the specular vector of a material.
+		 *
+		 * @param id the entity id
+		 * @param val the specular value
 		 */
 		void updateSpecular(const unsigned int &id, const glm::vec3 &val);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the shininess value of a material.
+		 *
+		 * @param id the entity id
+		 * @param val the shininess value
 		 */
 		void updateShininess(const unsigned int &id, const float &val);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the material of the entity given.
+		 *
+		 * @param id the entity id
+		 * @param material the new material
 		 */
 		void updateMaterial(const unsigned int &id, const Material &material);
 	} // namespace material
 
+	/**
+	 * @namespace systems::light
+	 * @brief This namespace contains utilities for lights and shader data.
+	 */
 	namespace light {
-		LightShaderBlock getLightInfo(const unsigned int &id);
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Retrieves a block (struct data) that will be sent to a shader program.
+		 * The block will contain all the light data.
+		 *
+		 * @param id the light id
+		 * @return a data block for shader programs
+		 */
+		LightShaderBlock getLightInfo(const unsigned int &id);
+
+		/**
+		 * @brief Updates the light color vector.
+		 *
+		 * @param id the light id
+		 * @param color the light color
 		 */
 		void updateColor(const unsigned int &id, const glm::vec3 &color);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the light color vector.
+		 *
+		 * @param id the light id
+		 * @param color the light color
 		 */
 		void updateIntensity(const unsigned int &id, const float &intensity);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the light color vector.
+		 *
+		 * @param id the light id
+		 * @param color the light color
 		 */
 		void updateAmbient(const unsigned int &id, const glm::vec3 &ambient);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the light diffuse vector.
+		 *
+		 * @param id the light id
+		 * @param diffuse the light diffuse
 		 */
 		void updateDiffuse(const unsigned int &id, const glm::vec3 &diffuse);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the light specular vector.
+		 *
+		 * @param id the light id
+		 * @param specular the light specular
 		 */
 		void updateSpecular(const unsigned int &id, const glm::vec3 &specular);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the light direction vector.
+		 *
+		 * @param id the light id
+		 * @param direction the light direction
 		 */
 		void updateDirection(const unsigned int &id, const glm::vec3 &direction);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the light position vector.
+		 *
+		 * @param id the light id
+		 * @param position the light position
 		 */
 		void updatePosition(const unsigned int &id, const glm::vec3 &position);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the light constant value.
+		 *
+		 * @param id the light id
+		 * @param constant the light constant
 		 */
 		void updateConstant(const unsigned int &id, const float &constant);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the light linear value.
+		 *
+		 * @param id the light id
+		 * @param linear the light linear
 		 */
 		void updateLinear(const unsigned int &id, const float &linear);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the light quadratic value.
+		 *
+		 * @param id the light id
+		 * @param quadratic the light quadratic
 		 */
 		void updateQuadratic(const unsigned int &id, const float &quadratic);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the light cutoff value.
+		 *
+		 * @param id the light id
+		 * @param cutoff the light cutoff
 		 */
 		void updateCutoff(const unsigned int &id, const float &cutoff);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the light outer cutoff value.
+		 *
+		 * @param id the light id
+		 * @param outerCutoff the light outer cutoff
 		 */
 		void updateOuterCutoff(const unsigned int &id, const float &outerCutoff);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Updates the light computaion of an entity.
+		 *
+		 * @param id the light id
+		 * @param color the light color
 		 */
 		void setLightComputation(const unsigned int &id, const LightComputation &comp);
 
 		/**
-		 * @brief
-		 * @param id entity id
-		 * @return
+		 * @brief Retrieves the light computation of an entity.
+		 *
+		 * @param id the entity id
+		 * @return the light computation
 		 */
 		LightComputation getLightComputation(const unsigned int &id);
 	} // namespace light
 
+	/**
+	 * @namespace systems::render
+	 * @brief This namespace contains utilities for rendering entities.
+	 */
 	namespace render {
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief Initialize the stencil shader.
 		 */
 		void initStencilShader();
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief This methods calls the renderer and prepares the buffers with
+		 * the model matrixes and colors.
+		 *
+		 * @param models a list of model matrixes
+		 * @param colors a list of colors
+		 *
+		 * TODO implement proper instancing rendering for every mesh
+		 * @warning This currently works only for instanced rendering with spheres.
 		 */
 		void prepareInstancedMesh(const std::vector<glm::mat4> &models, const std::vector<glm::vec4> &colors);
 
 		/**
-		 * @brief
-		 * @param id entity id
+		 * @brief This method draws the Skybox of the scene
+		 * @param id the entity id
 		 */
 		void renderSkybox(const unsigned int &id, const Shared<ogl::ShaderProgram> &shader);
 

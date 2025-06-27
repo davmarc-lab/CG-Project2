@@ -59,7 +59,7 @@ namespace systems {
 		}
 
 		void cleanAll() {
-            // remove all entities from memory
+			// remove all entities from memory
 			for (const auto e : em->getEntities()) {
 				removeEntityFromAll(e);
 			}
@@ -233,6 +233,8 @@ namespace systems {
 				return false;
 			auto fc = em->getComponentFromId<ColliderComponent>(first);
 			auto sc = em->getComponentFromId<ColliderComponent>(second);
+			ASSERT(fc != nullptr);
+			ASSERT(sc != nullptr);
 
 			return fc->isColliding(*sc);
 		}
@@ -412,24 +414,6 @@ namespace systems {
 				if (c->dead)
 					rmv.push_back(ett);
 			}
-			for (auto e : rmv) {
-				::systems::ecs::removeEntityFromAll(e);
-			}
-		}
-
-		void updateDistanceAnimation() {
-			std::vector<unsigned int> rmv{};
-			/* for (auto ett : em->getEntitiesFromComponent<ProjectileComponent>()) {
-				auto c = em->getComponentFromId<ProjectileComponent>(ett);
-				ASSERT(c != nullptr);
-
-				if (c->dead)
-					continue;
-
-				c->updateTick(systems::transform::getPosition(ett));
-				if (c->dead)
-					rmv.push_back(ett);
-			} */
 			for (auto e : rmv) {
 				::systems::ecs::removeEntityFromAll(e);
 			}
@@ -741,6 +725,10 @@ namespace systems {
 		}
 
 		void renderSkybox(const unsigned int &id, const Shared<ogl::ShaderProgram> &shader) {
+			if (!em->getEntitiesFromComponent<SkyboxComponent>().size()) {
+				std::cerr << "No skybox detected\n";
+				return;
+			}
 			shader->use();
 			auto rc = em->getComponentFromId<RenderComponent>(id);
 			shader->setMat4("view", glm::mat4(glm::mat3(scene->getCamera()->getViewMatrix())));
