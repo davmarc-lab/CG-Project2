@@ -15,8 +15,6 @@ std::vector<unsigned int> etts{};
 glm::vec3 force{}, acc{}, vel{}, pos{};
 float mass{}, dt{};
 
-const float zfighting = 0.01f;
-
 /**
  * @brief Data structure to store collision point in the CollisionSolver and
  * in collision detection phase.

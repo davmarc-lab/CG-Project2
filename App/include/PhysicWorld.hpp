@@ -11,22 +11,51 @@ inline glm::vec3 GRAVITY = {0, -9.82f, 0};
 class PhysicWorld;
 
 /**
- * @brief A Solver defines behaviour 
+ * @brief A Solver defines a generic behaviour in a Physic World.
+ *
+ * It manipulates the PhysicComponent of an entity during the simulation.
+ *
+ * A Solver need to be attached to a PhysicWorld to work.
+ *
+ * @note This class needs to be extended by a specific solver.
  */
 class Solver {
 public:
+	/**
+	 * @brief This method is executed at every physic simulation step.
+	 *
+	 * @note This method must be overrided in the child class.
+	 */
 	virtual void solve() { std::cout << "solve\n"; };
 
+	/**
+	 * @brief Instances basic Solver.
+	 *
+	 * @param world reference of the PhysicWorld where this solver operates
+	 */
 	Solver(PhysicWorld &world) :
 		world(world) {}
 
 	virtual ~Solver() = default;
 
+	/// the reference to the PhysicWorld
 	PhysicWorld &world;
 };
 
+/*
+ * @brief Solves all collision between entities in the given PhysicWorld.
+ */
 class CollisionSolver : public Solver {
 public:
+	/**
+	 * @breif It gets all collisions at the current step, and calls a different
+	 * method based on the collider type of the entities.
+	 * To call the right method it uses the ColliderType as index of a matrix
+	 * containing all tests method pointers.
+	 *
+	 * After testing the collisions, if the entities are colliding it applies
+	 * the right modification to his position/physic values.
+	 */
 	virtual void solve() override;
 
 	CollisionSolver(PhysicWorld &world) :
@@ -35,26 +64,9 @@ public:
 	virtual ~CollisionSolver() override = default;
 };
 
-class ForceSolver : public Solver {
-public:
-	virtual void solve() override;
-
-	ForceSolver(PhysicWorld &world) :
-		Solver(world) {}
-
-	virtual ~ForceSolver() override = default;
-};
-
-class VelocitySolver : public Solver {
-public:
-	virtual void solve() override;
-
-	VelocitySolver(PhysicWorld &world) :
-		Solver(world) {}
-
-	virtual ~VelocitySolver() override = default;
-};
-
+/**
+ * @brief It calculates all the entities position from the current velocity.
+ */
 class PositionSolver : public Solver {
 public:
 	virtual void solve() override;
@@ -65,6 +77,9 @@ public:
 	virtual ~PositionSolver() override = default;
 };
 
+/**
+ * @brief Simulate gravity force towards the negative y world axis.
+ */
 class GravitySolver : public Solver {
 public:
 	virtual void solve() override;
@@ -175,23 +190,104 @@ namespace systems {
 	 * by physic.
 	 */
 	namespace physic {
+		/**
+		 * @brief Resets velocity on the on y-axis, acceleration and force
+		 * of the given entity.
+		 *
+		 * @warning This means if there is a velocity on y-axis external to
+		 * GravitySolver it will be lost when this method is called.
+		 *
+		 * @param id entity id
+		 */
 		void resetGravitySolver(const unsigned int &id);
 
+		/**
+		 * @brief Retrieves the velocity of the given entity.
+		 *
+		 * @param id entity id
+		 * @return a glm::vec3 vector containing entity velocity
+		 */
 		glm::vec3 getVelocity(const unsigned int &id);
+		/**
+		 * @brief Updates the velocity of the given entity.
+		 *
+		 * @param id entity id
+		 * @param velocity entity new velocity
+		 */
 		void updateVelocity(const unsigned int &id, const glm::vec3 velocity);
+		/**
+		 * @brief Adds the given offset to the velocity of the given entity.
+		 *
+		 * @param id entity id
+		 * @param the offset to be added
+		 */
 		void addVelocity(const unsigned int &id, const glm::vec3 offset);
 
+		/**
+		 * @brief Updates the restitution factor of the given entity.
+		 *
+		 * @param id entity id
+		 * @param factor entity new restitution factor
+		 */
 		void updateRestitutionFactor(const unsigned int &id, const float &factor);
 
+		/**
+		 * @brief Retrieves the acceleration of the given entity.
+		 *
+		 * @param id entity id
+		 * @return a glm::vec3 vector containing entity acceleration
+		 */
 		glm::vec3 getAcceleration(const unsigned int &id);
+		/**
+		 * @brief Updates the acceleration of the given entity.
+		 *
+		 * @param id entity id
+		 * @param acceleration entity new acceleration
+		 */
 		void updateAcceleration(const unsigned int &id, const glm::vec3 acceleration);
+		/**
+		 * @brief Adds the given offset to the acceleration of the given entity.
+		 *
+		 * @param id entity id
+		 * @param the offset to be added
+		 */
 		void addAcceleration(const unsigned int &id, const glm::vec3 offset);
 
+		/**
+		 * @brief Retrieves the force of the given entity.
+		 *
+		 * @param id entity id
+		 * @return a glm::vec3 vector containing entity force
+		 */
 		glm::vec3 getForce(const unsigned int &id);
+		/**
+		 * @brief Updates the force of the given entity.
+		 *
+		 * @param id entity id
+		 * @param force entity new force
+		 */
 		void updateForce(const unsigned int &id, const glm::vec3 force);
+		/**
+		 * @brief Adds the given offset to the force of the given entity.
+		 *
+		 * @param id entity id
+		 * @param the offset to be added
+		 */
 		void addForce(const unsigned int &id, const glm::vec3 offset);
 
+		/**
+		 * @brief Retrieves the mass of the given entity.
+		 *
+		 * @param id entity id
+		 * @return the entity mass
+		 */
 		float getMass(const unsigned int &id);
+		/**
+		 * @brief Updates the mass of the given entity.
+		 *
+		 * @param id entity id
+		 * @param mass entity new mass
+		 */
 		void updateMass(const unsigned int &id, const float &mass);
 	} // namespace physic
 } // namespace systems
