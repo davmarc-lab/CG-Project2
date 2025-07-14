@@ -42,13 +42,13 @@ public:
 	PhysicWorld &world;
 };
 
-/*
+/**
  * @brief Solves all collision between entities in the given PhysicWorld.
  */
 class CollisionSolver : public Solver {
 public:
 	/**
-	 * @breif It gets all collisions at the current step, and calls a different
+	 * @brief It gets all collisions at the current step, and calls a different
 	 * method based on the collider type of the entities.
 	 * To call the right method it uses the ColliderType as index of a matrix
 	 * containing all tests method pointers.
@@ -58,6 +58,12 @@ public:
 	 */
 	virtual void solve() override;
 
+    /**
+     * @brief Instance basic CollisionSolver object.
+     *
+     * @param world the physic world to be attached
+     * @see Solver
+     */
 	CollisionSolver(PhysicWorld &world) :
 		Solver(world) {}
 
@@ -71,6 +77,12 @@ class PositionSolver : public Solver {
 public:
 	virtual void solve() override;
 
+    /**
+     * @brief Instance basic PositionSolver object.
+     *
+     * @param world the physic world to be attached
+     * @see Solver
+     */
 	PositionSolver(PhysicWorld &world) :
 		Solver(world) {}
 
@@ -84,6 +96,12 @@ class GravitySolver : public Solver {
 public:
 	virtual void solve() override;
 
+    /**
+     * @brief Instance basic GravitySolver object.
+     *
+     * @param world the physic world to be attached
+     * @see Solver
+     */
 	GravitySolver(PhysicWorld &world) :
 		Solver(world) {}
 
@@ -219,7 +237,7 @@ namespace systems {
 		 * @brief Adds the given offset to the velocity of the given entity.
 		 *
 		 * @param id entity id
-		 * @param the offset to be added
+		 * @param offset the offset to add
 		 */
 		void addVelocity(const unsigned int &id, const glm::vec3 offset);
 
@@ -249,7 +267,7 @@ namespace systems {
 		 * @brief Adds the given offset to the acceleration of the given entity.
 		 *
 		 * @param id entity id
-		 * @param the offset to be added
+		 * @param offset the offset to add
 		 */
 		void addAcceleration(const unsigned int &id, const glm::vec3 offset);
 
@@ -271,7 +289,7 @@ namespace systems {
 		 * @brief Adds the given offset to the force of the given entity.
 		 *
 		 * @param id entity id
-		 * @param the offset to be added
+		 * @param offset the offset to add
 		 */
 		void addForce(const unsigned int &id, const glm::vec3 offset);
 
