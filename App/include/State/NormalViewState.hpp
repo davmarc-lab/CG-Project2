@@ -32,24 +32,6 @@ public:
 
 private:
 	/**
-	 * @brief Data structure used to store world camera information.
-	 */
-	struct WorldCamera {
-		/// world camera ECS id
-		unsigned int cameraId;
-		/// pointer to ogl::Camera
-		Shared<Camera> camera;
-		/// size of the collider
-		glm::vec3 cameraSize = glm::vec3(1);
-		/// trackball movement tolerance
-		/// @note This tolerance is used to move the cursor to the opposite side
-		/// of the window in case it goes near the window border.
-		int tbBorderTolerance = 20;
-		/// trackball radius
-		float tbRadius = 1.f;
-	} world;
-
-	/**
 	 * @brief Data structure to store mouse position data and allow fluent movement.
 	 */
 	struct Mouse {
@@ -82,6 +64,8 @@ private:
 	std::array<std::reference_wrapper<double>, 3> cputimes{inputCputime, updateCputime, renderCputime};
 	/// array used for rendering times
 	std::array<std::string, 3> names{"Input", "Update", "Render"};
+
+    ogl::WorldCamera world;
 
 	/// custom Event dispatched when the normal view is opened
 	const Event INPUT_NORMAL_VIEW_OPEN = Event("Input in Normal View Start");

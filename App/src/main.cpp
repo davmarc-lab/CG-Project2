@@ -6,6 +6,7 @@
 #include "../include/Profiler.hpp"
 #include "../include/State/BootstrapState.hpp"
 #include "../include/State/NormalViewState.hpp"
+#include "../include/State/SimulationState.hpp"
 #include "../include/State/State.hpp"
 
 #include <GLFW/glfw3.h>
@@ -74,6 +75,9 @@ int main(int argc, char *argv[]) {
 		ogl::Renderer::instance()->prepareBuffers(sphereModels, sphereColors);
 	});
 	*/
+
+    auto st = CreateShared<SimulationState>();
+    sm->cacheState(st);
 
 	auto ds = CreateShared<NormalViewState>();
 

@@ -6,6 +6,8 @@
 #include <glm/gtc/quaternion.hpp>
 #include <iostream>
 
+#include "../Core/Utils.hpp"
+
 namespace ogl {
 	inline const float YAW = -90.f;
 	inline const float PITCH = 0.f;
@@ -136,5 +138,23 @@ namespace ogl {
 		glm::mat4 m_viewProj = glm::mat4(0);
 
 		void updateCameraVectors();
+	};
+
+	/**
+	 * @brief Data structure used to store world camera information.
+	 */
+	struct WorldCamera {
+		/// world camera ECS id
+		unsigned int cameraId;
+		/// pointer to ogl::Camera
+		Shared<Camera> camera;
+		/// size of the collider
+		glm::vec3 cameraSize = glm::vec3(1);
+		/// trackball movement tolerance
+		/// @note This tolerance is used to move the cursor to the opposite side
+		/// of the window in case it goes near the window border.
+		int tbBorderTolerance = 20;
+		/// trackball radius
+		float tbRadius = 1.f;
 	};
 } // namespace ogl
