@@ -312,6 +312,9 @@ void NormalViewState::defaultKeyCallback(Window *w) {
 Unique<Window> w = nullptr;
 Unique<ImGuiManager> igm = nullptr;
 
+/**
+ * @brief Implementation of ogl::Layer for the NormalViewState.
+ */
 class CustomLayer : public Layer {
 public:
 	virtual void onAttach() override {}
@@ -322,21 +325,36 @@ public:
 			this->m_updateFun();
 	}
 
+	/**
+	 * @brief Sets if the Layer is running.
+	 *
+	 * @param run the run flag
+	 */
 	void setRunnig(const bool &run) { this->m_run = run; }
+	/**
+	 * @brief Sets the current update function.
+	 *
+	 * @param fun the function to execute every frame
+	 */
 	void setUpdateFun(std::function<void()> &&fun) { this->m_updateFun = std::move(fun); }
 
+	/**
+	 * @brief Instances basic Layer.
+	 */
 	CustomLayer() :
 		Layer("Custom Layer") {}
 
 	virtual ~CustomLayer() override = default;
 
 private:
+	/// run state flag
 	bool m_run = false;
+	/// callback function
 	std::function<void()> m_updateFun{};
 };
 
 void NormalViewState::onAttach() {
-    ASSERT(!this->m_attached);
+	ASSERT(!this->m_attached);
 	State::onAttach();
 	srand(time(NULL));
 	WindowSettings s{};
@@ -516,9 +534,9 @@ void NormalViewState::onAttach() {
 }
 
 void NormalViewState::onDetach() {
-    ASSERT(this->m_attached);
+	ASSERT(this->m_attached);
 	State::onDetach();
-    systems::ecs::cleanAll();
+	systems::ecs::cleanAll();
 	// delete all buffers
 	// delete all textures
 	// delete all shaders

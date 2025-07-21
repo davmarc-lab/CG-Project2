@@ -31,6 +31,12 @@ namespace ogl {
 
 		inline void setRenderFunc(std::function<void()> &&func) { this->m_renderFunc = std::move(func); }
 
+		/**
+		 * @brief Method called at every frame that draws the ImGui window.
+		 *
+		 * When extending this class this method can be ovverrided. When an
+		 * object of this class is instanced, the method setRenderFunc() must be called.
+		 */
 		inline virtual void onRender() { this->m_renderFunc(); }
 
 		ImGuiPanel(const std::string &name = "Panel", const unsigned short &priority = 0) :

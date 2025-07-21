@@ -20,6 +20,7 @@
  */
 class EntityManager {
 public:
+    /// entity id in ecs
 	using Index = unsigned int;
 
 	/**
@@ -69,6 +70,7 @@ public:
 	 * @brief Sets the name of the entity given.
 	 *
 	 * @param id entity id
+     * @param name entity name
 	 */
 	inline void setEntityName(const Index &id, const std::string &name) { this->m_entities.at(id) = std::move(name); }
 

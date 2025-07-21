@@ -46,8 +46,8 @@ public:
 	 * @brief Removes the given entity from the scene with the corresponding shader,
 	 * to optimize entity search process.
 	 *
-	 * @params shader a ogl::ShaderProgram shared pointer
-	 * @params ett entity id
+	 * @param shader a ogl::ShaderProgram shared pointer
+	 * @param ett entity id
 	 */
 	void removeEntity(Shared<ogl::ShaderProgram> &shader, const unsigned int &ett);
 

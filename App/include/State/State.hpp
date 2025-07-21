@@ -80,7 +80,7 @@ public:
 	 *
 	 * @note Each state need a name to be cached in the StateManager.
 	 *
-	 * @params name the state's name
+	 * @param name the state's name
 	 */
 	State(const std::string &name = "State") :
 		m_name(std::move(name)) {}
@@ -162,10 +162,10 @@ public:
 	 * @brief Works as the other `StateManager::changeState(const Shared<State>&)` but this
 	 * will use the given `name` while caching.
 	 *
-	 * @see StateManager::changeState(const Shared<State>&)
+	 * @see StateManager::changeState()
 	 *
 	 * @param name state's name
-	 * @param State a shared pointer to the `State`
+	 * @param state a shared pointer to the `State`
 	 */
 	void changeState(const std::string &name, const Shared<State> &state);
 
@@ -177,7 +177,7 @@ public:
 	 * To make it work the method `StateManager::sync()` needs to be called
 	 * (read `StateManager::sync()` for further informations).
 	 *
-	 * @param State a shared pointer to the `State`
+	 * @param state a shared pointer to the `State`
 	 */
 	inline void changeState(const Shared<State> &state) { this->changeState(state->getName(), state); }
 	/**
@@ -199,7 +199,7 @@ public:
 	 * @brief This method caches the `State` given with the given name.
 	 *
 	 * @param name state's name
-	 * @param State a shared pointer to the `State`
+	 * @param state a shared pointer to the `State`
 	 */
 	void cacheState(const std::string &name, const Shared<State> &state);
 
