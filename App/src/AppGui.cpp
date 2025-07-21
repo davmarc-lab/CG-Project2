@@ -12,6 +12,7 @@
 #include "../include/ECS/EntityManager.hpp"
 #include "../include/ECS/System.hpp"
 #include "../include/PhysicWorld.hpp"
+#include "../include/State/SimulationState.hpp"
 
 #include "../../Opengl-Core/include/Core.hpp"
 
@@ -306,19 +307,19 @@ void ImGuiEntityTree::onRender() {
 						ImGui::Text("Geom: %s", sc->geom.c_str());
 
 					// light computation
-                    if (ImGui::BeginCombo("Light Comp##7", "Opts")) {
-                        for (int i = 0; i < light::lightCompStr.size(); i++) {
-                            if (ImGui::Selectable(light::lightCompStr[i].c_str(), (sc->computation == light::lightCompsEnm[i]))) {
-                                systems::light::setLightComputation(id, light::lightCompsEnm[i]);
-                            }
+					if (ImGui::BeginCombo("Light Comp##7", "Opts")) {
+						for (int i = 0; i < light::lightCompStr.size(); i++) {
+							if (ImGui::Selectable(light::lightCompStr[i].c_str(), (sc->computation == light::lightCompsEnm[i]))) {
+								systems::light::setLightComputation(id, light::lightCompsEnm[i]);
+							}
 
-                            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-                            if (sc->computation == light::lightCompsEnm[i]) {
-                                ImGui::SetItemDefaultFocus();
-                            }
-                        }
-                        ImGui::EndCombo();
-                    }
+							// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+							if (sc->computation == light::lightCompsEnm[i]) {
+								ImGui::SetItemDefaultFocus();
+							}
+						}
+						ImGui::EndCombo();
+					}
 				}
 			}
 
@@ -500,4 +501,22 @@ void ImGuiNormalView::resetCamera() {
 	this->m_npcam->setCameraVelocity(0.05f);
 	this->m_npcam->setCameraPosition(glm::vec3{0, 0, 3});
 	this->m_npcam->setMouseSensitivity(0.1f);
+}
+
+void ImGuiSimulationPanel::onRender() {
+	ImGui::Begin("Simulation Config");
+
+	if (ImGui::DragFloat3("Gravity##", &this->m_config.gravity.x)) {
+	}
+
+	if (ImGui::Button("Run##")) {
+		ed->post(RUN_SIMULATION);
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Stop##")) {
+		ed->post(STOP_SIMULATION);
+	}
+
+    ImGui::Text("Collisions: %zu", systems::collision::getCollisions().size());
+	ImGui::End();
 }

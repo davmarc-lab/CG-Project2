@@ -200,6 +200,13 @@ void GravitySolver::solve() {
 void PhysicWorld::onAttach() {
 	this->m_solvers.push_back(CreateShared<GravitySolver>(*this));
 	this->m_attached = true;
+	this->m_currentFrame = glfwGetTime();
+	this->m_lastFrame = this->m_currentFrame;
+}
+
+void PhysicWorld::onDetach() {
+	this->m_solvers.clear();
+	this->m_attached = false;
 }
 
 void PhysicWorld::onUpdate() {

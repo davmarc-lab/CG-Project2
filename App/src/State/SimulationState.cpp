@@ -128,6 +128,11 @@ void SimulationState::onAttach() {
 	ed->subscribe(ogl::event::loop::LOOP_BEGIN_RENDER, [this]() { this->m_img->begin(); });
 	ed->subscribe(ogl::event::loop::LOOP_END_RENDER, [this]() { this->m_img->end(); });
 
+	// Physic world
+	this->m_pw.onAttach();
+	this->m_pw.addSolver<CollisionSolver>();
+	this->m_pw.addSolver<PositionSolver>();
+
 	this->m_world.cameraId = em->createEntity();
 	systems::ecs::updateEntityName(this->m_world.cameraId, "World Camera");
 	auto cam = em->addComponent<CameraComponent>(this->m_world.cameraId);
@@ -162,10 +167,16 @@ void SimulationState::onAttach() {
 
 	Shared<ShaderProgram> skyboxShader = CreateShared<ShaderProgram>("skyboxVertShader.glsl", "skyboxFragShader.glsl");
 	skyboxShader->createShaderProgram();
+	Shared<ShaderProgram> planeShader = CreateShared<ShaderProgram>("vertexShader.glsl", "basicFS.glsl");
+	planeShader->createShaderProgram();
 	Shared<ShaderProgram> shader = CreateShared<ShaderProgram>("vertexShader.glsl", "fragmentShader.glsl");
 	shader->createShaderProgram();
 
-	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
+	auto skybox = factory::factorySkyBox("./resources/texture/skybox/lycksele/", "jpg");
+
+	auto plane = factory::factoryPlane({.3f, .3f, .3f, 1});
+    scene->addEntity(planeShader, plane);
+    this->m_pw.addEntity(plane);
 
 	auto shape = factory::factorySphere(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
 	scene->addEntity(shader, shape);
@@ -176,8 +187,36 @@ void SimulationState::onAttach() {
 	auto sc = em->getComponentFromId<ShaderComponent>(shape);
 	sc->computation = LightComputation::PHONG;
 	sc->reflective = false;
+	em->addComponent<PhysicComponent>(shape);
+
+	this->m_pw.addEntity(shape);
 
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { systems::collision::updateAllColliders(); });
+
+	SimulationConfig config{};
+	config.gravity = {0, -9.81f, 0};
+	// simulation panel
+	auto sp = this->m_img->addPanel<ImGuiSimulationPanel>(config);
+	this->m_img->addPanel<ImGuiEntityTree>();
+
+	ed->subscribe(RUN_SIMULATION, [this, sp]() {
+		sp->setRunning(true);
+		this->m_pw.onAttach();
+		this->m_pw.addSolver<CollisionSolver>();
+		this->m_pw.addSolver<PositionSolver>();
+	});
+	ed->subscribe(STOP_SIMULATION, [this, sp]() {
+		sp->setRunning(false);
+		this->m_pw.onDetach();
+	});
+
+	ed->subscribe(event::loop::LOOP_UPDATE, [this, sp]() {
+		if (sp->isRunning()) {
+			this->m_pw.onUpdate();
+		} else {
+			this->m_pw.resetDeltaTime();
+		}
+	});
 
 	ed->subscribe(event::loop::LOOP_RENDER, [skybox, skyboxShader]() {
 		systems::render::renderSkybox(skybox, skyboxShader);

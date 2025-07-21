@@ -71,3 +71,27 @@ private:
 	/// This method resets the camera to its default position.
 	void resetCamera();
 };
+
+struct SimulationConfig {
+	glm::vec3 gravity{};
+	bool collisions = true;
+	bool run = false;
+};
+
+class ImGuiSimulationPanel : public ImGuiPanel {
+public:
+	virtual void onRender() override;
+
+	inline SimulationConfig getConfig() const { return this->m_config; }
+
+	inline bool isRunning() const { return this->m_config.run; }
+	inline void setRunning(const bool &run) { this->m_config.run = run; }
+
+	ImGuiSimulationPanel(const SimulationConfig &config) :
+		ImGuiPanel("Simulation Panel"), m_config(config) {}
+
+	virtual ~ImGuiSimulationPanel() override = default;
+
+private:
+	SimulationConfig m_config{};
+};

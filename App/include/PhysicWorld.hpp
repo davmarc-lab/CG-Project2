@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-inline glm::vec3 GRAVITY = {0, -9.82f, 0};
+inline glm::vec3 GRAVITY = {0, -9.81f, 0};
 
 class PhysicWorld;
 
@@ -58,12 +58,12 @@ public:
 	 */
 	virtual void solve() override;
 
-    /**
-     * @brief Instance basic CollisionSolver object.
-     *
-     * @param world the physic world to be attached
-     * @see Solver
-     */
+	/**
+	 * @brief Instance basic CollisionSolver object.
+	 *
+	 * @param world the physic world to be attached
+	 * @see Solver
+	 */
 	CollisionSolver(PhysicWorld &world) :
 		Solver(world) {}
 
@@ -77,12 +77,12 @@ class PositionSolver : public Solver {
 public:
 	virtual void solve() override;
 
-    /**
-     * @brief Instance basic PositionSolver object.
-     *
-     * @param world the physic world to be attached
-     * @see Solver
-     */
+	/**
+	 * @brief Instance basic PositionSolver object.
+	 *
+	 * @param world the physic world to be attached
+	 * @see Solver
+	 */
 	PositionSolver(PhysicWorld &world) :
 		Solver(world) {}
 
@@ -96,12 +96,12 @@ class GravitySolver : public Solver {
 public:
 	virtual void solve() override;
 
-    /**
-     * @brief Instance basic GravitySolver object.
-     *
-     * @param world the physic world to be attached
-     * @see Solver
-     */
+	/**
+	 * @brief Instance basic GravitySolver object.
+	 *
+	 * @param world the physic world to be attached
+	 * @see Solver
+	 */
 	GravitySolver(PhysicWorld &world) :
 		Solver(world) {}
 
@@ -126,6 +126,11 @@ public:
 	 * \copydoc ogl::Layer::onAttach()
 	 */
 	virtual void onAttach() override;
+
+	/**
+	 * \copydoc ogl::Layer::onDetach()
+	 */
+	virtual void onDetach() override;
 
 	/**
 	 * \copydoc ogl::Layer::onUpdate()
@@ -167,6 +172,14 @@ public:
 	 * @return world's delta time
 	 */
 	inline float getWorldDeltaTime() const { return this->m_deltaTime; }
+
+	/**
+	 * @brief Reset the delta time when the simulation is stopped.
+	 */
+	inline void resetDeltaTime() {
+		this->m_currentFrame = 0;
+		this->m_lastFrame = 0;
+	}
 
 	/**
 	 * Retrieves all the entity that are simulated.
