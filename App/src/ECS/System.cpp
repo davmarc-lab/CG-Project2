@@ -19,13 +19,23 @@ const auto scene = BasicScene::instance();
 
 const auto BOUNDING_BOX_COLOR = glm::vec4{1, 0, 0, 1};
 
+/**
+ * @brief Data structure to store bounding box information for rendering purpose.
+ */
 struct BoundingBox {
+	/// bounding box shader program
 	ogl::ShaderProgram program = ogl::ShaderProgram("vertexShader.glsl", "fragmentShader.glsl");
+	/// bounding box vao
 	ogl::VertexArray vao{};
+	/// bounding box geometry vbo
 	ogl::VertexBuffer vbog{};
+	/// bounding box colors vbo
 	ogl::VertexBuffer vboc{};
+	/// bounding box vertex coords
 	std::vector<glm::vec3> coords{};
+	/// bounding box colors
 	std::vector<glm::vec4> colors{};
+	/// tells if the bounding box shaders is created
 	bool init = false;
 } defaultShader;
 
@@ -59,7 +69,7 @@ namespace systems {
 		}
 
 		void cleanAll() {
-            // remove all entities from memory
+			// remove all entities from memory
 			for (const auto e : em->getEntities()) {
 				removeEntityFromAll(e);
 			}
@@ -233,6 +243,8 @@ namespace systems {
 				return false;
 			auto fc = em->getComponentFromId<ColliderComponent>(first);
 			auto sc = em->getComponentFromId<ColliderComponent>(second);
+			ASSERT(fc != nullptr);
+			ASSERT(sc != nullptr);
 
 			return fc->isColliding(*sc);
 		}
@@ -270,7 +282,7 @@ namespace systems {
 				auto c = em->getComponentFromId<ParentComponent>(id);
 				auto pv = em->getComponentFromId<VertexComponent>(id);
 				auto box = em->getComponentFromId<ColliderComponent>(id);
-				// remove ColliderComponent component from each children and update the parent
+				// remove ColliderComponent component from each child and update the parent
 				for (auto child : c->children) {
 					if (em->entityHasComponent<ColliderComponent>(child)) {
 						auto cv = em->getComponentFromId<VertexComponent>(child);
@@ -412,24 +424,6 @@ namespace systems {
 				if (c->dead)
 					rmv.push_back(ett);
 			}
-			for (auto e : rmv) {
-				::systems::ecs::removeEntityFromAll(e);
-			}
-		}
-
-		void updateDistanceAnimation() {
-			std::vector<unsigned int> rmv{};
-			/* for (auto ett : em->getEntitiesFromComponent<ProjectileComponent>()) {
-				auto c = em->getComponentFromId<ProjectileComponent>(ett);
-				ASSERT(c != nullptr);
-
-				if (c->dead)
-					continue;
-
-				c->updateTick(systems::transform::getPosition(ett));
-				if (c->dead)
-					rmv.push_back(ett);
-			} */
 			for (auto e : rmv) {
 				::systems::ecs::removeEntityFromAll(e);
 			}
@@ -741,6 +735,10 @@ namespace systems {
 		}
 
 		void renderSkybox(const unsigned int &id, const Shared<ogl::ShaderProgram> &shader) {
+			if (!em->getEntitiesFromComponent<SkyboxComponent>().size()) {
+				std::cerr << "No skybox detected\n";
+				return;
+			}
 			shader->use();
 			auto rc = em->getComponentFromId<RenderComponent>(id);
 			shader->setMat4("view", glm::mat4(glm::mat3(scene->getCamera()->getViewMatrix())));

@@ -129,7 +129,7 @@ glm::vec3 NormalViewState::getRayFromMouse(const Pair<float> &size, int mouse_x,
 	return glm::normalize(glm::vec3(pw) - glm::vec3(world.camera->getCameraPosition()));
 }
 
-bool NormalViewState::isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const float &sphere_radius, float *id) {
+bool NormalViewState::isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const float &sphere_radius, float *dist) {
 	glm::vec3 d = world.camera->getCameraPosition() - sphere_pos;
 	float b = dot(d, ray);
 	float cc = dot(d, d) - sphere_radius * sphere_radius;
@@ -140,7 +140,7 @@ bool NormalViewState::isRayInSphere(const glm::vec3 &ray, const glm::vec3 &spher
 	else if (delta > 0.0f) {
 		float t_a = -b + sqrt(delta);
 		float t_b = -b - sqrt(delta);
-		*id = t_b;
+		*dist = t_b;
 
 		if (t_a < 0.0f && t_b < 0.0f)
 			return false;
@@ -150,7 +150,7 @@ bool NormalViewState::isRayInSphere(const glm::vec3 &ray, const glm::vec3 &spher
 		float t = -b + sqrt(delta);
 		if (t < 0)
 			return false;
-		*id = t;
+		*dist = t;
 		return true;
 	}
 }
@@ -271,7 +271,7 @@ void NormalViewState::changeInputState(Window *w, const InputState &state) {
 									}
 								}
 							}
-							ed->post(ENTITY_ELECTED_CHANGED);
+							ed->post(ENTITY_SELECTED_CHANGED);
 						}
 						break;
 					}
@@ -312,6 +312,9 @@ void NormalViewState::defaultKeyCallback(Window *w) {
 Unique<Window> w = nullptr;
 Unique<ImGuiManager> igm = nullptr;
 
+/**
+ * @brief Implementation of ogl::Layer for the NormalViewState.
+ */
 class CustomLayer : public Layer {
 public:
 	virtual void onAttach() override {}
@@ -322,21 +325,36 @@ public:
 			this->m_updateFun();
 	}
 
+	/**
+	 * @brief Sets if the Layer is running.
+	 *
+	 * @param run the run flag
+	 */
 	void setRunnig(const bool &run) { this->m_run = run; }
+	/**
+	 * @brief Sets the current update function.
+	 *
+	 * @param fun the function to execute every frame
+	 */
 	void setUpdateFun(std::function<void()> &&fun) { this->m_updateFun = std::move(fun); }
 
+	/**
+	 * @brief Instances basic Layer.
+	 */
 	CustomLayer() :
 		Layer("Custom Layer") {}
 
 	virtual ~CustomLayer() override = default;
 
 private:
+	/// run state flag
 	bool m_run = false;
+	/// callback function
 	std::function<void()> m_updateFun{};
 };
 
 void NormalViewState::onAttach() {
-    ASSERT(!this->m_attached);
+	ASSERT(!this->m_attached);
 	State::onAttach();
 	srand(time(NULL));
 	WindowSettings s{};
@@ -457,7 +475,7 @@ void NormalViewState::onAttach() {
 		ub->update(0, sizeof(glm::mat4), glm::value_ptr(vp));
 	});
 
-	ed->subscribe(ENTITY_ELECTED_CHANGED, [this, igmTree]() {
+	ed->subscribe(ENTITY_SELECTED_CHANGED, [this, igmTree]() {
 		igmTree->setSelectedEntity(ettSelected);
 	});
 
@@ -516,9 +534,9 @@ void NormalViewState::onAttach() {
 }
 
 void NormalViewState::onDetach() {
-    ASSERT(this->m_attached);
+	ASSERT(this->m_attached);
 	State::onDetach();
-    systems::ecs::cleanAll();
+	systems::ecs::cleanAll();
 	// delete all buffers
 	// delete all textures
 	// delete all shaders

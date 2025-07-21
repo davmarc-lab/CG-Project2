@@ -9,12 +9,20 @@
 
 const float PI = glm::pi<float>();
 
+/**
+ * @brief Utility struct to temporally store mesh vectors.
+ */
 struct MeshInfo {
+	/// mesh normalized position coords vertices
 	std::vector<glm::vec3> vertex{};
+	/// mesh normal coords vertices
 	std::vector<glm::vec3> normals{};
+	/// mesh texture coords vertices
 	std::vector<glm::vec2> texCoords{};
+	/// mesh vertex coords indices
 	std::vector<unsigned int> indices{};
 };
+
 inline std::vector<glm::vec3> skyboxGeometry{
 	// vertex pos
 	{-1.0f, -1.0f, -1.0f},
@@ -211,22 +219,22 @@ inline std::vector<glm::vec3> pyramidNormals{
 };
 
 inline std::vector<glm::vec2> pyramidTexCoords{
-    {0.f, 0.f},
-    {1.f, 0.f},
-    {1.f, 1.f},
-    {0.f, 1.f},
-    {1.f, 0.f},
-    {0.5f, 1.f},
-    {0.f, 1.f},
-    {1.f, 0.f},
-    {0.5f, 1.f},
-    {0.f, 1.f},
-    {1.f, 0.f},
-    {0.5f, 1.f},
-    {0.f, 1.f},
-    {1.f, 0.f},
-    {0.5f, 1.f},
-    {0.f, 1.f},
+	{0.f, 0.f},
+	{1.f, 0.f},
+	{1.f, 1.f},
+	{0.f, 1.f},
+	{1.f, 0.f},
+	{0.5f, 1.f},
+	{0.f, 1.f},
+	{1.f, 0.f},
+	{0.5f, 1.f},
+	{0.f, 1.f},
+	{1.f, 0.f},
+	{0.5f, 1.f},
+	{0.f, 1.f},
+	{1.f, 0.f},
+	{0.5f, 1.f},
+	{0.f, 1.f},
 };
 
 // sphere
@@ -306,7 +314,7 @@ inline MeshInfo getCylinderVertices(const float &height = 5.f, const unsigned in
 	auto baseCenterIndex = unitCircle.vertex.size();
 	auto topCenterIndex = baseCenterIndex + slices + 1;
 
-    int factor = -1;
+	int factor = -1;
 	for (int i = 0; i < 2; i++) {
 		auto h = (height / 2.f) * factor;
 		auto nz = factor;
@@ -325,7 +333,7 @@ inline MeshInfo getCylinderVertices(const float &height = 5.f, const unsigned in
 			// Texture
 			coords.texCoords.push_back({-uv.x * 0.5f + 0.5f, -uv.y * 0.5f + 0.5f});
 		}
-        factor *= -1;
+		factor *= -1;
 	}
 
 	// indices
