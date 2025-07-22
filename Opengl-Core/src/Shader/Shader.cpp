@@ -42,6 +42,11 @@ namespace ogl {
 		this->checkCompileErrors();
 	}
 
+	void ShaderProgram::clear() {
+		glDeleteProgram(this->m_id);
+		this->m_id = 0;
+	}
+
 	ShaderProgram::ShaderProgram(const std::string &vloc, const std::string &vfile, const std::string &floc, const std::string &ffile) {
 		assert(!vloc.empty());
 		assert(!vfile.empty());
@@ -74,7 +79,9 @@ namespace ogl {
 	}
 
 	void ShaderProgram::createShaderProgram() {
+		ASSERT(this->m_vert != nullptr);
 		this->m_vert->createShader();
+		ASSERT(this->m_frag != nullptr);
 		this->m_frag->createShader();
 
 		if (this->m_geom != nullptr) {

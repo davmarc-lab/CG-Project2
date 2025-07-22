@@ -353,6 +353,11 @@ private:
 	std::function<void()> m_updateFun{};
 };
 
+Shared<ShaderProgram> skyboxShader;
+Shared<ShaderProgram> basicShader;
+Shared<ShaderProgram> modelShader;
+Shared<ShaderProgram> lightShader;
+
 void NormalViewState::onAttach() {
 	ASSERT(!this->m_attached);
 	State::onAttach();
@@ -416,20 +421,20 @@ void NormalViewState::onAttach() {
 	// Initializing Scene
 	scene->init(world.camera);
 
-	Shared<ShaderProgram> skyboxShader = CreateShared<ShaderProgram>("skyboxVertShader.glsl", "skyboxFragShader.glsl");
+	skyboxShader = CreateShared<ShaderProgram>("skyboxVertShader.glsl", "skyboxFragShader.glsl");
 	skyboxShader->createShaderProgram();
-	Shared<ShaderProgram> shader = CreateShared<ShaderProgram>("vertexShader.glsl", "fragmentShader.glsl");
-	shader->createShaderProgram();
-	Shared<ShaderProgram> modelShader = CreateShared<ShaderProgram>("modelVertShader.glsl", "modelFragShader.glsl");
+	basicShader = CreateShared<ShaderProgram>("vertexShader.glsl", "fragmentShader.glsl");
+	basicShader->createShaderProgram();
+	modelShader = CreateShared<ShaderProgram>("modelVertShader.glsl", "modelFragShader.glsl");
 	modelShader->createShaderProgram();
-	Shared<ShaderProgram> lightShader = CreateShared<ShaderProgram>("lightVertShader.glsl", "lightFragShader.glsl");
+	lightShader = CreateShared<ShaderProgram>("lightVertShader.glsl", "lightFragShader.glsl");
 	lightShader->createShaderProgram();
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
 	plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
 	systems::ecs::updateEntityName(plane, "Basic Plane");
-	scene->addEntity(shader, plane);
+	scene->addEntity(basicShader, plane);
 
 	auto shape = factory::factoryPyramid(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
@@ -479,7 +484,7 @@ void NormalViewState::onAttach() {
 		igmTree->setSelectedEntity(ettSelected);
 	});
 
-	ed->subscribe(event::loop::LOOP_RENDER, [this, skybox, skyboxShader]() {
+	ed->subscribe(event::loop::LOOP_RENDER, [this, skybox]() {
 		// render skybox
 		systems::render::renderSkybox(skybox, skyboxShader);
 		// render other meshes
@@ -537,9 +542,17 @@ void NormalViewState::onDetach() {
 	ASSERT(this->m_attached);
 	State::onDetach();
 	systems::ecs::cleanAll();
+	skyboxShader->clear();
+	basicShader->clear();
+	modelShader->clear();
+	lightShader->clear();
+
 	// delete all buffers
 	// delete all textures
 	// delete all shaders
+
+	Renderer::instance()->clear();
+	systems::render::clear();
 	igm->onDetach();
 	w->onDetach();
 #undef BIG

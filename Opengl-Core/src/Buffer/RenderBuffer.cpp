@@ -21,7 +21,10 @@ namespace ogl {
 		glRenderbufferStorage(GL_RENDERBUFFER, this->m_config.format, this->m_config.width, this->m_config.height);
 	}
 
-	void RenderBuffer::onDetach() { glDeleteRenderbuffers(1, &this->m_id); }
+	void RenderBuffer::onDetach() {
+		glDeleteRenderbuffers(1, &this->m_id);
+		this->m_id = 0;
+	}
 
 	void RenderBuffer::rescaleRenderBuffer(const unsigned int &width, const unsigned int &height) {
 		this->m_config.width = width;

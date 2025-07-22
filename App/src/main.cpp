@@ -76,11 +76,10 @@ int main(int argc, char *argv[]) {
 	});
 	*/
 
-    auto st = CreateShared<SimulationState>();
-    sm->cacheState(st);
+	auto st = CreateShared<SimulationState>();
+	sm->cacheState(st);
 
 	auto ds = CreateShared<NormalViewState>();
-
 	sm->changeState(ds);
 	sm->sync();
 

@@ -634,6 +634,8 @@ namespace systems {
 	 * @brief All utilities for rendering entities.
 	 */
 	namespace render {
+		void clear();
+
 		/**
 		 * @brief Initialize the stencil shader.
 		 */

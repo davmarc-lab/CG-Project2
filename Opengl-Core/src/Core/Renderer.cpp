@@ -1,4 +1,5 @@
 #include "../../include/Core/Renderer.hpp"
+#include <GLFW/glfw3.h>
 
 #include "../../include/Core/Event.hpp"
 
@@ -14,14 +15,25 @@ glm::mat4 calcModelMatrix(const glm::vec3 &pos, const glm::vec3 &dim, const glm:
 }
 
 namespace ogl {
-	ShaderProgram rendShader = ShaderProgram("vertexShader.glsl", "fragmentShader.glsl");
-	ShaderProgram instancedShader = ShaderProgram("instancedVertShader.glsl", "instancedFragShader.glsl");
+	Unique<ShaderProgram> rendShader;
+	Unique<ShaderProgram> instancedShader;
+
+	void Renderer::clear() {
+		this->m_cube.clear();
+		this->m_sphere.clear();
+		this->m_pyramid.clear();
+		this->m_thorus.clear();
+		rendShader->clear();
+		instancedShader->clear();
+
+		this->m_init = false;
+	}
 
 	void Renderer::init() {
-		if (rendShader.getId() <= 0)
-			rendShader.createShaderProgram();
-		if (instancedShader.getId() <= 0)
-			instancedShader.createShaderProgram();
+		rendShader = CreateUnique<ShaderProgram>("vertexShader.glsl", "fragmentShader.glsl");
+		instancedShader = CreateUnique<ShaderProgram>("instancedVertShader.glsl", "instancedFragShader.glsl");
+		rendShader->createShaderProgram();
+		instancedShader->createShaderProgram();
 
 		// cube
 		this->m_cube.vao.onAttach();
@@ -48,6 +60,7 @@ namespace ogl {
 
 		this->m_cube.ebo.onAttach();
 		this->m_cube.ebo.setup(this->m_cube.index.data(), this->m_cube.index.size(), GL_STATIC_DRAW);
+		this->m_cube.vao.unbind();
 
 		// pyramid
 		this->m_pyramid.vao.onAttach();
@@ -74,6 +87,7 @@ namespace ogl {
 
 		this->m_pyramid.ebo.onAttach();
 		this->m_pyramid.ebo.setup(this->m_pyramid.index.data(), this->m_pyramid.index.size(), GL_STATIC_DRAW);
+		this->m_pyramid.vao.unbind();
 
 		// sphere
 		this->m_sphere.vao.onAttach();
@@ -106,6 +120,7 @@ namespace ogl {
 
 		this->m_sphere.ebo.onAttach();
 		this->m_sphere.ebo.setup(this->m_sphere.index.data(), this->m_sphere.index.size(), GL_STATIC_DRAW);
+		this->m_sphere.vao.unbind();
 
 		// thorus
 		this->m_thorus.vao.onAttach();
@@ -133,6 +148,7 @@ namespace ogl {
 
 		this->m_thorus.ebo.onAttach();
 		this->m_thorus.ebo.setup(this->m_thorus.index.data(), this->m_thorus.index.size(), GL_STATIC_DRAW);
+		this->m_thorus.vao.unbind();
 
 		this->m_init = true;
 	}
@@ -140,11 +156,9 @@ namespace ogl {
 	void Renderer::appendSphere(const unsigned int &id, const glm::mat4 &model, const glm::vec4 &color) {
 		ASSERT(this->m_init);
 		this->m_stats.numSpheres++;
-		this->m_sphere.index.push_back(id);
 		this->m_sphere.modelOffset.push_back(model);
 		this->m_sphere.colorOffset.push_back(color);
 		this->m_sphere.vao.bind();
-		this->m_sphere.vboco.bind();
 		this->m_sphere.vboco.setup(this->m_sphere.colorOffset.data(), this->m_sphere.colorOffset.size(), GL_STATIC_DRAW);
 		this->m_sphere.vao.linkAttribFast(4, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
 		glVertexAttribDivisor(4, 1);
@@ -163,11 +177,9 @@ namespace ogl {
 	void Renderer::appendCube(const unsigned int &id, const glm::mat4 &model, const glm::vec4 &color) {
 		ASSERT(this->m_init);
 		this->m_stats.numCubes++;
-		this->m_cube.index.push_back(id);
 		this->m_cube.modelOffset.push_back(model);
 		this->m_cube.colorOffset.push_back(color);
 		this->m_cube.vao.bind();
-		this->m_cube.vboco.bind();
 		this->m_cube.vboco.setup(this->m_cube.colorOffset.data(), this->m_cube.colorOffset.size(), GL_STATIC_DRAW);
 		this->m_cube.vao.linkAttribFast(4, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
 		glVertexAttribDivisor(4, 1);
@@ -186,16 +198,9 @@ namespace ogl {
 	void Renderer::prepareBuffers(const std::vector<glm::mat4> &models, const std::vector<glm::vec4> &colors) {
 		ASSERT(this->m_init);
 		if (this->m_stats.numSpheres) {
-			this->m_sphere.vbomo.bind();
+			this->m_sphere.vao.bind();
 			this->m_sphere.vbomo.setup(models.data(), models.size(), GL_STATIC_DRAW);
-			this->m_sphere.vboco.bind();
 			this->m_sphere.vboco.setup(colors.data(), colors.size(), GL_STATIC_DRAW);
-		}
-		if (this->m_stats.numCubes) {
-			this->m_cube.vbomo.bind();
-			this->m_cube.vbomo.setup(models.data(), models.size(), GL_STATIC_DRAW);
-			this->m_cube.vboco.bind();
-			this->m_cube.vboco.setup(colors.data(), colors.size(), GL_STATIC_DRAW);
 		}
 	}
 
@@ -212,10 +217,7 @@ namespace ogl {
 	}
 
 	void Renderer::drawAllInstanced() {
-		if (!(this->m_stats.numCubes + this->m_stats.numPyramids + this->m_stats.numSpheres + this->m_stats.numThorus))
-			return;
-
-		instancedShader.use();
+		instancedShader->use();
 		if (this->m_stats.numSpheres) {
 			this->m_sphere.vao.bind();
 			glDrawElementsInstanced(GL_TRIANGLES, this->m_sphere.index.size(), GL_UNSIGNED_INT, 0, this->m_stats.numSpheres);

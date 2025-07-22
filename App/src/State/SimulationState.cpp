@@ -21,6 +21,9 @@ const auto sm = StateManager::instance();
 const auto SPHERE_POS = glm::vec3(1, 1, -4);
 const auto SPHERE_SIZE = glm::vec3(0.3f);
 
+std::vector<glm::mat4> sphereModels{};
+std::vector<glm::vec4> sphereColors{};
+
 void SimulationState::defaultKeyCallback() {
 	this->m_window->setKeysCallback([this](GLFWwindow *, int key, int, int action, int) {
 		switch (action) {
@@ -120,8 +123,6 @@ glm::vec3 getPosNear(const glm::vec3 &pos) {
 	return (getRandVec3() / glm::vec3{2}) + (rand() % 2 == 0 ? pos : -pos);
 }
 
-Shared<ShaderProgram> basicShader;
-
 void SimulationState::onAttach() {
 	ASSERT(!this->m_attached);
 	State::onAttach();
@@ -192,28 +193,12 @@ void SimulationState::onAttach() {
 	skyboxShader->createShaderProgram();
 	Shared<ShaderProgram> planeShader = CreateShared<ShaderProgram>("vertexShader.glsl", "basicFS.glsl");
 	planeShader->createShaderProgram();
-	basicShader = CreateShared<ShaderProgram>("vertexShader.glsl", "fragmentShader.glsl");
-	basicShader->createShaderProgram();
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/lycksele/", "jpg");
 
 	auto plane = factory::factoryPlane({.3f, .3f, .3f, 1});
 	scene->addEntity(planeShader, plane);
 	this->m_pw.addEntity(plane);
-
-	auto shape = factory::factorySphere(BasicInfo{SPHERE_POS, SPHERE_SIZE, {}}, glm::vec4{getRandVec3(), 1});
-	scene->addEntity(basicShader, shape);
-	em->addComponent<ColliderComponent>(shape);
-	systems::collision::updateColliderType(shape, ColliderType::COLLIDER_SPHERE);
-	systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_EMERALD));
-
-	systems::ecs::updateEntityName(shape, "Sphere");
-	auto sc = em->getComponentFromId<ShaderComponent>(shape);
-	sc->computation = LightComputation::PHONG;
-	sc->reflective = false;
-	em->addComponent<PhysicComponent>(shape);
-
-	this->m_pw.addEntity(shape);
 
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { systems::collision::updateAllColliders(); });
 
@@ -242,9 +227,19 @@ void SimulationState::onAttach() {
 		}
 	});
 
+	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() {
+		sphereModels.clear();
+		for (auto e : em->getEntitiesFromComponent<InstancedComponent>()) {
+			sphereModels.push_back(systems::transform::getModelMatrix(e));
+		}
+
+		systems::render::prepareInstancedMesh(sphereModels, sphereColors);
+	});
+
 	ed->subscribe(event::loop::LOOP_RENDER, [skybox, skyboxShader]() {
 		systems::render::renderSkybox(skybox, skyboxShader);
 		systems::render::renderAllMeshes();
+		systems::render::renderInstancedMeshes();
 	});
 
 	ed->subscribe(STATE_CHANGED, []() {
@@ -252,9 +247,9 @@ void SimulationState::onAttach() {
 	});
 
 	ed->subscribe(ADD_SPHERE, [this]() {
-		auto shape = factory::factorySphere(BasicInfo{getPosNear(SPHERE_POS), SPHERE_SIZE, {}}, glm::vec4{getRandVec3(), 1});
-		scene->addEntity(basicShader, shape);
-		em->addComponent<ColliderComponent>(shape);
+		auto color = glm::vec4{getRandVec3(), 1};
+		sphereColors.push_back(color);
+		auto shape = factory::factorySphereInstanced(BasicInfo{getPosNear(SPHERE_POS), SPHERE_SIZE, {}}, color);
 		systems::collision::updateColliderType(shape, ColliderType::COLLIDER_SPHERE);
 		systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_NONE));
 
@@ -262,6 +257,7 @@ void SimulationState::onAttach() {
 		sc->computation = LightComputation::NONE;
 		sc->reflective = false;
 		em->addComponent<PhysicComponent>(shape);
+		sphereModels.push_back(systems::transform::getModelMatrix(shape));
 
 		this->m_pw.addEntity(shape);
 	});

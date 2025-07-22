@@ -33,6 +33,7 @@ void StateManager::sync() {
 		this->m_currentState->onDetach();
 
 	ed->cleanAll();
+	ogl::ResourceManager::instance()->clear();
 	this->m_currentState = std::move(this->m_queueState);
 	this->m_currentState->onAttach();
 

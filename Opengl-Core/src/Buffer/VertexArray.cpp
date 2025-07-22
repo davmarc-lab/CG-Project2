@@ -14,13 +14,12 @@ namespace ogl {
 	void VertexArray::unbind() const { glBindVertexArray(0); }
 
 	void VertexArray::onAttach() {
-		if (!this->m_id) {
-			glGenVertexArrays(1, &this->m_id);
-		}
+		glGenVertexArrays(1, &this->m_id);
 	}
 
 	void VertexArray::onDetach() {
-		// glDeleteVertexArrays(1, &this->m_id);
+		glDeleteVertexArrays(1, &this->m_id);
+		this->m_id = 0;
 	}
 
 	void VertexArray::linkAttribFast(const unsigned int &layout, const int &size, const unsigned int &type, const bool &normalize, const int &stride,

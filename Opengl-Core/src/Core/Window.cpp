@@ -13,6 +13,7 @@ namespace ogl {
 	// error callback
 	static void errorCallback(int code, const char *description) { std::cerr << "GLFW error (" << code << ") -> (" << description << ")\n"; }
 
+#ifdef C_DBG
 	const char *getErrorSource(const GLenum &source) {
 		switch (source) {
 			case GL_DEBUG_SOURCE_API:
@@ -67,6 +68,7 @@ namespace ogl {
 					  << msg << "\n";
 		}
 	}
+#endif
 
 	// resize Callback
 	static void resizeCallback(GLFWwindow *window, int width, int height) {
@@ -222,6 +224,8 @@ namespace ogl {
 		// debug callback
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
+#ifdef C_DBG
+
 		if (this->m_settings.debugMode) {
 			int debugFlags;
 			glGetIntegerv(GL_CONTEXT_FLAGS, &debugFlags);
@@ -233,6 +237,7 @@ namespace ogl {
 				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 			}
 		}
+#endif
 
 		// enable blend
 		glEnable(GL_BLEND);

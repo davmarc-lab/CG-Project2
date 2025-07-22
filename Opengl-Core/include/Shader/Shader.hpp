@@ -84,6 +84,7 @@ namespace ogl {
 		void createShaderProgram();
 
 		void use() const;
+        void clear();
 
 		inline unsigned int getId() const { return this->m_id; }
 

@@ -37,6 +37,13 @@ struct BoundingBox {
 	std::vector<glm::vec4> colors{};
 	/// tells if the bounding box shaders is created
 	bool init = false;
+
+	void clear() {
+		vbog.onDetach();
+		vboc.onDetach();
+		vao.onDetach();
+		program.clear();
+	}
 } defaultShader;
 
 ogl::ShaderProgram stencil = ogl::ShaderProgram("vertexShader.glsl", "stencilShader.glsl");
@@ -634,6 +641,10 @@ namespace systems {
 	} // namespace light
 
 	namespace render {
+		void clear() {
+			stencil.clear();
+		}
+
 		void initStencilShader() {
 			stencil.createShaderProgram();
 		}
@@ -755,6 +766,7 @@ namespace systems {
 			auto skyboxTexture = em->getComponentFromId<TextureComponent>(sid[0]);
 			for (auto [shader, etts] : scene->getShaderEntityMap()) {
 				shader->use();
+				// std::cout << "SYSTEM SHADER: " << shader->getId() << "\n";
 				// send light data
 				sendLightDataShader(shader, lightsData);
 				for (auto id : etts) {
