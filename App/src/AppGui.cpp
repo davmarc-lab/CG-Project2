@@ -518,5 +518,9 @@ void ImGuiSimulationPanel::onRender() {
 	}
 
     ImGui::Text("Collisions: %zu", systems::collision::getCollisions().size());
+
+    if (ImGui::Button("Add")) {
+        ed->post(ADD_SPHERE);
+    }
 	ImGui::End();
 }

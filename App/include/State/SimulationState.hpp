@@ -4,6 +4,7 @@
 
 #include "../PhysicWorld.hpp"
 
+const auto ADD_SPHERE = ogl::Event("Add Sphere");
 const ogl::Event RUN_SIMULATION = ogl::Event("Run Simulation");
 const ogl::Event STOP_SIMULATION = ogl::Event("Stop Simulation");
 

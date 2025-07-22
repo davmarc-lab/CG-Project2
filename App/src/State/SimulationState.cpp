@@ -1,4 +1,5 @@
 #include "../../include/State/SimulationState.hpp"
+#include <cstdlib>
 #include <glm/gtc/type_ptr.hpp>
 #include "../../include/State/BootstrapState.hpp"
 
@@ -16,6 +17,9 @@ const auto im = ogl::InputManager::instance();
 const auto ed = ogl::EventManager::instance();
 const auto scene = BasicScene::instance();
 const auto sm = StateManager::instance();
+
+const auto SPHERE_POS = glm::vec3(1, 1, -4);
+const auto SPHERE_SIZE = glm::vec3(0.3f);
 
 void SimulationState::defaultKeyCallback() {
 	this->m_window->setKeysCallback([this](GLFWwindow *, int key, int, int action, int) {
@@ -104,6 +108,20 @@ void SimulationState::enableDefaultCameraMovement() {
 	});
 }
 
+float randf() {
+	return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+}
+
+glm::vec3 getRandVec3() {
+	return glm::vec3(randf(), randf(), randf());
+}
+
+glm::vec3 getPosNear(const glm::vec3 &pos) {
+	return (getRandVec3() / glm::vec3{2}) + (rand() % 2 == 0 ? pos : -pos);
+}
+
+Shared<ShaderProgram> basicShader;
+
 void SimulationState::onAttach() {
 	ASSERT(!this->m_attached);
 	State::onAttach();
@@ -174,8 +192,8 @@ void SimulationState::onAttach() {
 	skyboxShader->createShaderProgram();
 	Shared<ShaderProgram> planeShader = CreateShared<ShaderProgram>("vertexShader.glsl", "basicFS.glsl");
 	planeShader->createShaderProgram();
-	Shared<ShaderProgram> shader = CreateShared<ShaderProgram>("vertexShader.glsl", "fragmentShader.glsl");
-	shader->createShaderProgram();
+	basicShader = CreateShared<ShaderProgram>("vertexShader.glsl", "fragmentShader.glsl");
+	basicShader->createShaderProgram();
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/lycksele/", "jpg");
 
@@ -183,10 +201,10 @@ void SimulationState::onAttach() {
 	scene->addEntity(planeShader, plane);
 	this->m_pw.addEntity(plane);
 
-	auto shape = factory::factorySphere(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
-	scene->addEntity(shader, shape);
+	auto shape = factory::factorySphere(BasicInfo{SPHERE_POS, SPHERE_SIZE, {}}, glm::vec4{getRandVec3(), 1});
+	scene->addEntity(basicShader, shape);
 	em->addComponent<ColliderComponent>(shape);
-    systems::collision::updateColliderType(shape, ColliderType::COLLIDER_SPHERE);
+	systems::collision::updateColliderType(shape, ColliderType::COLLIDER_SPHERE);
 	systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_EMERALD));
 
 	systems::ecs::updateEntityName(shape, "Sphere");
@@ -231,6 +249,21 @@ void SimulationState::onAttach() {
 
 	ed->subscribe(STATE_CHANGED, []() {
 		sm->changeState(BOOTSTRAP_STATE_NAME);
+	});
+
+	ed->subscribe(ADD_SPHERE, [this]() {
+		auto shape = factory::factorySphere(BasicInfo{getPosNear(SPHERE_POS), SPHERE_SIZE, {}}, glm::vec4{getRandVec3(), 1});
+		scene->addEntity(basicShader, shape);
+		em->addComponent<ColliderComponent>(shape);
+		systems::collision::updateColliderType(shape, ColliderType::COLLIDER_SPHERE);
+		systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_NONE));
+
+		auto sc = em->getComponentFromId<ShaderComponent>(shape);
+		sc->computation = LightComputation::NONE;
+		sc->reflective = false;
+		em->addComponent<PhysicComponent>(shape);
+
+		this->m_pw.addEntity(shape);
 	});
 }
 
