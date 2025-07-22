@@ -38,6 +38,11 @@ struct BoundingBox {
 	/// tells if the bounding box shaders is created
 	bool init = false;
 
+	/**
+	 * @brief Clears all graphics data for the bounding box
+     *
+     * @note This method should be called when detaching a State.
+	 */
 	void clear() {
 		vbog.onDetach();
 		vboc.onDetach();

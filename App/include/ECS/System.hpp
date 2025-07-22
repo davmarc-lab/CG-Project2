@@ -634,6 +634,11 @@ namespace systems {
 	 * @brief All utilities for rendering entities.
 	 */
 	namespace render {
+		/**
+		 * @brief This method clears all graphics data used in the current context.
+		 *
+		 * @note This method should be called when detaching a State.
+		 */
 		void clear();
 
 		/**
