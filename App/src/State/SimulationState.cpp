@@ -1,5 +1,6 @@
 #include "../../include/State/SimulationState.hpp"
 #include <glm/gtc/type_ptr.hpp>
+#include "../../include/State/BootstrapState.hpp"
 
 #include "../../../Opengl-Core/include/Core.hpp"
 #include "../../../Opengl-Core/include/Graphic.hpp"
@@ -14,6 +15,7 @@ const auto em = EntityManager::instance();
 const auto im = ogl::InputManager::instance();
 const auto ed = ogl::EventManager::instance();
 const auto scene = BasicScene::instance();
+const auto sm = StateManager::instance();
 
 void SimulationState::defaultKeyCallback() {
 	this->m_window->setKeysCallback([this](GLFWwindow *, int key, int, int action, int) {
@@ -26,6 +28,9 @@ void SimulationState::defaultKeyCallback() {
 				im->keyReleased(key);
 				break;
 			}
+		}
+		if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+			ed->post(STATE_CHANGED);
 		}
 	});
 }
@@ -175,12 +180,13 @@ void SimulationState::onAttach() {
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/lycksele/", "jpg");
 
 	auto plane = factory::factoryPlane({.3f, .3f, .3f, 1});
-    scene->addEntity(planeShader, plane);
-    this->m_pw.addEntity(plane);
+	scene->addEntity(planeShader, plane);
+	this->m_pw.addEntity(plane);
 
 	auto shape = factory::factorySphere(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
 	scene->addEntity(shader, shape);
 	em->addComponent<ColliderComponent>(shape);
+    systems::collision::updateColliderType(shape, ColliderType::COLLIDER_SPHERE);
 	systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_EMERALD));
 
 	systems::ecs::updateEntityName(shape, "Sphere");
@@ -222,9 +228,22 @@ void SimulationState::onAttach() {
 		systems::render::renderSkybox(skybox, skyboxShader);
 		systems::render::renderAllMeshes();
 	});
+
+	ed->subscribe(STATE_CHANGED, []() {
+		sm->changeState(BOOTSTRAP_STATE_NAME);
+	});
 }
 
-void SimulationState::onDetach() {}
+void SimulationState::onDetach() {
+	ASSERT(this->m_attached);
+	State::onDetach();
+	systems::ecs::cleanAll();
+	// delete all buffers
+	// delete all textures
+	// delete all shaders
+	this->m_img->onDetach();
+	this->m_window->onDetach();
+}
 
 void SimulationState::onUpdate() {}
 

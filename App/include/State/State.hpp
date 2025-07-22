@@ -3,6 +3,8 @@
 #include <map>
 #include "../../../Opengl-Core/include/Core.hpp"
 
+const auto STATE_CHANGED = ogl::Event("State Changed");
+
 /**
  * @brief This class allow to create a state to be attached to the StateManager.
  * A State works like a scene: defines all the meshes that will be rendered or not,
