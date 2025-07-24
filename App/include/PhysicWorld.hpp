@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../Opengl-Core/include/Core.hpp"
+#include "ECS/Component.hpp"
 
 #include <glm/ext/vector_float3.hpp>
 #include <utility>
@@ -40,6 +41,16 @@ public:
 
 	/// the reference to the PhysicWorld
 	PhysicWorld &world;
+};
+
+class RopeSolver : public Solver {
+public:
+	virtual void solve() override;
+
+	RopeSolver(PhysicWorld &world) :
+		Solver(world) {}
+
+	virtual ~RopeSolver() override = default;
 };
 
 /**

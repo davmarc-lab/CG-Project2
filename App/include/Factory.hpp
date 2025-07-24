@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <string>
+#include <vector>
 
 #include "Utils.hpp"
 
@@ -27,6 +28,8 @@ namespace factory {
 	unsigned int factoryPyramid(const BasicInfo &info, const glm::vec4 &color = {1, 0, 0, 1});
 	unsigned int factoryThorus(const BasicInfo &info, const glm::vec4 &color = {1, 0, 0, 1});
 	unsigned int factoryCylinder(const BasicInfo &info, const glm::vec4 &color = {1, 0, 0, 1});
+
+    std::vector<std::pair<glm::vec4, glm::mat4>> factoryRope(const glm::vec3& center, const float& legnth, const float& constant, const unsigned int subdivisons);
 
 	unsigned int factoryPlane(const glm::vec4 &color);
 

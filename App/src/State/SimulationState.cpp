@@ -155,6 +155,7 @@ void SimulationState::onAttach() {
 	// Physic world
 	this->m_pw.onAttach();
 	this->m_pw.addSolver<CollisionSolver>();
+	this->m_pw.addSolver<RopeSolver>();
 	this->m_pw.addSolver<PositionSolver>();
 
 	this->m_world.cameraId = em->createEntity();
@@ -166,6 +167,7 @@ void SimulationState::onAttach() {
 	em->addComponent<ColliderComponent>(this->m_world.cameraId, glm::vec3{4, 4, 4}, this->m_world.cameraSize);
 	enableDefaultCameraMovement();
 	this->m_world.camera->updatePerspProjection(this->m_world.camera->getCameraZoom(), this->m_window->getWidth(), this->m_window->getHeight(), 0.1f, 100.f);
+	this->m_world.camera->setCameraVelocity(0.02f);
 
 	ed->subscribe(CAMERA_UPDATE_DATA, [this]() {
 		systems::camera::updateCameraCollider(this->m_world.cameraId, this->m_world.camera->getCameraPosition(), this->m_world.cameraSize);
@@ -208,10 +210,25 @@ void SimulationState::onAttach() {
 	auto sp = this->m_img->addPanel<ImGuiSimulationPanel>(config);
 	this->m_img->addPanel<ImGuiEntityTree>();
 
+	auto rope = factory::factoryRope({0, 1, 0}, 1, 1, 8);
+	for (auto r : rope) {
+		sphereColors.push_back(r.first);
+		sphereModels.push_back(r.second);
+	}
+
+	for (auto e : em->getEntitiesFromComponent<RopeComponent>()) {
+		auto c = em->getComponentFromId<RopeComponent>(e);
+		for (int i = 0; i < c->points.size(); i++) {
+			if (std::find(ALL(c->fixedPoints), i) == c->fixedPoints.end())
+				this->m_pw.addEntity(c->points[i]);
+		}
+	}
+
 	ed->subscribe(RUN_SIMULATION, [this, sp]() {
 		sp->setRunning(true);
 		this->m_pw.onAttach();
 		this->m_pw.addSolver<CollisionSolver>();
+		this->m_pw.addSolver<RopeSolver>();
 		this->m_pw.addSolver<PositionSolver>();
 	});
 	ed->subscribe(STOP_SIMULATION, [this, sp]() {
@@ -267,6 +284,7 @@ void SimulationState::onDetach() {
 	ASSERT(this->m_attached);
 	State::onDetach();
 	systems::ecs::cleanAll();
+	this->m_pw.onDetach();
 	// delete all buffers
 	// delete all textures
 	// delete all shaders
