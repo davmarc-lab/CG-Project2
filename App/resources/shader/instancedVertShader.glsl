@@ -1,12 +1,12 @@
 #version 420 core
 
-layout(location = 0) in vec3 aPos;
-layout(location = 1) in vec4 aColor;
-layout(location = 2) in vec3 aNormal;
-layout(location = 3) in vec2 aTexCoord;
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec4 aColor;
+layout (location = 2) in vec3 aNormal;
+layout (location = 3) in vec2 aTexCoord;
 
-layout(location = 4) in vec4 aColorOffset;
-layout(location = 5) in mat4 aModelOffset;
+layout (location = 4) in vec4 aColorOffset;
+layout (location = 5) in mat4 aModelOffset;
 
 out VS_OUT {
     vec4 vertColor;
