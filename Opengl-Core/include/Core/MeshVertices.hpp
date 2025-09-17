@@ -237,7 +237,16 @@ inline std::vector<glm::vec2> pyramidTexCoords{
 	{0.f, 1.f},
 };
 
-// sphere
+/**
+ * @brief Calculates all sphere vertices with the given parameters
+ *
+ * @param center center point coords in local space
+ * @param radius radius lenght in local space
+ * @param stacks number of stacks
+ * @param slices number of slices
+ *
+ * @return sphere points coords
+ */
 inline MeshInfo getSphereVertices(const glm::vec3 &center = {0, 0, 0}, const glm::vec3 &radius = {1, 1, 1}, const unsigned int &stacks = 30, const unsigned int &slices = 30) {
 	MeshInfo coords{};
 	float s, t;
@@ -259,9 +268,7 @@ inline MeshInfo getSphereVertices(const glm::vec3 &center = {0, 0, 0}, const glm
 			coords.vertex.push_back(glm::vec3(x, y, z));
 			coords.normals.push_back(glm::vec3(x, y, z));
 
-			s = U;
-			t = V;
-			coords.texCoords.push_back(glm::vec2(s, t));
+			coords.texCoords.push_back(glm::vec2(U, V));
 		}
 	}
 
