@@ -243,7 +243,8 @@ void LightState::onAttach() {
 	// scene->addEntity(lightShader, emer);
 
 	// lights
-	auto dir = factory::light::factoryDirectional({1, 1, -1});
+	// auto dir = factory::light::factoryDirectional({1, 1, -1});
+	auto dir = factory::light::factoryPoint({0, 0, -2}, {});
 
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { systems::collision::updateAllColliders(); });
 

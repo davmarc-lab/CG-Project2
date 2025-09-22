@@ -90,6 +90,9 @@ void main() {
         vec3 N = normalize(fs_out.normal);
         vec3 V = normalize(camPos - FragPos);
 
+        vec3 F0 = vec3(0.04f);
+        F0 = mix(F0, material.albedo, material.metallic);
+
         vec3 Lo = vec3(0.f);
         for (int i = 0; i < lightsCount && i < MAX_LIGHTS; i++) {
             vec3 L = normalize(lights[i].position - FragPos);
@@ -99,26 +102,29 @@ void main() {
             float attenuation = 1.0 / (distance * distance);
             vec3 radiance = lights[i].color * attenuation;
 
-            vec3 F0 = vec3(0.04f);
-            F0 = mix(F0, material.albedo, material.metallic);
-            vec3 F = fresnelSchlick(max(dot(H, V), 0.f), F0);
-
             float NDF = distributionGGX(N, H, material.roughness);
             float G = GeometrySmith(N, V, L, material.roughness);
+            vec3 F = fresnelSchlick(max(dot(H, V), 0.f), F0);
+
+            vec3 kd = vec3(1.f) - F;
+            kd *= 1.f - material.metallic;
 
             vec3 numerator = NDF * G * F;
             float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
             vec3 specular = numerator / denominator;
-
-            vec3 kd = vec3(1.f) - F;
-            kd *= 1.f - material.roughness;
 
             float NdotL = max(dot(N, L), 0.0);
             Lo += (kd * material.albedo / PI + specular) * radiance * NdotL;
         }
 
         vec3 ambient = vec3(0.03) * material.albedo * material.ao;
-        fragColor = vec4(ambient + Lo, 1.f);
+        vec3 color = ambient + Lo;
+
+        color = color / (color + vec3(1.0));
+        // gamma correct
+        color = pow(color, vec3(1.0/2.2));
+
+        fragColor = vec4(color, 1.f);
     } else {
         fragColor = fs_out.vertColor;
     }
