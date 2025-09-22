@@ -36,5 +36,5 @@ public:
 };
 
 namespace pbr {
-	const PBMaterial metal{{0.916, 0.923, 0.924}, 1, 0, 1};
+	const PBMaterial metal{{0.916, 0.923, 0.924}, 0.2, 0.5, 1};
 }

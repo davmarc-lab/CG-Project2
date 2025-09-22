@@ -28,6 +28,7 @@ namespace systems {
 		void renderScene(const Shared<ogl::ShaderProgram> &shader, ogl::WorldCamera& world) {
 			auto lightsData = prepareLightData();
 			shader->use();
+            sendLightDataShader(shader, lightsData);
             shader->setVec3("camPos", world.camera->getCameraPosition());
 			for (auto ett : ps->getEntities()) {
 				auto mc = em->getComponentFromId<PBMaterial>(ett);

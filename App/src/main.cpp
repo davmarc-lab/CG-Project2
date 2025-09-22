@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 	auto bs = CreateShared<BootstrapState>();
 	sm->cacheState(bs);
 
-	sm->changeState(ls);
+	sm->changeState(bs);
 	sm->sync();
 
 	// #define C_DBG

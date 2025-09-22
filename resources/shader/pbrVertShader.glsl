@@ -11,15 +11,6 @@ out VS_OUT {
     vec2 texCoord;
 } vs_out;
 
-// Materials structure
-struct Material {
-    vec3 albedo;
-    float roughess;
-    float metallic;
-    float ao;
-};
-
-uniform Material material;
 uniform vec3 viewPos;
 
 uniform mat4 model;
