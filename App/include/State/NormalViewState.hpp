@@ -1,7 +1,8 @@
 #pragma once
 
 #include "../../include/AppGui.hpp"
-#include "../../include/State/State.hpp"
+#include "State.hpp"
+#include "../../include/Utils.hpp"
 
 /**
  * @brief This State render an interactive scene with rendered meshes and lights.
@@ -31,20 +32,7 @@ public:
 	virtual ~NormalViewState() override = default;
 
 private:
-	/**
-	 * @brief Data structure to store mouse position data and allow fluent movement.
-	 */
-	struct Mouse {
-		/// mouse current position
-		glm::vec2 pos{};
-		/// first move of the cursor
-		bool first = true;
-		/// if true start executing trackball movement
-		bool trackState = false;
-		/// skips the current position if the cursor has been moved to the opposite side
-		/// of the window
-		bool skipCursorPos = false;
-	} mouse;
+    Mouse mouse;
 
 	/// input wall time
 	double inputWalltime{};
@@ -118,19 +106,6 @@ private:
 	 * @return true if the ray is inside the sphere
 	 */
 	bool isRayInSphere(const glm::vec3 &ray, const glm::vec3 &sphere_pos, const float &sphere_radius, float *dist);
-
-	/**
-	 * @enum InputState
-	 * @brief It tells which state is the mouse.
-	 *
-	 * If the mouse in passive state means that the camera will move following
-	 * the mouse cursor, if the state is active the camera will not follow
-	 * the cursor.
-	 */
-	enum InputState {
-		MOUSE_PASSIVE,
-		MOUSE_ACTIVE
-	};
 
 	/**
 	 * @brief Changes the current input state.

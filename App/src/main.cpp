@@ -5,6 +5,7 @@
 
 #include "../include/Profiler.hpp"
 #include "../include/State/BootstrapState.hpp"
+#include "../include/State/LightScene.hpp"
 #include "../include/State/NormalViewState.hpp"
 #include "../include/State/SimulationState.hpp"
 #include "../include/State/State.hpp"
@@ -52,11 +53,16 @@ int main(int argc, char *argv[]) {
 	auto st = CreateShared<SimulationState>();
 	sm->cacheState(st);
 
+	auto ls = CreateShared<LightState>();
+	sm->cacheState(ls);
+
 	auto ds = CreateShared<NormalViewState>();
 	sm->cacheState(ds);
 
 	auto bs = CreateShared<BootstrapState>();
-	sm->changeState(bs);
+	sm->cacheState(bs);
+
+	sm->changeState(ls);
 	sm->sync();
 
 	// #define C_DBG
