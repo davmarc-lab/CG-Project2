@@ -1,7 +1,6 @@
-#include "../../include/State/SimulationState.hpp"
-#include <cstdlib>
+#include "../../include/State/LightScene.hpp"
+
 #include <glm/gtc/type_ptr.hpp>
-#include "../../include/State/BootstrapState.hpp"
 
 #include "../../../Opengl-Core/include/Core.hpp"
 #include "../../../Opengl-Core/include/Graphic.hpp"
@@ -12,37 +11,18 @@
 #include "../../include/ECS/System.hpp"
 #include "../../include/Factory.hpp"
 
+#include "../../include/PBR/PBScene.hpp"
+
 const auto em = EntityManager::instance();
 const auto im = ogl::InputManager::instance();
 const auto ed = ogl::EventManager::instance();
 const auto scene = BasicScene::instance();
+const auto pbscene = PBScene::instance();
 const auto sm = StateManager::instance();
 
-const auto SPHERE_POS = glm::vec3(1, 1, -4);
-const auto SPHERE_SIZE = glm::vec3(0.3f);
+Mouse mouse{};
 
-std::vector<glm::mat4> sphereModels{};
-std::vector<glm::vec4> sphereColors{};
-
-void SimulationState::defaultKeyCallback() {
-	this->m_window->setKeysCallback([this](GLFWwindow *, int key, int, int action, int) {
-		switch (action) {
-			case GLFW_PRESS: {
-				im->keyPressed(key);
-				break;
-			}
-			case GLFW_RELEASE: {
-				im->keyReleased(key);
-				break;
-			}
-		}
-		if (key == GLFW_KEY_C && action == GLFW_PRESS) {
-			ed->post(STATE_CHANGED);
-		}
-	});
-}
-
-void SimulationState::enableDefaultCameraMovement() {
+void LightState::enableDefaultCameraMovement() {
 	ed->subscribe(event::loop::LOOP_INPUT, [this]() {
 		auto collider = em->getComponentFromId<ColliderComponent>(this->m_world.cameraId);
 		ASSERT(collider != nullptr);
@@ -111,19 +91,66 @@ void SimulationState::enableDefaultCameraMovement() {
 	});
 }
 
-float randf() {
-	return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+void changeInputState(Window *w, ogl::WorldCamera &world, const InputState &state) {
+	switch (state) {
+		case MOUSE_PASSIVE: {
+			mouse.first = true;
+			if (glfwRawMouseMotionSupported())
+				glfwSetInputMode(w->getContext(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+			glfwSetInputMode(w->getContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			w->setCursorPosCallback([world](GLFWwindow *window, double x, double y) {
+				if (mouse.first) {
+					mouse.first = false;
+					mouse.pos = {x, y};
+					return;
+				}
+
+				auto xoffset = x - mouse.pos.x;
+				auto yoffset = y - mouse.pos.y;
+
+				mouse.pos = {x, y};
+
+				world.camera->processMouseMovement(xoffset, yoffset);
+			});
+			break;
+		}
+		case MOUSE_ACTIVE: {
+			if (glfwRawMouseMotionSupported())
+				glfwSetInputMode(w->getContext(), GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+			glfwSetInputMode(w->getContext(), GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
+
+			w->setCursorPosCallback([](auto, auto, auto) {});
+			break;
+		}
+	}
 }
 
-glm::vec3 getRandVec3() {
-	return glm::vec3(randf(), randf(), randf());
+void defaultKeyCallback(Window *w, ogl::WorldCamera &world) {
+	w->setKeysCallback([w, &world](GLFWwindow *window, int key, int code, int action, int mod) {
+		switch (action) {
+			case GLFW_REPEAT:
+			case GLFW_PRESS: {
+				im->keyPressed(key);
+				break;
+			}
+			case GLFW_RELEASE:
+				im->keyReleased(key);
+				break;
+			default:
+				break;
+		}
+		if (key == GLFW_KEY_P) {
+			changeInputState(w, world, MOUSE_PASSIVE);
+			return;
+		}
+		if (key == GLFW_KEY_I) {
+			changeInputState(w, world, MOUSE_ACTIVE);
+			return;
+		}
+	});
 }
 
-glm::vec3 getPosNear(const glm::vec3 &pos) {
-	return (getRandVec3() / glm::vec3{2}) + (rand() % 2 == 0 ? pos : -pos);
-}
-
-void SimulationState::onAttach() {
+void LightState::onAttach() {
 	ASSERT(!this->m_attached);
 	State::onAttach();
 	srand(time(NULL));
@@ -136,7 +163,8 @@ void SimulationState::onAttach() {
 	this->m_window = CreateUnique<ogl::Window>(settings);
 	this->m_window->onAttach();
 
-	this->defaultKeyCallback();
+	enableDefaultCameraMovement();
+	defaultKeyCallback(this->m_window.get(), this->m_world);
 
 	glEnable(GL_CULL_FACE);
 	ed->subscribe(ogl::event::loop::LOOP_UPDATE, [this]() { this->m_window->onUpdate(); });
@@ -144,30 +172,24 @@ void SimulationState::onAttach() {
 
 	ogl::Renderer::instance()->init();
 
-	this->m_img = CreateUnique<ogl::ImGuiManager>(this->m_window.get(), ogl::DEFAULT_IMGUI_CONFIGS);
-	this->m_img->onAttach();
+	this->m_igm = CreateUnique<ogl::ImGuiManager>(this->m_window.get(), ogl::DEFAULT_IMGUI_CONFIGS);
+	this->m_igm->onAttach();
 
-	ed->subscribe(ogl::event::loop::LOOP_UPDATE, [this]() { this->m_img->onUpdate(); });
-	ed->subscribe(ogl::event::loop::LOOP_RENDER, [this]() { this->m_img->onRender(); });
-	ed->subscribe(ogl::event::loop::LOOP_BEGIN_RENDER, [this]() { this->m_img->begin(); });
-	ed->subscribe(ogl::event::loop::LOOP_END_RENDER, [this]() { this->m_img->end(); });
-
-	// Physic world
-	this->m_pw.onAttach();
-	this->m_pw.addSolver<CollisionSolver>();
-	this->m_pw.addSolver<RopeSolver>();
-	this->m_pw.addSolver<PositionSolver>();
+	ed->subscribe(ogl::event::loop::LOOP_UPDATE, [this]() { this->m_igm->onUpdate(); });
+	ed->subscribe(ogl::event::loop::LOOP_RENDER, [this]() { this->m_igm->onRender(); });
+	ed->subscribe(ogl::event::loop::LOOP_BEGIN_RENDER, [this]() { this->m_igm->begin(); });
+	ed->subscribe(ogl::event::loop::LOOP_END_RENDER, [this]() { this->m_igm->end(); });
 
 	this->m_world.cameraId = em->createEntity();
-	systems::ecs::updateEntityName(this->m_world.cameraId, "World Camera");
+	systems::ecs::updateEntityName(this->m_world.cameraId, "Main Camera");
 	auto cam = em->addComponent<CameraComponent>(this->m_world.cameraId);
 	cam->camera = CreateShared<ogl::Camera>();
 	this->m_world.camera = systems::camera::getCamera(this->m_world.cameraId);
 	this->m_world.camera->setCameraPosition(CAMERA_START_POSITION);
 	em->addComponent<ColliderComponent>(this->m_world.cameraId, glm::vec3{4, 4, 4}, this->m_world.cameraSize);
-	enableDefaultCameraMovement();
+	ed->post(CAMERA_UPDATE_DATA);
+	// enableDefaultCameraMovement();
 	this->m_world.camera->updatePerspProjection(this->m_world.camera->getCameraZoom(), this->m_window->getWidth(), this->m_window->getHeight(), 0.1f, 100.f);
-	this->m_world.camera->setCameraVelocity(0.02f);
 
 	ed->subscribe(CAMERA_UPDATE_DATA, [this]() {
 		systems::camera::updateCameraCollider(this->m_world.cameraId, this->m_world.camera->getCameraPosition(), this->m_world.cameraSize);
@@ -195,107 +217,72 @@ void SimulationState::onAttach() {
 	skyboxShader->createShaderProgram();
 	Shared<ShaderProgram> planeShader = CreateShared<ShaderProgram>("vertexShader.glsl", "basicFS.glsl");
 	planeShader->createShaderProgram();
+	Shared<ShaderProgram> lightShader = CreateShared<ShaderProgram>("lightVertShader.glsl", "lightFragShader.glsl");
+	lightShader->createShaderProgram();
+	Shared<ShaderProgram> pbrShader = CreateShared<ShaderProgram>("pbrVertShader.glsl", "pbrFragShader.glsl");
+	pbrShader->createShaderProgram();
 
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/lycksele/", "jpg");
 
 	auto plane = factory::factoryPlane({.3f, .3f, .3f, 1});
+	systems::ecs::updateEntityName(plane, "Plane");
 	scene->addEntity(planeShader, plane);
-	this->m_pw.addEntity(plane);
+
+	// entities
+	auto foo = factory::factorySphere(BasicInfo{{-2, 0, -4}, {1, 1, 1}, {0, 0, 0}});
+	em->removeComponent<MaterialComponent>(foo);
+	em->addComponent<PBMaterial>(foo);
+	systems::pbr::updateMaterial(foo, pbr::metal);
+	systems::light::setLightComputation(foo, LightComputation::PHONG);
+    pbscene->addEntity(foo);
+
+	// scene->addEntity(lightShader, foo);
+
+	// auto emer = factory::factorySphere(BasicInfo{{2, 0, -4}, {1, 1, 1}, {0, 0, 0}});
+	// systems::light::setLightComputation(emer, LightComputation::PHONG);
+	// scene->addEntity(lightShader, emer);
+
+	// lights
+	// auto dir = factory::light::factoryDirectional({1, 1, -1});
+	auto dir = factory::light::factoryPoint({0, 0, -1}, {});
+	auto aaa = factory::light::factoryPoint({-3, 0, -2}, {});
+	auto bbb = factory::light::factoryPoint({0, 2, -3}, {});
 
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { systems::collision::updateAllColliders(); });
 
-	SimulationConfig config{};
-	config.gravity = {0, -9.81f, 0};
-	// simulation panel
-	auto sp = this->m_img->addPanel<ImGuiSimulationPanel>(config);
-	this->m_img->addPanel<ImGuiEntityTree>();
-
-	auto rope = factory::factoryRope({0, 1, 0}, 1, 1, 8);
-	for (auto r : rope) {
-		sphereColors.push_back(r.first);
-		sphereModels.push_back(r.second);
-	}
-
-	for (auto e : em->getEntitiesFromComponent<RopeComponent>()) {
-		auto c = em->getComponentFromId<RopeComponent>(e);
-		for (int i = 0; i < c->points.size(); i++) {
-			if (std::find(ALL(c->fixedPoints), i) == c->fixedPoints.end())
-				this->m_pw.addEntity(c->points[i]);
-		}
-	}
-
-	ed->subscribe(RUN_SIMULATION, [this, sp]() {
-		sp->setRunning(true);
-		this->m_pw.onAttach();
-		this->m_pw.addSolver<CollisionSolver>();
-		this->m_pw.addSolver<RopeSolver>();
-		this->m_pw.addSolver<PositionSolver>();
-	});
-	ed->subscribe(STOP_SIMULATION, [this, sp]() {
-		sp->setRunning(false);
-		this->m_pw.onDetach();
-	});
-
-	ed->subscribe(event::loop::LOOP_UPDATE, [this, sp]() {
-		if (sp->isRunning()) {
-			this->m_pw.onUpdate();
-		} else {
-			this->m_pw.resetDeltaTime();
-		}
-	});
+	this->m_igm->addPanel<ImGuiEntityTree>();
 
 	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() {
-		sphereModels.clear();
-		for (auto e : em->getEntitiesFromComponent<InstancedComponent>()) {
-			sphereModels.push_back(systems::transform::getModelMatrix(e));
-		}
-
-		systems::render::prepareInstancedMesh(sphereModels, sphereColors);
+		// sphereModels.clear();
+		// for (auto e : em->getEntitiesFromComponent<InstancedComponent>()) {
+		// 	sphereModels.push_back(systems::transform::getModelMatrix(e));
+		// }
+		//
+		// systems::render::prepareInstancedMesh(sphereModels, sphereColors);
 	});
 
-	ed->subscribe(event::loop::LOOP_RENDER, [skybox, skyboxShader]() {
+	ed->subscribe(event::loop::LOOP_RENDER, [this, skybox, skyboxShader, pbrShader]() {
 		systems::render::renderSkybox(skybox, skyboxShader);
 		systems::render::renderAllMeshes();
-		systems::render::renderInstancedMeshes();
+		systems::render::renderScene(pbrShader, this->m_world);
+		// systems::render::renderInstancedMeshes();
 	});
 
 	ed->subscribe(STATE_CHANGED, []() {
-		sm->changeState(BOOTSTRAP_STATE_NAME);
-	});
-
-	ed->subscribe(ADD_SPHERE, [this]() {
-		auto color = glm::vec4{getRandVec3(), 1};
-		sphereColors.push_back(color);
-		auto shape = factory::factorySphereInstanced(BasicInfo{getPosNear(SPHERE_POS), SPHERE_SIZE, {}}, color);
-		systems::collision::updateColliderType(shape, ColliderType::COLLIDER_SPHERE);
-		systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_NONE));
-
-		auto sc = em->getComponentFromId<ShaderComponent>(shape);
-		sc->computation = LightComputation::NONE;
-		sc->reflective = false;
-		em->addComponent<PhysicComponent>(shape);
-		sphereModels.push_back(systems::transform::getModelMatrix(shape));
-
-		this->m_pw.addEntity(shape);
+		// sm->changeState(BOOTSTRAP_STATE_NAME);
 	});
 }
-
-void SimulationState::onDetach() {
+void LightState::onDetach() {
 	ASSERT(this->m_attached);
 	State::onDetach();
-	systems::ecs::cleanAll();
-	this->m_pw.onDetach();
-	// delete all buffers
-	// delete all textures
-	// delete all shaders
-	this->m_img->onDetach();
+
+	this->m_igm->onDetach();
 	this->m_window->onDetach();
 }
 
-void SimulationState::onUpdate() {}
+void LightState::onUpdate() {}
+void LightState::onRender() {}
 
-void SimulationState::onRender() {}
-
-bool SimulationState::isCurrentStateEnd() {
+bool LightState::isCurrentStateEnd() {
 	return glfwWindowShouldClose(this->m_window->getContext());
 }

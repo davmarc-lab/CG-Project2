@@ -635,6 +635,13 @@ namespace systems {
 	 */
 	namespace render {
 		/**
+		 * @brief This method clears all graphics data used in the current context.
+		 *
+		 * @note This method should be called when detaching a State.
+		 */
+		void clear();
+
+		/**
 		 * @brief Initialize the stencil shader.
 		 */
 		void initStencilShader();

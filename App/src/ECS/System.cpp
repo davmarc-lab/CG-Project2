@@ -37,6 +37,18 @@ struct BoundingBox {
 	std::vector<glm::vec4> colors{};
 	/// tells if the bounding box shaders is created
 	bool init = false;
+
+	/**
+	 * @brief Clears all graphics data for the bounding box
+	 *
+	 * @note This method should be called when detaching a State.
+	 */
+	void clear() {
+		vbog.onDetach();
+		vboc.onDetach();
+		vao.onDetach();
+		program.clear();
+	}
 } defaultShader;
 
 ogl::ShaderProgram stencil = ogl::ShaderProgram("vertexShader.glsl", "stencilShader.glsl");
@@ -634,6 +646,10 @@ namespace systems {
 	} // namespace light
 
 	namespace render {
+		void clear() {
+			stencil.clear();
+		}
+
 		void initStencilShader() {
 			stencil.createShaderProgram();
 		}
@@ -782,7 +798,10 @@ namespace systems {
 					if (tc != nullptr) {
 						glActiveTexture(GL_TEXTURE0);
 						shader->setInt("texture1", 0);
+                        shader->setInt("useColor", 0);
 						tc->texture.bind();
+					} else {
+                        shader->setInt("useColor", 1);
 					}
 					auto rc = em->getComponentFromId<RenderComponent>(id);
 					if (em->entityHasComponent<Transform>(id)) {

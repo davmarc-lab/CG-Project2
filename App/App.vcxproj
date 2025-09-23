@@ -152,6 +152,10 @@
     <ClInclude Include="include\Factory.hpp" />
     <ClInclude Include="include\PhysicWorld.hpp" />
     <ClInclude Include="include\Profiler.hpp" />
+    <ClInclude Include="include\State\BootstrapState.hpp" />
+    <ClInclude Include="include\State\NormalViewState.hpp" />
+    <ClInclude Include="include\State\SimulationState.hpp" />
+    <ClInclude Include="include\State\State.hpp" />
     <ClInclude Include="include\stb_image.hpp" />
     <ClInclude Include="include\Utils.hpp" />
   </ItemGroup>
@@ -163,6 +167,10 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PhysicWorld.cpp" />
     <ClCompile Include="src\Profiler.cpp" />
+    <ClCompile Include="src\State\BootstrapState.cpp" />
+    <ClCompile Include="src\State\NormalViewState.cpp" />
+    <ClCompile Include="src\State\SimulationState.cpp" />
+    <ClCompile Include="src\State\State.cpp" />
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>

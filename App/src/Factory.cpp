@@ -8,6 +8,7 @@
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/geometric.hpp>
 #include <iostream>
+#include <utility>
 #include <vector>
 
 #include "../include/Utils.hpp"
@@ -120,7 +121,8 @@ namespace factory {
 		ogl::Renderer::instance()->appendSphere(id, systems::transform::getModelMatrix(id), color);
 
 		em->addComponent<MaterialComponent>(id);
-		em->addComponent<ColliderComponent>(id);
+		auto cm = em->addComponent<ColliderComponent>(id);
+		cm->size = info.scale;
 		em->addComponent<InstancedComponent>(id, ogl::RenderPrimitiveType::PRIMITIVE_SPHERE);
 		em->addComponent<ShaderComponent>(id, LightComputation::PHONG, SHADER_INST_DEFAULT_VERT, SHADER_INST_DEFAULT_FRAG);
 
@@ -200,6 +202,30 @@ namespace factory {
 			rd->drawElements(vaoid, GL_TRIANGLES, vc->getIndexCoords().size(), GL_UNSIGNED_INT);
 		});
 		return id;
+	}
+
+	const glm::vec3 ROPE_CENTER_SIZE = glm::vec3(.08f);
+	const glm::vec3 ROPE_POINT_SIZE = glm::vec3(.03f);
+	std::vector<std::pair<glm::vec4, glm::mat4>> factoryRope(const glm::vec3 &center, const float &length, const float &constant, const unsigned int subdivisons) {
+		auto id = factorySphereInstanced({center, ROPE_CENTER_SIZE, {}}, {1, 0, 0, 1});
+		auto res = std::vector<std::pair<glm::vec4, glm::mat4>>();
+
+		auto rp = em->addComponent<RopeComponent>(id, center, length, subdivisons, constant);
+		em->addComponent<PhysicComponent>(id);
+		res.emplace_back(glm::vec4{1, 0, 0, 1}, systems::transform::getModelMatrix(id));
+		rp->fixedPoints.push_back(0);
+
+		auto startp = center - length / 2 * glm::vec3(1, 0, 0);
+
+		for (auto i = 0; i <= subdivisons; i++) {
+			auto elem = factorySphereInstanced({{startp + (i * (length / subdivisons) * glm::vec3(1, 0, 0))}, ROPE_POINT_SIZE, {}}, {0, 0, 1, 1});
+			em->addComponent<PhysicComponent>(elem);
+			res.emplace_back(glm::vec4{0, 0, 1, 1}, systems::transform::getModelMatrix(elem));
+			rp->points.push_back(elem);
+		}
+		rp->fixedPoints.push_back(rp->points.size() - 1);
+
+		return res;
 	}
 
 	unsigned int factoryPlane(const glm::vec4 &color) {

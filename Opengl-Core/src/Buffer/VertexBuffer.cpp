@@ -9,11 +9,13 @@ namespace ogl {
 	}
 
 	void VertexBuffer::onAttach() {
-		if (!this->m_id)
-			glGenBuffers(1, &this->m_id);
+		glGenBuffers(1, &this->m_id);
 	}
 
-	void VertexBuffer::onDetach() { glDeleteBuffers(1, &this->m_id); }
+	void VertexBuffer::onDetach() {
+		glDeleteBuffers(1, &this->m_id);
+		this->m_id = 0;
+	}
 
 	void VertexBuffer::bind() const { glBindBuffer(GL_ARRAY_BUFFER, this->m_id); }
 

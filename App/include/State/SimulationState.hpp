@@ -2,6 +2,12 @@
 
 #include "State.hpp"
 
+#include "../PhysicWorld.hpp"
+
+const auto ADD_SPHERE = ogl::Event("Add Sphere");
+const ogl::Event RUN_SIMULATION = ogl::Event("Run Simulation");
+const ogl::Event STOP_SIMULATION = ogl::Event("Stop Simulation");
+
 /**
  * @brief This State render an interactive scene with rendered meshes and lights.
  *
@@ -33,6 +39,8 @@ private:
 	Unique<ogl::Window> m_window;
 	/// imgui manager
 	Unique<ogl::ImGuiManager> m_img;
+
+	PhysicWorld m_pw{};
 
 	/// scene camera
 	ogl::WorldCamera m_world;

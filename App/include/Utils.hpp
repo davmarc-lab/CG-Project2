@@ -4,6 +4,34 @@
 #include <string>
 
 /**
+ * @enum InputState
+ * @brief It tells which state is the mouse.
+ *
+ * If the mouse in passive state means that the camera will move following
+ * the mouse cursor, if the state is active the camera will not follow
+ * the cursor.
+ */
+enum InputState {
+	MOUSE_PASSIVE,
+	MOUSE_ACTIVE
+};
+
+/**
+ * @brief Data structure to store mouse position data and allow fluent movement.
+ */
+struct Mouse {
+	/// mouse current position
+	glm::vec2 pos{};
+	/// first move of the cursor
+	bool first = true;
+	/// if true start executing trackball movement
+	bool trackState = false;
+	/// skips the current position if the cursor has been moved to the opposite side
+	/// of the window
+	bool skipCursorPos = false;
+};
+
+/**
  * @namespace light
  * Desc.
  *

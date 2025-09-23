@@ -2,8 +2,10 @@
 
 #include "State.hpp"
 
+const std::string BOOTSTRAP_STATE_NAME = "Bootstrap";
+
 /**
- * @brief This State allows to load one State in an ImGui window from 
+ * @brief This State allows to load one State in an ImGui window from
  * cached states in the StateManager.
  */
 class BootstrapState : public State {
@@ -16,13 +18,11 @@ public:
 
 	virtual bool isCurrentStateEnd() override;
 
-    /**
-    * @brief Instances basic state with the given name.
-    *
-    * @param name state name
-    */
-	BootstrapState(const std::string &name = "Bootstrap State") :
-		State(name) {}
+	/**
+	 * @brief Instances basic state with the given name.
+	 */
+	BootstrapState() :
+		State(BOOTSTRAP_STATE_NAME) {}
 
 	virtual ~BootstrapState() override = default;
 

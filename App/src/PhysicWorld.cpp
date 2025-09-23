@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <glm/common.hpp>
+#include <glm/ext/quaternion_exponential.hpp>
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/geometric.hpp>
 
@@ -197,9 +198,55 @@ void GravitySolver::solve() {
 	}
 }
 
+bool isInFixed(const std::vector<unsigned int> &elems, const unsigned int &elem) {
+	return std::find(ALL(elems), elem) != elems.end();
+}
+
+int i, i1, i2;
+int precision = 30;
+void RopeSolver::solve() {
+	for (auto rope : em->getEntitiesFromComponent<RopeComponent>()) {
+		auto rp = em->getComponentFromId<RopeComponent>(rope);
+		auto factor = rp->constant / 2;
+		for (auto it = 0; it < precision; it++) {
+			for (i = 1; i < rp->points.size(); i++) {
+				i2 = isInFixed(rp->fixedPoints, i);
+				if (i2)
+					continue;
+				i1 = isInFixed(rp->fixedPoints, i - 1);
+
+				// solve rope simulation
+				auto p1 = rp->points[i - 1];
+				auto p2 = rp->points[i];
+				auto pos1 = systems::transform::getPosition(p1);
+				auto pos2 = systems::transform::getPosition(p2);
+
+				auto dir = glm::normalize(pos2 - pos1);
+				auto err = glm::distance(pos1, pos2) - rp->distance;
+
+				if (!i1 && i2)
+					systems::physic::addVelocity(p1, (factor * 2 * dir * err));
+				else if (i1 && !i2)
+					systems::physic::addVelocity(p2, (-factor * 2 * dir * err));
+				else {
+					systems::physic::addVelocity(p1, (factor * dir * err));
+					systems::physic::addVelocity(p2, (-factor * dir * err));
+				}
+			}
+		}
+	}
+}
+
 void PhysicWorld::onAttach() {
 	this->m_solvers.push_back(CreateShared<GravitySolver>(*this));
 	this->m_attached = true;
+	this->m_currentFrame = glfwGetTime();
+	this->m_lastFrame = this->m_currentFrame;
+}
+
+void PhysicWorld::onDetach() {
+	this->m_solvers.clear();
+	this->m_attached = false;
 }
 
 void PhysicWorld::onUpdate() {
@@ -218,7 +265,8 @@ void PhysicWorld::addEntity(const unsigned int &id) {
 	ASSERT(em->entityHasComponent<PhysicComponent>(id));
 	ASSERT(em->entityHasComponent<ColliderComponent>(id));
 
-	this->m_entities.push_back(id);
+	if (std::find(ALL(this->m_entities), id) == this->m_entities.end())
+		this->m_entities.push_back(id);
 }
 
 bool PhysicWorld::removeEntity(const unsigned int &id) {

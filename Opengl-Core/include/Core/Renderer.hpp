@@ -30,6 +30,17 @@ namespace ogl {
 		std::vector<glm::mat4> modelOffset{};
 		VertexBuffer vboco{};
 		std::vector<glm::vec4> colorOffset{};
+
+		inline void clear() {
+			this->vbog.onDetach();
+			this->vboc.onDetach();
+			this->vbot.onDetach();
+			this->vbon.onDetach();
+			this->vbomo.onDetach();
+			this->vboco.onDetach();
+			this->ebo.onDetach();
+			this->vao.onDetach();
+		}
 	};
 
 	struct RendererStats {
@@ -50,6 +61,7 @@ namespace ogl {
 	class Renderer {
 	public:
 		void init();
+		void clear();
 
 		void appendSphere(const unsigned int &id, const glm::mat4 &model, const glm::vec4 &color);
 		void appendCube(const unsigned int &id, const glm::mat4 &model, const glm::vec4 &color);

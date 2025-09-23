@@ -1012,6 +1012,22 @@ public:
 	virtual ~PhysicComponent() override = default;
 };
 
+class RopeComponent : public Component {
+public:
+	unsigned int subdivisions = 3;
+	glm::vec3 center{};
+	float length{};
+	float constant = 1.f;
+	std::vector<unsigned int> points{};
+    std::vector<unsigned int> fixedPoints{};
+	float distance;
+
+	RopeComponent(const glm::vec3 &center, const float &length, const unsigned int &sub, const float &constant) :
+		center(center), length(length), subdivisions(sub), constant(constant), distance(length / subdivisions), Component() {}
+
+	virtual ~RopeComponent() override = default;
+};
+
 // TODO: put it in a namespace
 /**
  * @enum ColliderType

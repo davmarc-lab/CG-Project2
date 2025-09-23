@@ -54,7 +54,10 @@ namespace ogl {
 		glGenFramebuffers(1, &this->m_id);
 	}
 
-	void FrameBuffer::onDetach() {}
+	void FrameBuffer::onDetach() {
+		glDeleteFramebuffers(1, &this->m_id);
+		this->m_id = 0;
+	}
 
 	void FrameBuffer::bind() const {
 		glBindFramebuffer(this->m_config.operation, this->m_id);

@@ -71,3 +71,58 @@ private:
 	/// This method resets the camera to its default position.
 	void resetCamera();
 };
+
+/**
+ * @brief Data structure to save simulation configuration.
+ */
+struct SimulationConfig {
+	/// simulation gravity
+	glm::vec3 gravity{};
+	/// simulation collisions enabled
+	bool collisions = true;
+	/// simulation is running
+	bool run = false;
+};
+
+/**
+ * @brief Implementation of ImGuiPanel that provides a panel containing
+ * all simulation features.
+ */
+class ImGuiSimulationPanel : public ImGuiPanel {
+public:
+	virtual void onRender() override;
+
+	/**
+	 * @brief Retrieves the configuration of the current physic simulation.
+	 *
+	 * @return the configuration
+	 */
+	inline SimulationConfig getConfig() const { return this->m_config; }
+
+	/**
+	 * @brief Retrieves the state of the simulation: if it's running or not.
+	 *
+	 * @return true if the simulation is running
+	 */
+	inline bool isRunning() const { return this->m_config.run; }
+	/**
+	 * @brief Sets the state of the simulation.
+	 *
+	 * @param run if true the simulation run, false the simulation stops
+	 */
+	inline void setRunning(const bool &run) { this->m_config.run = run; }
+
+	/**
+	 * @brief Instances basic simualtion panel.
+	 *
+	 * @param config the simulation configuration
+	 */
+	ImGuiSimulationPanel(const SimulationConfig &config) :
+		ImGuiPanel("Simulation Panel"), m_config(config) {}
+
+	virtual ~ImGuiSimulationPanel() override = default;
+
+private:
+	/// simulation parameters
+	SimulationConfig m_config{};
+};

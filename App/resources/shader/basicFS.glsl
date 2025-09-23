@@ -6,9 +6,8 @@ in VS_OUT {
     vec2 texCoord;
 } fs_out;
 
-out vec4 FragColor;
+out vec4 fragColor;
 
 void main() {
-    FragColor = fs_out.vertColor;
-    // FragColor = vec4(1, 0, 0, 1);
+    fragColor = fs_out.vertColor;
 }
