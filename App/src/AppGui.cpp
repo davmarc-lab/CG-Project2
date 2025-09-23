@@ -11,6 +11,7 @@
 
 #include "../include/ECS/EntityManager.hpp"
 #include "../include/ECS/System.hpp"
+#include "../include/PBR/PBMaterial.hpp"
 #include "../include/PhysicWorld.hpp"
 #include "../include/State/SimulationState.hpp"
 
@@ -322,6 +323,16 @@ void ImGuiEntityTree::onRender() {
 					}
 				}
 			}
+
+            auto pm = em->getComponentFromId<PBMaterial>(id);
+            if (pm != nullptr) {
+                if (ImGui::CollapsingHeader("PBRMaterial##8")) {
+                    ImGui::SliderFloat3("Albedo: ", &pm->albedo.x, 0.f, 1.f);
+                    ImGui::SliderFloat("Metallic: ", &pm->metallic, 0.f, 1.f);
+                    ImGui::SliderFloat("Roughness: ", &pm->roughness, 0.f, 1.f);
+                    ImGui::SliderFloat("Ao: ", &pm->ao, 0.f, 1.f);
+                }
+            }
 
 			ImGui::PopID();
 			ImGui::TreePop();

@@ -244,7 +244,9 @@ void LightState::onAttach() {
 
 	// lights
 	// auto dir = factory::light::factoryDirectional({1, 1, -1});
-	auto dir = factory::light::factoryPoint({0, 0, -2}, {});
+	auto dir = factory::light::factoryPoint({0, 0, -1}, {});
+	auto aaa = factory::light::factoryPoint({-3, 0, -2}, {});
+	auto bbb = factory::light::factoryPoint({0, 2, -3}, {});
 
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { systems::collision::updateAllColliders(); });
 
