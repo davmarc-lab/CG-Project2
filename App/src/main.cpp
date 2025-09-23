@@ -29,7 +29,7 @@ const auto sm = StateManager::instance();
 #ifdef _WIN32
 WProfiler profiler{PROFILE_ALL};
 #else
-LinuxProfiler profiler{PROFILE_ALL};
+auto profiler = LinuxProfiler::instance();
 #endif
 
 // Some Utilities
@@ -71,14 +71,22 @@ int main(int argc, char *argv[]) {
 #ifdef C_DBG
 		std::cout << "\n---START---\n";
 #endif
+
+		profiler->start();
 		ed->post(event::loop::LOOP_INPUT);
+		profiler->end();
+		profiler->dumpInput();
 #ifdef C_DBG
 		std::cout << "INP\n";
 #endif
+        profiler->start();
 		ed->post(event::loop::LOOP_UPDATE);
+		profiler->end();
+		profiler->dumpUpdate();
 #ifdef C_DBG
 		std::cout << "UPD\n";
 #endif
+		profiler->start();
 		ed->post(event::loop::LOOP_BEGIN_RENDER);
 #ifdef C_DBG
 		std::cout << "BR\n";
@@ -88,6 +96,8 @@ int main(int argc, char *argv[]) {
 		std::cout << "R\n";
 #endif
 		ed->post(event::loop::LOOP_END_RENDER);
+		profiler->end();
+		profiler->dumpRender();
 #ifdef C_DBG
 		std::cout << "ER\n";
 		std::cout << "---END---\n";

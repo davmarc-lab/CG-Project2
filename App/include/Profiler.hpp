@@ -3,6 +3,8 @@
 #include <ctime>
 #include <string>
 
+#include "../../Opengl-Core/include/Core.hpp"
+
 /**
  * @enum ProfileFilter
  * @brief Filters the type of time the profiler tracks.
@@ -78,9 +80,9 @@ public:
 		m_profilerFilter(filter) {
 	}
 
-    /**
-     * @brief Basic destructor.
-     */
+	/**
+	 * @brief Basic destructor.
+	 */
 	virtual ~Profiler() = default;
 
 protected:
@@ -124,8 +126,18 @@ public:
 	/**
 	 * @brief Instances basic Linux profiler.
 	 */
-	LinuxProfiler(const ProfileFilter &filter = PROFILE_ALL) :
-		Profiler(filter) {
+	LinuxProfiler(const ProfileFilter &filter) = delete;
+
+	LinuxProfiler(LinuxProfiler &other) = delete;
+
+	void operator=(const LinuxProfiler &other) = delete;
+
+	inline static Shared<LinuxProfiler> instance() {
+		if (s_pointer == nullptr) {
+			Shared<LinuxProfiler> copy(new LinuxProfiler());
+			copy.swap(s_pointer);
+		}
+		return s_pointer;
 	}
 
 	virtual ~LinuxProfiler() override = default;
@@ -146,7 +158,30 @@ public:
 	 */
 	inline double getLastCPU() const { return this->m_cpu; }
 
+	inline void dumpInput() { this->dump(this->inputWalltime, this->inputCputime); }
+	inline void dumpUpdate() { this->dump(this->updateWalltime, this->updateCputime); }
+	inline void dumpRender() { this->dump(this->renderWalltime, this->renderCputime); }
+
+	inline Pair<double> getInputTime() { return {this->inputWalltime, this->inputCputime}; }
+	inline Pair<double> getUpdateTime() { return {this->updateWalltime, this->updateCputime}; }
+	inline Pair<double> getRenderTime() { return {this->renderWalltime, this->renderCputime}; }
+
 private:
+	LinuxProfiler() = default;
+
+	inline static Shared<LinuxProfiler> s_pointer = nullptr;
+	double inputWalltime{};
+	/// input cpu time
+	double inputCputime{};
+	/// update wall time
+	double updateWalltime{};
+	/// update cpu time
+	double updateCputime{};
+	/// render wall time
+	double renderWalltime{};
+	/// render cpu time
+	double renderCputime{};
+
 	/// start wall time
 	std::timespec m_wallBegin{};
 	/// end wall time

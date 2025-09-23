@@ -13,12 +13,16 @@
 
 #include "../../include/PBR/PBScene.hpp"
 
+#include "../../include/Profiler.hpp"
+
 const auto em = EntityManager::instance();
 const auto im = ogl::InputManager::instance();
 const auto ed = ogl::EventManager::instance();
 const auto scene = BasicScene::instance();
 const auto pbscene = PBScene::instance();
 const auto sm = StateManager::instance();
+
+const auto pf = LinuxProfiler::instance();
 
 Mouse mouse{};
 
@@ -217,8 +221,8 @@ void LightState::onAttach() {
 	skyboxShader->createShaderProgram();
 	Shared<ShaderProgram> planeShader = CreateShared<ShaderProgram>("vertexShader.glsl", "basicFS.glsl");
 	planeShader->createShaderProgram();
-	Shared<ShaderProgram> lightShader = CreateShared<ShaderProgram>("lightVertShader.glsl", "lightFragShader.glsl");
-	lightShader->createShaderProgram();
+	Shared<ShaderProgram> modelShader = CreateShared<ShaderProgram>("modelVertShader.glsl", "modelFragShader.glsl");
+	modelShader->createShaderProgram();
 	Shared<ShaderProgram> pbrShader = CreateShared<ShaderProgram>("pbrVertShader.glsl", "pbrFragShader.glsl");
 	pbrShader->createShaderProgram();
 
@@ -234,13 +238,20 @@ void LightState::onAttach() {
 	em->addComponent<PBMaterial>(foo);
 	systems::pbr::updateMaterial(foo, pbr::metal);
 	systems::light::setLightComputation(foo, LightComputation::PHONG);
-    pbscene->addEntity(foo);
+	pbscene->addEntity(foo);
 
-	// scene->addEntity(lightShader, foo);
+	{
+		// Too heavy
+		auto model = factory::factoryObjMesh(BasicInfo{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}}, "resources/models/machine/Machine.obj");
+		// auto model = factory::factoryObjMesh(BasicInfo{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}}, "resources/models/backpack/backpack.obj");
+		scene->addEntity(modelShader, model);
+	}
 
 	// auto emer = factory::factorySphere(BasicInfo{{2, 0, -4}, {1, 1, 1}, {0, 0, 0}});
-	// systems::light::setLightComputation(emer, LightComputation::PHONG);
-	// scene->addEntity(lightShader, emer);
+	// em->removeComponent<MaterialComponent>(foo);
+	// em->addComponent<PBMaterial>(foo);
+	// systems::pbr::updateMaterial(foo, pbr::metal);
+	// pbscene->addEntity(emer);
 
 	// lights
 	// auto dir = factory::light::factoryDirectional({1, 1, -1});
@@ -251,6 +262,26 @@ void LightState::onAttach() {
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { systems::collision::updateAllColliders(); });
 
 	this->m_igm->addPanel<ImGuiEntityTree>();
+	auto pp = this->m_igm->addPanel<ImGuiPanel>("Profiler");
+	pp->setRenderFunc([this]() {
+		ImGui::Begin("Profiler");
+
+		auto input = pf->getInputTime();
+		auto update = pf->getUpdateTime();
+		auto render = pf->getRenderTime();
+
+		ImGui::SeparatorText("Input");
+		ImGui::Text("Wall time: %lf", input.x);
+		ImGui::Text("Cpu time: %lf", input.y);
+		ImGui::SeparatorText("Update");
+		ImGui::Text("Wall time: %lf", update.x);
+		ImGui::Text("Cpu time: %lf", update.y);
+		ImGui::SeparatorText("Render");
+		ImGui::Text("Wall time: %lf", render.x);
+		ImGui::Text("Cpu time: %lf", render.y);
+
+		ImGui::End();
+	});
 
 	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() {
 		// sphereModels.clear();
