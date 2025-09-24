@@ -8,6 +8,7 @@
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/geometric.hpp>
 #include <iostream>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -525,7 +526,8 @@ namespace factory {
 		auto first = factoryPyramid(BasicInfo{info.position + TREE_LEAF_OFFSET, info.scale * TREE_LEAF_SCALE, {}}, {0, 1, 0, 1});
 		em->addComponent<HideTreeComponent>(first);
 		systems::parent::addChild(id, first);
-		auto ddata = readImageData("./resources/texture/leaves.jpg", width, height, nrChannels);
+        flipImagesVertically(true);
+		auto ddata = readImageData("./resources/texture/leaves.png", width, height, nrChannels);
 		ogl::Texture leaves{params, {(unsigned int)width, (unsigned int)height}};
 		leaves.onAttach();
 		leaves.bind();
@@ -535,7 +537,7 @@ namespace factory {
 		leaves.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
 		leaves.createTexture2D(ddata);
 		leaves.generateMipmap();
-		em->addComponent<TextureComponent>(first, "./resources/texture/leaves.jpg");
+		em->addComponent<TextureComponent>(first, "./resources/texture/leaves.png");
 		systems::texture::setTexture(first, leaves);
 		freeImageData(ddata);
 		leaves.unbind();
@@ -551,18 +553,21 @@ namespace factory {
 	namespace light {
 		unsigned int factoryDirectional(const glm::vec3 &direction) {
 			auto id = em->createEntity();
+            em->setEntityName(id, "Light " + std::to_string(id));
 			em->addComponent<LightComponent>(id, direction);
 			return id;
 		}
 
 		unsigned int factoryPoint(const glm::vec3 &position, const LightConstraint &constraint) {
 			auto id = em->createEntity();
+            em->setEntityName(id, "Light " + std::to_string(id));
 			em->addComponent<LightComponent>(id, position, constraint);
 			return id;
 		}
 
 		unsigned int factorySpot(const glm::vec3 &position, const glm::vec3 &direction, const LightConstraint &constraint, const float &cutOff, const float &outerCutOff) {
 			auto id = em->createEntity();
+            em->setEntityName(id, "Light " + std::to_string(id));
 			em->addComponent<LightComponent>(id, position, direction, constraint, cutOff, outerCutOff);
 			return id;
 		}

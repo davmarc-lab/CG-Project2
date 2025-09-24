@@ -14,7 +14,7 @@ const auto im = InputManager::instance();
 const auto ed = EventManager::instance();
 const auto scene = BasicScene::instance();
 
-void NormalViewState::enableDefaultCameraMovement() {
+void NormalViewState::collisionCameraMovement() {
 	ed->subscribe(event::loop::LOOP_INPUT, [this]() {
 		auto collider = em->getComponentFromId<ColliderComponent>(world.cameraId);
 		ASSERT(collider != nullptr);
@@ -155,7 +155,7 @@ bool NormalViewState::isRayInSphere(const glm::vec3 &ray, const glm::vec3 &spher
 	}
 }
 
-void NormalViewState::changeInputState(Window *w, const InputState &state) {
+void NormalViewState::changeInputStateTrackball(Window *w, const InputState &state) {
 	switch (state) {
 		case MOUSE_PASSIVE: {
 			mouse.first = true;
@@ -284,31 +284,6 @@ void NormalViewState::changeInputState(Window *w, const InputState &state) {
 	}
 }
 
-void NormalViewState::defaultKeyCallback(Window *w) {
-	w->setKeysCallback([this, w](GLFWwindow *window, int key, int code, int action, int mod) {
-		switch (action) {
-			case GLFW_REPEAT:
-			case GLFW_PRESS: {
-				im->keyPressed(key);
-				break;
-			}
-			case GLFW_RELEASE:
-				im->keyReleased(key);
-				break;
-			default:
-				break;
-		}
-		if (key == GLFW_KEY_P) {
-			changeInputState(w, MOUSE_PASSIVE);
-			return;
-		}
-		if (key == GLFW_KEY_I) {
-			changeInputState(w, MOUSE_ACTIVE);
-			return;
-		}
-	});
-}
-
 Unique<Window> w = nullptr;
 Unique<ImGuiManager> igm = nullptr;
 
@@ -378,8 +353,8 @@ void NormalViewState::onAttach() {
 	w = CreateUnique<Window>(s);
 	ASSERT(w != nullptr);
 	w->onAttach();
-	defaultKeyCallback(w.get());
-	changeInputState(w.get(), MOUSE_ACTIVE);
+	defaultKeyCallback(w.get(), this->world, mouse);
+	changeInputStateTrackball(w.get(), MOUSE_ACTIVE);
 
 	glEnable(GL_CULL_FACE);
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { w->onUpdate(); });
@@ -406,7 +381,7 @@ void NormalViewState::onAttach() {
 	world.camera->setCameraPosition(CAMERA_START_POSITION);
 	em->addComponent<ColliderComponent>(world.cameraId, glm::vec3{4, 4, 4}, world.cameraSize);
 	ed->post(CAMERA_UPDATE_DATA);
-	enableDefaultCameraMovement();
+	collisionCameraMovement();
 	world.camera->updatePerspProjection(world.camera->getCameraZoom(), w->getWidth(), w->getHeight(), 0.1f, 100.f);
 
 	ed->subscribe(CAMERA_UPDATE_DATA, [this]() {
@@ -467,6 +442,9 @@ void NormalViewState::onAttach() {
 	sc->computation = LightComputation::PHONG;
 	sc->reflective = false;
 
+    auto tree = factory::factoryTree({{}, {1, 1, 1}, {}});
+    scene->addEntity(lightShader, tree);
+
 	auto id = factory::light::factoryDirectional({1, 0, 0});
 
 	ub = CreateUnique<UniformBuffer>("Matrices");
@@ -491,7 +469,6 @@ void NormalViewState::onAttach() {
 		systems::render::renderAllMeshes();
 		if (renderBB)
 			systems::render::renderBoundingBox();
-		// systems::render::renderInstancedMeshes();
 	});
 
 	systems::collision::updateAllColliders();
@@ -532,8 +509,8 @@ void NormalViewState::onAttach() {
 	ed->subscribe(NORMAL_VIEW_CLOSE, [this, np, cl]() {
 		igm->removePanel<ImGuiNormalView>(np);
 		// enable main window movement
-		defaultKeyCallback(w.get());
-		changeInputState(w.get(), InputState::MOUSE_ACTIVE);
+		defaultKeyCallback(w.get(), this->world, mouse);
+		changeInputStateTrackball(w.get(), InputState::MOUSE_ACTIVE);
 		cl->setRunnig(false);
 	});
 }

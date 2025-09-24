@@ -75,7 +75,7 @@ private:
 	Unique<UniformBuffer> ub;
 
 	/// @brief Defines default camera movement
-	void enableDefaultCameraMovement();
+	void collisionCameraMovement();
 
 	/**
 	 * @brief Retrieves the trackball point around a circle.
@@ -113,12 +113,11 @@ private:
 	 * @param w pointer to ogl::Window
 	 * @param state updated state
 	 */
-	void changeInputState(Window *w, const InputState &state);
+	void changeInputStateTrackball(Window *w, const InputState &state);
 
 	/**
 	 * @brief Sets the default key callback if it's changed.
 	 *
 	 * @param w pointer to ogl::Window
 	 */
-	void defaultKeyCallback(Window *w);
 };
