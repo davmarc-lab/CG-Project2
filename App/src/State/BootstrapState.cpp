@@ -15,8 +15,8 @@ void BootstrapState::onAttach() {
 	WindowSettings s{};
 	s.bgColor = {1, 1, 1, 1};
 	s.decorated = false;
-	s.size = {800, 600};
-	s.position = {400, 400};
+	s.size = {400, 300};
+	s.position = {200, 50};
 	this->window = CreateUnique<Window>(s);
 	this->window->onAttach();
 	ed->subscribe(event::loop::LOOP_UPDATE, [this]() { this->window->onUpdate(); });
