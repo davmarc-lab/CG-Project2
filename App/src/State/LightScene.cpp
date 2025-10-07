@@ -156,8 +156,8 @@ void LightState::onAttach() {
 	srand(time(NULL));
 	ogl::WindowSettings settings{};
 	settings.decorated = false;
-	settings.size = {1366, 768};
-	settings.position = {400, 12};
+	settings.size = {800, 600};
+	settings.position = {400, 50};
 	settings.bgColor = {.3, .3, .3, 1};
 
 	this->m_window = CreateUnique<ogl::Window>(settings);

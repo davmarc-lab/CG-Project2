@@ -364,8 +364,8 @@ void NormalViewState::onAttach() {
 	srand(time(NULL));
 	WindowSettings s{};
 	s.decorated = false;
-	s.size = {1366, 768};
-	s.position = {400, 12};
+	s.size = {800, 600};
+	s.position = {400, 50};
 
 #ifdef BIG
 	s.position = {10, 606};
