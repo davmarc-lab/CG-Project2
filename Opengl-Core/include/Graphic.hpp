@@ -7,7 +7,11 @@
 #include "../vendor/include/imgui/imgui_impl_glfw.h"
 #include "../vendor/include/imgui/imgui_impl_opengl3.h"
 
-// ImGuiHelpMarker
+/**
+* @brief Create an help icon with the given descrition
+*
+* @param desc help description
+*/
 inline static void ImGuiHelpMarker(const char *desc) {
 	ImGui::TextDisabled("(?)");
 	if (ImGui::BeginItemTooltip()) {

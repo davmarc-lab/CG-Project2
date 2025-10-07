@@ -8,6 +8,9 @@
 
 #include "../Core/Utils.hpp"
 
+/**
+ * @namespace ogl
+ */
 namespace ogl {
 	inline const float YAW = -90.f;
 	inline const float PITCH = 0.f;
