@@ -25,8 +25,6 @@ public:
 	virtual ~LightState() override = default;
 
 private:
-	void enableDefaultCameraMovement();
-
 	/// pointer to the window
 	Unique<ogl::Window> m_window;
 	/// pointer to the imgui manager

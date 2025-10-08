@@ -174,12 +174,12 @@ inline std::vector<glm::vec3> pyramidGeometry{
 	{1, -1, 1},
 	{-1, -1, 1},
 
-	// front
+	// back
 	{1, -1, 1},
 	{0, 1, 0},
 	{-1, -1, 1},
 
-	// back
+	// front
 	{-1, -1, -1},
 	{0, 1, 0},
 	{1, -1, -1},
@@ -223,20 +223,19 @@ inline std::vector<glm::vec2> pyramidTexCoords{
 	{1.f, 0.f},
 	{1.f, 1.f},
 	{0.f, 1.f},
-	{1.f, 0.f},
+	{0.f, 0.f},
 	{0.5f, 1.f},
-	{0.f, 1.f},
 	{1.f, 0.f},
+	{0.f, 0.f},
 	{0.5f, 1.f},
-	{0.f, 1.f},
 	{1.f, 0.f},
+	{0.f, 0.f},
 	{0.5f, 1.f},
-	{0.f, 1.f},
 	{1.f, 0.f},
+	{0.f, 0.f},
 	{0.5f, 1.f},
-	{0.f, 1.f},
+	{1.f, 0.f},
 };
-
 /**
  * @brief Calculates all sphere vertices with the given parameters
  *

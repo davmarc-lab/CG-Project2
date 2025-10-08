@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <string>
 
+#include "../../Opengl-Core/include/Core.hpp"
+
 /**
  * @enum InputState
  * @brief It tells which state is the mouse.
@@ -30,6 +32,12 @@ struct Mouse {
 	/// of the window
 	bool skipCursorPos = false;
 };
+
+void defaultCameraMovement(ogl::WorldCamera& world);
+
+void changeInputState(ogl::Window *w, ogl::WorldCamera &world, const InputState &state, Mouse& mouse);
+
+void defaultKeyCallback(ogl::Window *w, ogl::WorldCamera &world, Mouse& mouse);
 
 /**
  * @namespace light

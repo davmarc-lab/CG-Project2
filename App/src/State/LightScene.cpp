@@ -13,6 +13,8 @@
 
 #include "../../include/PBR/PBScene.hpp"
 
+#include "../../include/Profiler.hpp"
+
 const auto em = EntityManager::instance();
 const auto im = ogl::InputManager::instance();
 const auto ed = ogl::EventManager::instance();
@@ -20,135 +22,9 @@ const auto scene = BasicScene::instance();
 const auto pbscene = PBScene::instance();
 const auto sm = StateManager::instance();
 
+const auto pf = LinuxProfiler::instance();
+
 Mouse mouse{};
-
-void LightState::enableDefaultCameraMovement() {
-	ed->subscribe(event::loop::LOOP_INPUT, [this]() {
-		auto collider = em->getComponentFromId<ColliderComponent>(this->m_world.cameraId);
-		ASSERT(collider != nullptr);
-
-		bool collision = false;
-		if (im->isKeyPressed(GLFW_KEY_W)) {
-			this->m_world.camera->moveCamera(this->m_world.camera->getCameraFront());
-			ed->post(CAMERA_UPDATE_DATA);
-			for (auto [first, second] : systems::collision::getCollisions()) {
-				if (first == this->m_world.cameraId || second == this->m_world.cameraId) {
-					this->m_world.camera->moveCamera(-this->m_world.camera->getCameraFront());
-					ed->post(CAMERA_UPDATE_DATA);
-				}
-			}
-		}
-		if (im->isKeyPressed(GLFW_KEY_S)) {
-			this->m_world.camera->moveCamera(-this->m_world.camera->getCameraFront());
-			ed->post(CAMERA_UPDATE_DATA);
-			for (auto [first, second] : systems::collision::getCollisions()) {
-				if (first == this->m_world.cameraId || second == this->m_world.cameraId) {
-					this->m_world.camera->moveCamera(this->m_world.camera->getCameraFront());
-					ed->post(CAMERA_UPDATE_DATA);
-				}
-			}
-		}
-		if (im->isKeyPressed(GLFW_KEY_D)) {
-			this->m_world.camera->moveCamera(this->m_world.camera->getCameraRight());
-			ed->post(CAMERA_UPDATE_DATA);
-			for (auto [first, second] : systems::collision::getCollisions()) {
-				if (first == this->m_world.cameraId || second == this->m_world.cameraId) {
-					this->m_world.camera->moveCamera(-this->m_world.camera->getCameraRight());
-					ed->post(CAMERA_UPDATE_DATA);
-				}
-			}
-		}
-		if (im->isKeyPressed(GLFW_KEY_A)) {
-			this->m_world.camera->moveCamera(-this->m_world.camera->getCameraRight());
-			ed->post(CAMERA_UPDATE_DATA);
-			for (auto [first, second] : systems::collision::getCollisions()) {
-				if (first == this->m_world.cameraId || second == this->m_world.cameraId) {
-					this->m_world.camera->moveCamera(this->m_world.camera->getCameraRight());
-					ed->post(CAMERA_UPDATE_DATA);
-				}
-			}
-		}
-		if (im->isKeyPressed(GLFW_KEY_SPACE)) {
-			this->m_world.camera->moveCamera(this->m_world.camera->getCameraUp());
-			ed->post(CAMERA_UPDATE_DATA);
-			for (auto [first, second] : systems::collision::getCollisions()) {
-				if (first == this->m_world.cameraId || second == this->m_world.cameraId) {
-					this->m_world.camera->moveCamera(-this->m_world.camera->getCameraUp());
-					ed->post(CAMERA_UPDATE_DATA);
-				}
-			}
-		}
-		if (im->isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
-			this->m_world.camera->moveCamera(-this->m_world.camera->getCameraUp());
-			ed->post(CAMERA_UPDATE_DATA);
-			for (auto [first, second] : systems::collision::getCollisions()) {
-				if (first == this->m_world.cameraId || second == this->m_world.cameraId) {
-					this->m_world.camera->moveCamera(this->m_world.camera->getCameraUp());
-					ed->post(CAMERA_UPDATE_DATA);
-				}
-			}
-		}
-	});
-}
-
-void changeInputState(Window *w, ogl::WorldCamera &world, const InputState &state) {
-	switch (state) {
-		case MOUSE_PASSIVE: {
-			mouse.first = true;
-			if (glfwRawMouseMotionSupported())
-				glfwSetInputMode(w->getContext(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-			glfwSetInputMode(w->getContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-			w->setCursorPosCallback([world](GLFWwindow *window, double x, double y) {
-				if (mouse.first) {
-					mouse.first = false;
-					mouse.pos = {x, y};
-					return;
-				}
-
-				auto xoffset = x - mouse.pos.x;
-				auto yoffset = y - mouse.pos.y;
-
-				mouse.pos = {x, y};
-
-				world.camera->processMouseMovement(xoffset, yoffset);
-			});
-			break;
-		}
-		case MOUSE_ACTIVE: {
-			if (glfwRawMouseMotionSupported())
-				glfwSetInputMode(w->getContext(), GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
-			glfwSetInputMode(w->getContext(), GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
-
-			w->setCursorPosCallback([](auto, auto, auto) {});
-			break;
-		}
-	}
-}
-
-void defaultKeyCallback(Window *w, ogl::WorldCamera &world) {
-	w->setKeysCallback([w, &world](GLFWwindow *window, int key, int code, int action, int mod) {
-		switch (action) {
-			case GLFW_REPEAT:
-			case GLFW_PRESS: {
-				im->keyPressed(key);
-				break;
-			}
-			case GLFW_RELEASE:
-				im->keyReleased(key);
-				break;
-			default:
-				break;
-		}
-		if (key == GLFW_KEY_P) {
-			changeInputState(w, world, MOUSE_PASSIVE);
-			return;
-		}
-		if (key == GLFW_KEY_I) {
-			changeInputState(w, world, MOUSE_ACTIVE);
-			return;
-		}
-	});
-}
 
 void LightState::onAttach() {
 	ASSERT(!this->m_attached);
@@ -163,8 +39,7 @@ void LightState::onAttach() {
 	this->m_window = CreateUnique<ogl::Window>(settings);
 	this->m_window->onAttach();
 
-	enableDefaultCameraMovement();
-	defaultKeyCallback(this->m_window.get(), this->m_world);
+	defaultKeyCallback(this->m_window.get(), this->m_world, mouse);
 
 	glEnable(GL_CULL_FACE);
 	ed->subscribe(ogl::event::loop::LOOP_UPDATE, [this]() { this->m_window->onUpdate(); });
@@ -188,7 +63,9 @@ void LightState::onAttach() {
 	this->m_world.camera->setCameraPosition(CAMERA_START_POSITION);
 	em->addComponent<ColliderComponent>(this->m_world.cameraId, glm::vec3{4, 4, 4}, this->m_world.cameraSize);
 	ed->post(CAMERA_UPDATE_DATA);
-	// enableDefaultCameraMovement();
+
+	defaultCameraMovement(this->m_world);
+
 	this->m_world.camera->updatePerspProjection(this->m_world.camera->getCameraZoom(), this->m_window->getWidth(), this->m_window->getHeight(), 0.1f, 100.f);
 
 	ed->subscribe(CAMERA_UPDATE_DATA, [this]() {
@@ -217,8 +94,8 @@ void LightState::onAttach() {
 	skyboxShader->createShaderProgram();
 	Shared<ShaderProgram> planeShader = CreateShared<ShaderProgram>("vertexShader.glsl", "basicFS.glsl");
 	planeShader->createShaderProgram();
-	Shared<ShaderProgram> lightShader = CreateShared<ShaderProgram>("lightVertShader.glsl", "lightFragShader.glsl");
-	lightShader->createShaderProgram();
+	Shared<ShaderProgram> modelShader = CreateShared<ShaderProgram>("modelVertShader.glsl", "modelFragShader.glsl");
+	modelShader->createShaderProgram();
 	Shared<ShaderProgram> pbrShader = CreateShared<ShaderProgram>("pbrVertShader.glsl", "pbrFragShader.glsl");
 	pbrShader->createShaderProgram();
 
@@ -234,13 +111,21 @@ void LightState::onAttach() {
 	em->addComponent<PBMaterial>(foo);
 	systems::pbr::updateMaterial(foo, pbr::metal);
 	systems::light::setLightComputation(foo, LightComputation::PHONG);
-    pbscene->addEntity(foo);
+	pbscene->addEntity(foo);
 
-	// scene->addEntity(lightShader, foo);
+	{
+		// Too heavy
+		auto model = factory::factoryObjMesh(BasicInfo{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}}, "resources/models/machine/Machine.obj");
+		scene->addEntity(modelShader, model);
+	}
 
-	// auto emer = factory::factorySphere(BasicInfo{{2, 0, -4}, {1, 1, 1}, {0, 0, 0}});
-	// systems::light::setLightComputation(emer, LightComputation::PHONG);
-	// scene->addEntity(lightShader, emer);
+	{
+		// Too heavy
+		flipImagesVertically(true);
+		auto model = factory::factoryObjMesh(BasicInfo{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}}, "resources/models/backpack/backpack.obj");
+		flipImagesVertically(false);
+		scene->addEntity(modelShader, model);
+	}
 
 	// lights
 	// auto dir = factory::light::factoryDirectional({1, 1, -1});
@@ -251,21 +136,31 @@ void LightState::onAttach() {
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { systems::collision::updateAllColliders(); });
 
 	this->m_igm->addPanel<ImGuiEntityTree>();
+	auto pp = this->m_igm->addPanel<ImGuiPanel>("Profiler");
+	pp->setRenderFunc([this]() {
+		ImGui::Begin("Profiler");
 
-	ed->subscribe(event::loop::LOOP_BEGIN_RENDER, []() {
-		// sphereModels.clear();
-		// for (auto e : em->getEntitiesFromComponent<InstancedComponent>()) {
-		// 	sphereModels.push_back(systems::transform::getModelMatrix(e));
-		// }
-		//
-		// systems::render::prepareInstancedMesh(sphereModels, sphereColors);
+		auto input = pf->getInputTime();
+		auto update = pf->getUpdateTime();
+		auto render = pf->getRenderTime();
+
+		ImGui::SeparatorText("Input");
+		ImGui::Text("Wall time: %lf", input.x);
+		ImGui::Text("Cpu time: %lf", input.y);
+		ImGui::SeparatorText("Update");
+		ImGui::Text("Wall time: %lf", update.x);
+		ImGui::Text("Cpu time: %lf", update.y);
+		ImGui::SeparatorText("Render");
+		ImGui::Text("Wall time: %lf", render.x);
+		ImGui::Text("Cpu time: %lf", render.y);
+
+		ImGui::End();
 	});
 
 	ed->subscribe(event::loop::LOOP_RENDER, [this, skybox, skyboxShader, pbrShader]() {
 		systems::render::renderSkybox(skybox, skyboxShader);
 		systems::render::renderAllMeshes();
 		systems::render::renderScene(pbrShader, this->m_world);
-		// systems::render::renderInstancedMeshes();
 	});
 
 	ed->subscribe(STATE_CHANGED, []() {

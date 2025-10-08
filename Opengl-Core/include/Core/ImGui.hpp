@@ -14,8 +14,21 @@
 namespace ogl {
 	const ImGuiConfigFlags DEFAULT_IMGUI_CONFIGS{ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable};
 
+    /**
+     * @brief ImGui wrap to create a simple ImGui panel.
+     * Objects extending this class should be used in the ImGuiManger
+     *
+     * @see ImGuiManager
+     */
 	class ImGuiPanel {
 	public:
+        /**
+         * @brief Retrieves layer priority.
+         *
+         * The priority is used to organize layer callback methods.
+         *
+         * @return the layer priority
+         */
 		inline unsigned short getPriority() const { return this->m_priority; }
 
 		inline void setPriority(const unsigned short &priority) {

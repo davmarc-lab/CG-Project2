@@ -8,8 +8,13 @@
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/geometric.hpp>
 #include <iostream>
+#include <string>
 #include <utility>
 #include <vector>
+
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 
 #include "../include/Utils.hpp"
 
@@ -310,8 +315,10 @@ namespace factory {
 		unsigned int textureID;
 		glGenTextures(1, &textureID);
 
+		std::cout << filename << "\n";
+
 		int width, height, nrComponents;
-		auto data = readImageData(path, width, height, nrComponents, 0);
+		auto data = readImageData(filename, width, height, nrComponents, 0);
 		if (data) {
 			GLenum format;
 			if (nrComponents == 1)
@@ -338,12 +345,10 @@ namespace factory {
 		return textureID;
 	}
 
-	/*
 	std::vector<ImportedTexture> loadMaterialTextures(const aiMaterial *mat, const aiTextureType &type, const std::string &typeName, const std::string &dir) {
 		std::vector<ImportedTexture> textures{};
 		auto tt = em->getComponentFromId<ImportedMeshTextures>(mainMesh);
 		ASSERT(tt != nullptr);
-		flipImagesVertically(false);
 
 		for (auto i = 0; i < mat->GetTextureCount(type); i++) {
 			aiString str;
@@ -373,7 +378,6 @@ namespace factory {
 	unsigned int instanceMesh(const aiMesh *mesh, const aiScene *scene, const std::string &dir) {
 		auto id = em->createEntity();
 		em->addComponent<Transform>(id);
-		em->addComponent<ColliderComponent>(id);
 		em->addComponent<HideTreeComponent>(id);
 		em->addComponent<ImportedMeshTextures>(id);
 		MeshInfo info{};
@@ -479,14 +483,13 @@ namespace factory {
 			return -1;
 		}
 
-		auto sc = em->addComponent<ShaderComponent>(id, LightComputation::PHONG);
+		auto sc = em->addComponent<ShaderComponent>(id, LightComputation::NONE, "", "");
 
 		auto dir = pathToFile.substr(0, pathToFile.find_last_of('/'));
 		processNode(id, scene->mRootNode, scene, dir);
 
 		return id;
 	}
-	*/
 
 	const glm::vec3 TREE_LOG_OFFSET = {0.f, -1.f, 0.f};
 	const glm::vec3 TREE_LOG_SCALE = {.4f, .7f, .4f};
@@ -523,7 +526,8 @@ namespace factory {
 		auto first = factoryPyramid(BasicInfo{info.position + TREE_LEAF_OFFSET, info.scale * TREE_LEAF_SCALE, {}}, {0, 1, 0, 1});
 		em->addComponent<HideTreeComponent>(first);
 		systems::parent::addChild(id, first);
-		auto ddata = readImageData("./resources/texture/leaves.jpg", width, height, nrChannels);
+        flipImagesVertically(true);
+		auto ddata = readImageData("./resources/texture/leaves.png", width, height, nrChannels);
 		ogl::Texture leaves{params, {(unsigned int)width, (unsigned int)height}};
 		leaves.onAttach();
 		leaves.bind();
@@ -533,7 +537,7 @@ namespace factory {
 		leaves.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
 		leaves.createTexture2D(ddata);
 		leaves.generateMipmap();
-		em->addComponent<TextureComponent>(first, "./resources/texture/leaves.jpg");
+		em->addComponent<TextureComponent>(first, "./resources/texture/leaves.png");
 		systems::texture::setTexture(first, leaves);
 		freeImageData(ddata);
 		leaves.unbind();
@@ -549,18 +553,21 @@ namespace factory {
 	namespace light {
 		unsigned int factoryDirectional(const glm::vec3 &direction) {
 			auto id = em->createEntity();
+            em->setEntityName(id, "Light " + std::to_string(id));
 			em->addComponent<LightComponent>(id, direction);
 			return id;
 		}
 
 		unsigned int factoryPoint(const glm::vec3 &position, const LightConstraint &constraint) {
 			auto id = em->createEntity();
+            em->setEntityName(id, "Light " + std::to_string(id));
 			em->addComponent<LightComponent>(id, position, constraint);
 			return id;
 		}
 
 		unsigned int factorySpot(const glm::vec3 &position, const glm::vec3 &direction, const LightConstraint &constraint, const float &cutOff, const float &outerCutOff) {
 			auto id = em->createEntity();
+            em->setEntityName(id, "Light " + std::to_string(id));
 			em->addComponent<LightComponent>(id, position, direction, constraint, cutOff, outerCutOff);
 			return id;
 		}

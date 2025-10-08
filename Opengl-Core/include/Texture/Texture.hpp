@@ -71,14 +71,14 @@ namespace ogl {
 		/*
 		 * Retrieves the texture id.
 		 *
-		 * @returns texture id.
+		 * @return texture id.
 		 */
 		inline unsigned int getId() const { return this->m_id; }
 
 		/*
 		 * Retrieves the texture width.
 		 *
-		 * @returns texture width.
+		 * @return texture width.
 		 */
 		inline unsigned int getWidth() const { return this->m_size.x; }
 
@@ -95,7 +95,7 @@ namespace ogl {
 		/*
 		 * Retrieves the texture height.
 		 *
-		 * @returns texture height.
+		 * @return texture height.
 		 */
 		inline unsigned int getHeight() const { return this->m_size.y; }
 
@@ -112,7 +112,7 @@ namespace ogl {
 		/*
 		 * Retrieves the texture size.
 		 *
-		 * @returns texture size.
+		 * @return texture size.
 		 */
 		inline Pair<unsigned int> getSize() const { return this->m_size; }
 
