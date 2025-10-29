@@ -140,18 +140,46 @@ namespace ogl {
 		 */
 		unsigned int addResource(const std::string &file);
 
+		/**
+		 * @brief Removes and unloads the resource with the given id.
+		 *
+		 * @param id resource id
+		 *
+		 * @return true if the resource is unloaded
+		 */
 		bool removeResource(const unsigned int &id);
 
+		/**
+		 * @brief Retrieves the current id used to store resources.
+		 *
+		 * @return the next id for a resource
+		 */
 		inline unsigned int getCurrentId() const { return this->m_currentId; }
 
+		/**
+		 * @brief Retrieve the resource with the given id.
+		 *
+		 * @param id resource id
+		 *
+		 * @return the Resource found
+		 */
 		Resource getResource(const unsigned int &id) const;
 
+		/**
+		 * @brief Clears the manager from all resources.
+		 */
 		void clear();
 
 		ResourceManager(ResourceManager &other) = delete;
 
 		void operator=(const ResourceManager &other) = delete;
 
+		/**
+		 * @brief Retrieves the instance of the ResourceManger.
+		 * If it's not instanced, it will be instanced automatically.
+		 *
+		 * @return a Shared<ResourceManager> object
+		 */
 		inline static Shared<ResourceManager> instance() {
 			if (s_pointer == nullptr) {
 				Shared<ResourceManager> copy(new ResourceManager());
@@ -161,9 +189,12 @@ namespace ogl {
 		}
 
 	private:
+		/// static shared pointer for Singleton
 		inline static Shared<ResourceManager> s_pointer = nullptr;
+		/// id tracker for resources
 		unsigned int m_currentId = 1;
 
+		/// map containing all indexed resources
 		std::map<unsigned int, Resource> m_map{};
 
 		ResourceManager() = default;

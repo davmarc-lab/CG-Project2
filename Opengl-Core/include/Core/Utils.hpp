@@ -1,21 +1,21 @@
 #pragma once
 
 /**
-* @brief This class stores a pair of values of the same type.
-*
-* @tparam T values type
-*/
+ * @brief This class stores a pair of values of the same type.
+ *
+ * @tparam T values type
+ */
 template <typename T>
 struct Pair {
-    /// first element
+	/// first element
 	T x;
-    /// second element
-    T y;
+	/// second element
+	T y;
 
-    /// equals pairs operator
-    friend bool operator==(const Pair<T>& lhs, const Pair<T>& rhs) {
-        return (lhs.x == rhs.x) && (lhs.y == rhs.y);
-    }
+	/// equals pairs operator
+	friend bool operator==(const Pair<T> &lhs, const Pair<T> &rhs) {
+		return (lhs.x == rhs.x) && (lhs.y == rhs.y);
+	}
 };
 
 #include <memory>
