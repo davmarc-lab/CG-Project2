@@ -1,17 +1,39 @@
-name: doc
-
-run-name: Generate documentation
+name: Build Doxygen Documentation
 
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - 'dev-doc'
+    branches: [ "main" ]
+    paths:
+      - "**/*.h"
+      - "**/*.hpp"
+      - "**/*.c"
+      - "**/*.cpp"
+      - "Doxyfile"
 
 jobs:
-  runs-on: [ubuntu-latest]
+  doxygen:
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: mattnotmitt/doxygen-action@v1.9.5
-          with:
-            additional-packages: font-fira-code
-            doxyfile-path: 'docs/Doxyfile'
-            enable-latex: false
+      # Checkout source code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install Doxygen
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+
+      # Build documentation
+      - name: Generate Documentation
+        run: |
+          doxygen Doxyfile
+
+      # Upload generated docs as build artifact
+      - name: Upload Documentation Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: doxygen-docs
+          path: docs/html
