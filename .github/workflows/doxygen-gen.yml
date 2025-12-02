@@ -18,5 +18,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           working-directory: .
           doxyfile-path: docs/Doxyfile
-          html-output-folder: doc/html
+          html-output-folder: docs/html
           branch: dev-doc
