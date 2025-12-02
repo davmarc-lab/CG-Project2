@@ -28,6 +28,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Create docs folder
+        run: |
+          mkdir docs/html
       - name: Run Doxygen
         uses: mattnotmitt/doxygen-action@v1.9.5
         with:
