@@ -8,7 +8,7 @@ on:
       - 'dev-doc'
 
 jobs:
-  runs-on: ubuntu-latest
+  runs-on: [ubuntu-latest]
     steps:
       - uses: mattnotmitt/doxygen-action@v1.9.5
           with:
