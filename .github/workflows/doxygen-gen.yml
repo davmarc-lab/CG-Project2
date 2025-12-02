@@ -30,7 +30,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Create Documentation folder
         run: |
-          mkdir -p ${{ github.workspace }}/docs/html
           ls ${{ github.workspace }}/docs/
       - name: Doxygen Action
         # You may pin to the exact commit or the version.
@@ -39,6 +38,6 @@ jobs:
         with:
           # Path to Doxyfile
           doxyfile-path: docs/Doxyfile
-          working-directory: ${{ github.workspace }}/docs/html/
+          working-directory: ${{ github.workspace }}
           # Generate latex documentation
           enable-latex: false
