@@ -1,0 +1,17 @@
+name: doc
+
+run-name: Generate documentation
+
+on:
+  push:
+    branches:
+      - 'dev-doc'
+
+jobs:
+  runs-on: ubuntu-latest
+    steps:
+      - uses: mattnotmitt/doxygen-action@v1.9.5
+          with:
+            additional-packages: font-fira-code
+            doxyfile-path: 'docs/Doxyfile'
+            enable-latex: false
