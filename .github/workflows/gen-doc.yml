@@ -1,7 +1,6 @@
 name: Build Doxygen Documentation
 
 on:
-  workflow_dispatch:
   push:
     branches: [ "dev-doc" ]
     paths:
