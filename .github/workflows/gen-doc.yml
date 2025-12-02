@@ -3,11 +3,9 @@ name: Build Doxygen Documentation
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: [ "dev-doc" ]
     paths:
-      - "**/*.h"
       - "**/*.hpp"
-      - "**/*.c"
       - "**/*.cpp"
       - "Doxyfile"
 
