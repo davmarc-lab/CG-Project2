@@ -30,6 +30,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Create Documentation folder
         run: |
+          mkdir -p doc/html
           ls ${{ github.workspace }}/
       - name: Doxygen Action
         # You may pin to the exact commit or the version.
@@ -41,3 +42,8 @@ jobs:
           working-directory: '.'
           # Generate latex documentation
           enable-latex: false
+      - name: Moving Documentation
+        run: |
+          mkdir -p ${{ github.workspace }}/docs/html
+          mv doc/html/* ${{ github.workspace }}/docs/html/
+          rm -rf doc
