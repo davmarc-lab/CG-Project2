@@ -1,0 +1,22 @@
+name: Public Doxygen Generated Documentation
+on:
+  push:
+    branches:
+      - "dev-doc"
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Generate and Deploy Doxygen Docs
+        uses: AgarwalSaurav/ghaction-doxygen-ghpages@release/v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: .
+          doxyfile-path: docs/Doxyfile
+          html-output-folder: docs/html
+          branch: dev-doc
