@@ -45,5 +45,4 @@ jobs:
       - name: Moving Documentation
         run: |
           mkdir -p ${{ github.workspace }}/docs/html
-          mv doc/html/* ${{ github.workspace }}/docs/html/
-          rm -rf doc
+          cp -r doc/html/* ${{ github.workspace }}/docs/html/
