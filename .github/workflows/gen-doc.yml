@@ -6,7 +6,7 @@ on:
     paths:
       - "**/*.hpp"
       - "**/*.cpp"
-      - "Doxyfile"
+      - "docs/Doxyfile"
 
 jobs:
   doxygen:
