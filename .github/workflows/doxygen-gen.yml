@@ -42,14 +42,11 @@ jobs:
           working-directory: '.'
           # Generate latex documentation
           enable-latex: false
-      - name: Moving Documentation
-        run: |
-          mkdir -p ${{ github.workspace }}/docs/html
-          cp -r doc/html/* ${{ github.workspace }}/docs/html/
       - name: Deploy Documentation
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: dev-doc
           # Default Doxyfile build documentation to html directory. 
           # Change the directory if changes in Doxyfile
           publish_dir: ./doc/html
