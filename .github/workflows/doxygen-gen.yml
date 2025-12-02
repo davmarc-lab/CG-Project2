@@ -1,7 +1,8 @@
+name: Public Doxygen Generated Documentation
 on:
   push:
     branches:
-      - main
+      - "dev-doc"
 permissions:
   contents: write
 
