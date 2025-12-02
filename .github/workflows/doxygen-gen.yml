@@ -37,7 +37,7 @@ jobs:
         uses: mattnotmitt/doxygen-action@1.9.8
         with:
           # Path to Doxyfile
-          doxyfile-path: docs/Doxyfile
+          doxyfile-path: ${{ github.workspace }}/docs/Doxyfile
           working-directory: ${{ github.workspace }}/
           # Generate latex documentation
           enable-latex: false
