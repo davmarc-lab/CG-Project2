@@ -38,6 +38,6 @@ jobs:
         with:
           # Path to Doxyfile
           doxyfile-path: ${{ github.workspace }}/docs/Doxyfile
-          working-directory: '${{ github.workspace }}/'
+          working-directory: '.'
           # Generate latex documentation
           enable-latex: false
