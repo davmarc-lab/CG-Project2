@@ -4,7 +4,7 @@
 #include "State.hpp"
 
 /**
- *
+ * @brief Simple scene where lights computation is simulated.
  */
 class LightState : public State {
 public:

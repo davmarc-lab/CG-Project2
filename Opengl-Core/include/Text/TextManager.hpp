@@ -115,7 +115,7 @@ namespace ogl {
 		/**
 		 * @brief Changes the text scale.
 		 *
-		 * @param color the new text scale
+		 * @param scale the new text scale
 		 */
 		inline void setScale(const float &scale) { this->m_config.scale = scale; }
 

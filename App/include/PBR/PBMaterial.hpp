@@ -2,14 +2,21 @@
 
 #include "../ECS/Component.hpp"
 
+/**
+ * @brief This Component manages a pbr material.
+ */
 class PBMaterial : public Component {
 public:
 	/// material name
 	std::string name{"New Material"};
 
+    /// material albedo vector
 	glm::vec3 albedo{};
+    /// material metallic value
 	float metallic{};
+    /// material roughness value
 	float roughness{};
+    /// material ao value
 	float ao{};
 
 	/**
@@ -36,5 +43,6 @@ public:
 };
 
 namespace pbr {
+    /// metal pbr material
 	const PBMaterial metal{{0.5, 0, 0}, 1, 0.5, 0.1};
 }

@@ -40,31 +40,26 @@ namespace ogl {
 
 		/**
 		 * @brief Updates the buffer data.
-         *
+		 *
 		 * @note This method binds the current buffer.
-         *
-         * @param offset data offset
-         * @param size data total size
-         * @param data pointer to the data
+		 *
+		 * @param offset data offset
+		 * @param size data total size
+		 * @param data pointer to the data
 		 */
 		void update(const unsigned int &offset, const unsigned int &size, void *data) const;
 
 		/**
 		 * @brief Updates the buffer data.
-         *
-         * @param offset data offset
-         * @param size data total size
-         * @param data pointer to the data
+		 *
+		 * @param offset data offset
+		 * @param size data total size
+		 * @param data pointer to the data
 		 */
 		void fastUpdate(const unsigned int &offset, const unsigned int &size, void *data) const;
 
-		UniformBuffer() = delete;
-
-		UniformBuffer(const std::string &variable);
+		UniformBuffer() = default;
 
 		~UniformBuffer();
-
-	private:
-		std::string m_variable{};
 	};
 } // namespace ogl

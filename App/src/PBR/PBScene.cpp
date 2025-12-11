@@ -24,6 +24,7 @@ namespace systems {
 		}
 	} // namespace pbr
 
+    
 	namespace render {
 		void renderScene(const Shared<ogl::ShaderProgram> &shader, ogl::WorldCamera& world) {
 			auto lightsData = prepareLightData();
