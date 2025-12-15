@@ -33,17 +33,36 @@ struct Mouse {
 	bool skipCursorPos = false;
 };
 
-void defaultCameraMovement(ogl::WorldCamera& world);
+/**
+ * @brief Register callbacks for the WorldCamera movement with collisions.
+ *
+ * @param world the world camera
+ */
+void defaultCameraMovement(ogl::WorldCamera &world);
 
-void changeInputState(ogl::Window *w, ogl::WorldCamera &world, const InputState &state, Mouse& mouse);
+/**
+ * @brief Utility method that manages mouse behaviour in active or passive mode.
+ * It changes the GLFW callbacks.
+ *
+ * @param w the window
+ * @param world the world camera
+ * @param state the current input state (ACTIVE - PASSIVE)
+ * @param mouse the mouse data
+ */
+void changeInputState(ogl::Window *w, ogl::WorldCamera &world, const InputState &state, Mouse &mouse);
 
-void defaultKeyCallback(ogl::Window *w, ogl::WorldCamera &world, Mouse& mouse);
+/**
+ * @brief Defines default callbacks for a standard Window.
+ *
+ * @param w the window
+ * @param world the world camera
+ * @param mouse the mouse data
+ */
+void defaultKeyCallback(ogl::Window *w, ogl::WorldCamera &world, Mouse &mouse);
 
 /**
  * @namespace light
  * Desc.
- *
- * TODO put everything of this file in the namespace light.
  */
 namespace light {
 	/*!
@@ -53,91 +72,97 @@ namespace light {
 	 * This enum is needed to distinguish the lights in shader computation.
 	 */
 	enum LightType {
+		/// directional light
 		LIGHT_DIRECTIONAL,
+		/// point light
 		LIGHT_POINT,
+		/// spot light
 		LIGHT_SPOT,
 	};
-} // namespace light
 
-// REMOVE THIS LINE
-using namespace light;
-
+/// max lights in shaders
 #define SHADER_MAX_LIGHTS 32
 
-/**
- * @brief Lights attenuation data structure.
- */
-struct LightConstraint {
-	/// light constant value
-	float constant = 1.f;
-	/// light linear value
-	float linear = .09f;
-	/// light quadratic value
-	float quadratic = .032f;
-};
+	/**
+	 * @brief Lights attenuation data structure.
+	 */
+	struct LightConstraint {
+		/// light constant value
+		float constant = 1.f;
+		/// light linear value
+		float linear = .09f;
+		/// light quadratic value
+		float quadratic = .032f;
+	};
 
-/**
- * @brief Light vectors for light component.
- */
-struct LightVectors {
-	/// light ambient vector
-	glm::vec3 ambient{.1f, .1f, .1f};
-	/// light diffuse vector
-	glm::vec3 diffuse{.8f, .8f, .8f};
-	/// light specular vector
-	glm::vec3 specular{1, 1, 1};
-};
+	/**
+	 * @brief Light vectors for light component.
+	 */
+	struct LightVectors {
+		/// light ambient vector
+		glm::vec3 ambient{.1f, .1f, .1f};
+		/// light diffuse vector
+		glm::vec3 diffuse{.8f, .8f, .8f};
+		/// light specular vector
+		glm::vec3 specular{1, 1, 1};
+	};
 
-/**
- * @brief Data structure to send light data to shaders.
- */
-struct LightShaderBlock {
-	/// light type
-	int type = LightType::LIGHT_DIRECTIONAL;
-	/// light intensity
-	float intensity = 1;
-	/// light color
-	glm::vec3 color{1, 1, 1};
+	/**
+	 * @brief Data structure to send light data to shaders.
+	 */
+	struct LightShaderBlock {
+		/// light type
+		int type = LightType::LIGHT_DIRECTIONAL;
+		/// light intensity
+		float intensity = 1;
+		/// light color
+		glm::vec3 color{1, 1, 1};
 
-	/// light position
-	glm::vec3 position{};
-	/// light direction
-	glm::vec3 direction{};
+		/// light position
+		glm::vec3 position{};
+		/// light direction
+		glm::vec3 direction{};
 
-	/// light ambient vector
-	glm::vec3 ambient{.1f, .1f, .1f};
-	/// light diffuse vector
-	glm::vec3 diffuse{.8f, .8f, .8f};
-	/// light specular vector
-	glm::vec3 specular{1, 1, 1};
+		/// light ambient vector
+		glm::vec3 ambient{.1f, .1f, .1f};
+		/// light diffuse vector
+		glm::vec3 diffuse{.8f, .8f, .8f};
+		/// light specular vector
+		glm::vec3 specular{1, 1, 1};
 
-	/// light constant value
-	float constant = 1;
-	/// light linear value
-	float linear = .09f;
-	/// light quadratic value
-	float quadratic = .032f;
+		/// light constant value
+		float constant = 1;
+		/// light linear value
+		float linear = .09f;
+		/// light quadratic value
+		float quadratic = .032f;
 
-	/// light cutoff value
-	float cutoff = 12.5f;
-	/// light outer cutoff value
-	float outerCutoff = 17.5f;
+		/// light cutoff value
+		float cutoff = 12.5f;
+		/// light outer cutoff value
+		float outerCutoff = 17.5f;
 
-	/// light smooth flag
-	bool isSmooth = false;
-};
+		/// light smooth flag
+		bool isSmooth = false;
+	};
 
-/**
- * @enum LightComputation
- * @brief Defines light alghoritm to use in shaders.
- */
-enum LightComputation {
-	NONE,
-	PHONG,
-	BLINN_PHONG,
-	INT_PHONG,
-	INT_BLINN_PHONG,
-};
+	/**
+	 * @enum LightComputation
+	 * @brief Defines light alghoritm to use in shaders.
+	 */
+	enum LightComputation {
+		/// no light computation
+		NONE,
+		/// Phong alghoritm computation
+		PHONG,
+		/// Blinn-Phong alghoritm computation
+		BLINN_PHONG,
+		/// Interpolative Phong alghoritm computation
+		INT_PHONG,
+		/// Interpolative Blinn-Phong alghoritm computation
+		INT_BLINN_PHONG,
+	};
+} // namespace light
 
 /**
  * @brief Read data from the given image.

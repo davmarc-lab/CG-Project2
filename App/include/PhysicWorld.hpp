@@ -43,10 +43,19 @@ public:
 	PhysicWorld &world;
 };
 
+/**
+ * @brief Resolves the points of a simulated rope.
+ */
 class RopeSolver : public Solver {
 public:
 	virtual void solve() override;
 
+	/**
+	 * @brief Instance basic RopeSolver object.
+	 *
+	 * @param world the physic world to be attached
+	 * @see Solver
+	 */
 	RopeSolver(PhysicWorld &world) :
 		Solver(world) {}
 
@@ -117,6 +126,10 @@ public:
 		Solver(world) {}
 
 	virtual ~GravitySolver() override = default;
+
+private:
+    /// delay time at startup
+    bool m_delay = false;
 };
 
 /**

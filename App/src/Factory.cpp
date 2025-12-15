@@ -467,7 +467,7 @@ namespace factory {
 		}
 	}
 
-	unsigned int factoryObjMesh(const BasicInfo &info, const std::string &pathToFile) {
+	unsigned int factoryObjMesh(const BasicInfo &info, const std::string &path) {
 		auto id = em->createEntity();
 		mainMesh = id;
 		em->addComponent<ParentComponent>(id);
@@ -477,7 +477,7 @@ namespace factory {
 		systems::transform::updateScale(id, info.scale);
 		systems::transform::updateRotation(id, info.rotation);
 		Assimp::Importer import{};
-		const auto *scene = import.ReadFile(pathToFile, aiProcess_Triangulate | aiProcess_FlipUVs);
+		const auto *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 			std::cerr << "ERROR::ASSIMP::" << import.GetErrorString() << "\n";
 			return -1;
@@ -485,7 +485,7 @@ namespace factory {
 
 		auto sc = em->addComponent<ShaderComponent>(id, LightComputation::NONE, "", "");
 
-		auto dir = pathToFile.substr(0, pathToFile.find_last_of('/'));
+		auto dir = path.substr(0, path.find_last_of('/'));
 		processNode(id, scene->mRootNode, scene, dir);
 
 		return id;

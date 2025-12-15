@@ -447,7 +447,7 @@ void NormalViewState::onAttach() {
 
 	auto id = factory::light::factoryDirectional({1, 0, 0});
 
-	ub = CreateUnique<UniformBuffer>("Matrices");
+	ub = CreateUnique<UniformBuffer>();
 	ub->onAttach();
 	ub->setup(sizeof(glm::mat4), 0, 0, 0);
 	auto viewProj = world.camera->getViewProjMatrix();

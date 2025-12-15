@@ -378,8 +378,8 @@ namespace systems {
 
 		void updateCameraCollider(const unsigned int &id, const glm::vec3 &position, const glm::vec3 &size) {
 			auto c = em->getComponentFromId<ColliderComponent>(id);
-			ASSERT(c != nullptr);
-			c->updateCollider(position, size);
+			if (c != nullptr)
+				c->updateCollider(position, size);
 		}
 	} // namespace camera
 
@@ -798,10 +798,10 @@ namespace systems {
 					if (tc != nullptr) {
 						glActiveTexture(GL_TEXTURE0);
 						shader->setInt("texture1", 0);
-                        shader->setInt("useColor", 0);
+						shader->setInt("useColor", 0);
 						tc->texture.bind();
 					} else {
-                        shader->setInt("useColor", 1);
+						shader->setInt("useColor", 1);
 					}
 					auto rc = em->getComponentFromId<RenderComponent>(id);
 					if (em->entityHasComponent<Transform>(id)) {

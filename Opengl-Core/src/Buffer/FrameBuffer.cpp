@@ -41,6 +41,8 @@ namespace ogl {
 	void FrameBuffer::rescaleFrameBuffer(const unsigned int &width, const unsigned int &height) {
 		// calls rescaleTexture()
 		this->bind();
+		this->m_config.height = height;
+		this->m_config.width = width;
 		this->m_texture.setSize({width, height});
 		this->m_rbo.rescaleRenderBuffer(width, height);
 		glFramebufferRenderbuffer(this->m_config.operation, this->m_rbo.getAttachmentType(), GL_RENDERBUFFER, this->m_rbo.getId());

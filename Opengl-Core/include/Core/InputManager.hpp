@@ -33,9 +33,9 @@ namespace ogl {
 
 		/**
 		 * Retrieves the instance of the InputManager if it's not created.
-		 * This function is thread safe using a simple `std::mutex`.
+		 * This method is thread safe using a simple `std::mutex`.
 		 *
-		 * @return `InputManager` unique object.
+		 * @return the Shared<InputManager> unique object.
 		 */
 		inline static Shared<InputManager> instance() {
 			std::lock_guard<std::mutex> lock(s_mutex);

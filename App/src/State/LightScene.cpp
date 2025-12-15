@@ -79,7 +79,7 @@ void LightState::onAttach() {
 
 	scene->init(this->m_world.camera);
 
-	this->m_ub = CreateUnique<UniformBuffer>("Matrices");
+	this->m_ub = CreateUnique<UniformBuffer>();
 	this->m_ub->onAttach();
 	this->m_ub->setup(sizeof(glm::mat4), 0, 0, 0);
 	auto viewProj = this->m_world.camera->getViewProjMatrix();

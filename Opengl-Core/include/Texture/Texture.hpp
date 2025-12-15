@@ -5,47 +5,50 @@
 
 namespace ogl {
 
+	/**
+	 * @brief foo
+	 */
 	class Texture {
 	public:
-		/*
+		/**
 		 * Initialize the texture.
 		 * This operation must be done before using this object.
 		 */
 		void onAttach();
 
-		/*
-		 * Destroy the texture on the GPU.
+		/**
+		 * @brief Destroy the texture on the GPU.
 		 */
 		void onDetach();
 
-		/*
-		 * Bind the current texture id.
+		/**
+		 * @brief Bind the current texture id.
 		 */
 		void bind() const;
 
-		/*
-		 * Unbind the current texture id.
+		/**
+		 * @brief Unbind the current texture id.
 		 */
 		void unbind() const;
 
-		/*
-		 * Set an `int` parameter for the current texture in bound.
+		/**
+		 * @brief Set an `int` parameter for the current texture in bound.
 		 *
 		 * @param pname Parameter name.
 		 * @param pval Parameter `int` value.
 		 */
 		void setTexParameteri(const unsigned int &pname, const int &pval);
 
-		/*
-		 * Set a `float` parameter of the current texture in bound.
+		/**
+		 * @brief Set a `float` parameter of the current texture in bound.
 		 *
 		 * @param pname Parameter name.
 		 * @param pval Parameter `float` value.
 		 */
 		void setTexParameterf(const unsigned int &pname, const float &pval);
 
-		/*
-		 * Bind the `Texture` id and calls `fastCreatetexture2D`.
+		/**
+		 * @brief Bind the `Texture` id and calls `fastCreatetexture2D`.
 		 *
 		 * @param *data Pointer to texture's data.
 		 */
@@ -54,36 +57,49 @@ namespace ogl {
 			this->fastCreateTexture2D(data);
 		}
 
-		/*
-		 * Creates the texture already binded.
+		/**
+		 * @brief Creates the texture already binded.
 		 *
 		 * @param *data Pointer to texture's data.
 		 */
 		void fastCreateTexture2D(void *data);
 
+		/**
+		 * @brief Creates custom texture 2D with the given parameters and data.
+		 *
+		 * @param target the texture binding target
+		 * @param level the mipmap level of the texture.
+		 * @param internalFormat the texture internalFormat value
+		 * @param width the texture width
+		 * @param height the texture height
+		 * @param border the texture border (usually `0`)
+		 * @param format the texture pixel format
+		 * @param type the type of texture data
+		 * @param data the texture data
+		 */
 		void fastCreateCustomTexture2D(const unsigned int &target, const unsigned int &level, const unsigned int &internalFormat, const unsigned int &width, const unsigned int &height, const unsigned int &border, const unsigned int &format, const unsigned int &type, void *data);
 
-		/*
-		 * Generates the binded texture mipmap, only if the texture is created.
+		/**
+		 * @brief Generates the binded texture mipmap, only if the texture is created.
 		 */
 		void generateMipmap();
 
-		/*
-		 * Retrieves the texture id.
+		/**
+		 * @brief Retrieves the texture id.
 		 *
 		 * @return texture id.
 		 */
 		inline unsigned int getId() const { return this->m_id; }
 
-		/*
-		 * Retrieves the texture width.
+		/**
+		 * @brief Retrieves the texture width.
 		 *
 		 * @return texture width.
 		 */
 		inline unsigned int getWidth() const { return this->m_size.x; }
 
-		/*
-		 * Changes texture width.
+		/**
+		 * @brief Changes texture width.
 		 *
 		 * @param width Texture width.
 		 */
@@ -92,15 +108,15 @@ namespace ogl {
 			this->rescaleTexture();
 		}
 
-		/*
-		 * Retrieves the texture height.
+		/**
+		 * @brief Retrieves the texture height.
 		 *
 		 * @return texture height.
 		 */
 		inline unsigned int getHeight() const { return this->m_size.y; }
 
-		/*
-		 * Changes texture height.
+		/**
+		 * @brief Changes texture height.
 		 *
 		 * @param height Texture height.
 		 */
@@ -109,13 +125,19 @@ namespace ogl {
 			this->rescaleTexture();
 		}
 
-		/*
-		 * Retrieves the texture size.
+		/**
+		 * @brief Retrieves the texture size.
 		 *
 		 * @return texture size.
 		 */
 		inline Pair<unsigned int> getSize() const { return this->m_size; }
 
+		/**
+		 * @brief Updates the size of the texture.
+		 *
+		 * @param size the texture new size
+		 * @see Texture::rescaleTexture()
+		 */
 		inline void setSize(const Pair<unsigned int> &size) {
 			this->m_size = size;
 			this->rescaleTexture();
@@ -123,10 +145,25 @@ namespace ogl {
 
 		Texture() = default;
 
+		/**
+		 * @brief Instances a Texture with the given params and size.
+         *
+         * @param params the texture params data
+         * @param size the texture size
+		 */
 		Texture(const TextureParams &params, const Pair<unsigned int> &size) :
 			m_params(params), m_size(size) {
 		}
 
+		/**
+		 * @brief Instances a Texture with the given params.
+         *
+         * It's the same as Texture::Texture(const TextureParams &params, const Pair<unsigned int> &size)
+         *
+         * @param params the texture params data
+         * @param width the texture width in pixel
+         * @param height the texture height in pixel
+		 */
 		Texture(const TextureParams &params, const unsigned int &width, const unsigned int &height) :
 			m_params(params), m_size({width, height}) {
 		}

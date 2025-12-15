@@ -1,8 +1,5 @@
 #include "../../Opengl-Core/include/Core.hpp"
 
-#include "../include/ECS/EcsScene.hpp"
-#include "../include/ECS/EntityManager.hpp"
-
 #include "../include/Profiler.hpp"
 #include "../include/State/BootstrapState.hpp"
 #include "../include/State/LightScene.hpp"
@@ -10,20 +7,13 @@
 #include "../include/State/SimulationState.hpp"
 #include "../include/State/State.hpp"
 
-#include <GLFW/glfw3.h>
-
-#include <functional>
-#include <glm/ext/quaternion_geometric.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <cstdlib>
 
 using namespace ogl;
 
 #define BIG
 
 const auto ed = EventManager::instance();
-const auto im = InputManager::instance();
-const auto em = EntityManager::instance();
-const auto scene = BasicScene::instance();
 const auto sm = StateManager::instance();
 
 #ifdef _WIN32
@@ -32,25 +22,10 @@ WProfiler profiler{PROFILE_ALL};
 auto profiler = LinuxProfiler::instance();
 #endif
 
-// Some Utilities
-/*
-glm::vec3 evaluateNormal(const unsigned int &id) {
-	auto v = em->getComponentFromId<VertexComponent>(id);
-	glm::vec3 norm{};
-	glm::vec3 v1 = glm::vec4(v->getVertexCoords()[v->getIndexCoords()[0]], 0) * systems::transform::getModelMatrix(id);
-	glm::vec3 v2 = glm::vec4(v->getVertexCoords()[v->getIndexCoords()[1]], 0) * systems::transform::getModelMatrix(id);
-	glm::vec3 v3 = glm::vec4(v->getVertexCoords()[v->getIndexCoords()[2]], 0) * systems::transform::getModelMatrix(id);
-
-	v1 -= v2;
-	v3 -= v2;
-	norm = glm::normalize(glm::cross(v1, v3));
-
-	return norm;
-}
-*/
-
 int main(int argc, char *argv[]) {
+	// instance all the states
 	auto st = CreateShared<SimulationState>();
+	// caching teh state avoid instancing every time it changes
 	sm->cacheState(st);
 
 	auto ls = CreateShared<LightState>();
@@ -62,30 +37,38 @@ int main(int argc, char *argv[]) {
 	auto bs = CreateShared<BootstrapState>();
 	sm->cacheState(bs);
 
+	// change and sync the current state
 	sm->changeState(bs);
 	sm->sync();
 
 	// #define C_DBG
 
+	// simple game loop
+	// all the ifdef are used only for debugging
 	while (!sm->shouldExit()) {
 #ifdef C_DBG
 		std::cout << "\n---START---\n";
 #endif
 
+		// start measuring time
 		profiler->start();
 		ed->post(event::loop::LOOP_INPUT);
+		// stop measuring time
 		profiler->end();
+		// save elapsed time off input step
 		profiler->dumpInput();
 #ifdef C_DBG
 		std::cout << "INP\n";
 #endif
-        profiler->start();
+        // update step time
+		profiler->start();
 		ed->post(event::loop::LOOP_UPDATE);
 		profiler->end();
 		profiler->dumpUpdate();
 #ifdef C_DBG
 		std::cout << "UPD\n";
 #endif
+        // render step time ( pre render + render + after render )
 		profiler->start();
 		ed->post(event::loop::LOOP_BEGIN_RENDER);
 #ifdef C_DBG
@@ -108,5 +91,5 @@ int main(int argc, char *argv[]) {
 	// detach State Manager
 	sm->clean();
 
-	return 0;
+	return EXIT_SUCCESS;
 }

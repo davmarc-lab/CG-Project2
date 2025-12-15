@@ -5,6 +5,7 @@
 #include <glm/ext/quaternion_exponential.hpp>
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/geometric.hpp>
+#include <iostream>
 
 #include "../include/ECS/EntityManager.hpp"
 #include "../include/ECS/System.hpp"
@@ -40,14 +41,19 @@ CollisionPoints testSphereSphere(Shared<ColliderComponent> &a, Shared<Transform>
 	glm::vec3 ac = ta->getPosition();
 	glm::vec3 bc = tb->getPosition();
 	// distance between centers
-	auto dir = glm::distance(bc, ac);
+	auto ds = glm::distance(bc, ac);
 
-	point.normal = (bc - ac) / dir;
+	// calculate the normal vector of collision point
+	// this defines the direction of the first entity adjustment
+	point.normal = (bc - ac) / ds;
 
 	// radius sum
 	auto rs = glm::length(point.normal * (ta->getScale() + tb->getScale()));
-	point.colliding = dir <= rs;
-	point.depth = rs - dir;
+	// two spheres collides if the distance between centers is less than the sum of their radius
+	point.colliding = ds <= rs;
+	// how much the spheres are colliding
+	// new sphere position = depth * normal
+	point.depth = rs - ds;
 
 	return point;
 }
@@ -68,20 +74,24 @@ CollisionPoints testPlaneSphere(Shared<ColliderComponent> &a, Shared<Transform> 
 	point.normal = glm::normalize(collPoint - bc);
 	// distance from sphere center and collision point
 	auto dist = glm::distance(bc, collPoint);
-	// sphere radius length
+	// sphere radius + plane length
 	auto rsize = glm::length(tb->getScale() * point.normal) + glm::length(ta->getScale() * point.normal);
 
-	point.depth = rsize - dist;
 	point.colliding = dist < rsize;
+	point.depth = rsize - dist;
 
 	return point;
 }
+
 CollisionPoints testCubeCube(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb) {
+	std::cerr << "Cube to Cube not implemented\n";
 	return {};
 }
 
 using CollisionFunc = CollisionPoints (*)(Shared<ColliderComponent> &a, Shared<Transform> &ta, Shared<ColliderComponent> &b, Shared<Transform> &tb);
 
+// this matrix contains all function pointers of each test collisions method
+// it's indexed using the collider type property of each ColliderComponent
 const CollisionFunc testFunc[2][2] = {
 	{testSphereSphere, testPlaneSphere},
 	{testPlaneSphere, testCubeCube}};
@@ -92,6 +102,7 @@ CollisionPoints testCollisions(Shared<ColliderComponent> &a, Shared<Transform> &
 		std::swap(a, b);
 		std::swap(ta, tb);
 	}
+	// call the test function stored in the matrix
 	auto points = testFunc[a->type][b->type](a, ta, b, tb);
 
 	if (swap) {
@@ -102,6 +113,7 @@ CollisionPoints testCollisions(Shared<ColliderComponent> &a, Shared<Transform> &
 }
 
 void CollisionSolver::solve() {
+	// get all collisions of the current step
 	auto collisions = systems::collision::getCollisions();
 	dt = this->world.getWorldDeltaTime();
 	etts = this->world.getEntities();
@@ -110,59 +122,74 @@ void CollisionSolver::solve() {
 		if (first == second)
 			continue;
 
+		// if the colliding entity is not in the ECS skip them
 		if (std::find(ALL(etts), first) == etts.end())
 			continue;
 		if (std::find(ALL(etts), second) == etts.end())
 			continue;
 
+		// get entities collider
 		auto ca = em->getComponentFromId<ColliderComponent>(first);
 		auto cb = em->getComponentFromId<ColliderComponent>(second);
+		// if both entities are static skip collision response
 		if (ca->isStatic && cb->isStatic)
 			continue;
 
+		// get transform component where model matrix, position, etc are stored
 		auto ta = em->getComponentFromId<Transform>(first);
 		auto tb = em->getComponentFromId<Transform>(second);
-		// collision points
+		// calculate the collision point
 		auto p = testCollisions(ca, ta, cb, tb);
+
+		// solve the collision in different ways based from colliders type
 		if ((ca->type == COLLIDER_CUBE && cb->type == COLLIDER_SPHERE)) {
 			if (ca->isStatic) {
 				auto pa = em->getComponentFromId<PhysicComponent>(first);
 				auto pb = em->getComponentFromId<PhysicComponent>(second);
-				auto bv = systems::physic::getVelocity(second);
+				auto bv = pb->velocity;
+				// calculate velocity vector
 				auto speed = glm::dot(bv, p.normal);
+				// avoid attractive sphere
 				if (speed >= 0) {
 					continue;
 				}
+				// calculate restitution force
 				auto j = -(1 + (pa->restitution * pb->restitution)) * speed / (1 / pb->mass);
+				// final force with restitution factor
 				auto impulse = j * p.normal;
+				// update dynamic mesh velocity
 				bv += impulse / pb->mass;
 				systems::physic::updateVelocity(second, bv);
 
-				// position solver
+				// update position to avoid mesh overlapping
 				systems::transform::addPosition(second, p.normal * (p.depth / 2));
 			}
 		}
+
 		if (ca->type == COLLIDER_SPHERE && cb->type == COLLIDER_SPHERE) {
 			auto pa = em->getComponentFromId<PhysicComponent>(first);
-			auto pb = em->getComponentFromId<PhysicComponent>(first);
+			auto pb = em->getComponentFromId<PhysicComponent>(second);
 
 			// impulse solver
-			auto av = systems::physic::getVelocity(first);
-			auto bv = systems::physic::getVelocity(second);
+			auto av = pa->velocity;
+			auto bv = pb->velocity;
 			auto rv = bv - av;
 			auto speed = glm::dot(rv, p.normal);
+			// avoid attractive speed
 			if (speed >= 0) {
 				continue;
 			}
 
+			// calculate restitution force
 			auto j = -(1 + (pa->restitution * pb->restitution)) * speed / ((1 / pa->mass) + (1 / pb->mass));
+			// final force with restitution factor
 			auto impulse = j * p.normal;
 			av -= impulse / pa->mass;
 			bv += impulse / pb->mass;
 			systems::physic::updateVelocity(first, av);
 			systems::physic::updateVelocity(second, bv);
 
-			// position solver
+			// update position to avoid mesh overlapping
 			systems::transform::addPosition(first, p.normal * (-p.depth / 2));
 			systems::transform::addPosition(second, p.normal * (p.depth / 2));
 		}
@@ -170,25 +197,34 @@ void CollisionSolver::solve() {
 }
 
 void PositionSolver::solve() {
+	// time between frames
 	dt = this->world.getWorldDeltaTime();
 	etts = this->world.getEntities();
+	// updates all entity position
 	for (auto e : etts) {
 		systems::transform::addPosition(e, systems::physic::getVelocity(e) * dt);
 	}
 }
 
 void GravitySolver::solve() {
-	if (glfwGetTime() > 1) {
+	if (!this->m_delay) {
+		this->m_delay = glfwGetTime() > 1;
+	}
+	// just wait 1 second before start applying gravity
+	if (this->m_delay) {
 		dt = this->world.getWorldDeltaTime();
 		etts = this->world.getEntities();
+
+		auto colls = em->getEntitiesFromComponent<ColliderComponent>();
+
 		for (auto id : etts) {
+			// apply gravity only if the mesh is not static
 			if (em->getComponentFromId<ColliderComponent>(id)->isStatic) {
 				continue;
 			}
-			force = systems::physic::getForce(id);
+			force = mass * GRAVITY;
 			mass = systems::physic::getMass(id);
 			if (force == glm::vec3{0}) {
-				force = mass * GRAVITY;
 			}
 			acc = force / mass;
 			systems::physic::updateForce(id, force);
@@ -198,21 +234,20 @@ void GravitySolver::solve() {
 	}
 }
 
+// is the given entity a fixed point of a Rope?
 bool isInFixed(const std::vector<unsigned int> &elems, const unsigned int &elem) {
 	return std::find(ALL(elems), elem) != elems.end();
 }
 
-int i, i1, i2;
-int precision = 30;
+int i, it, i1, i2;
+int precision = 20;
 void RopeSolver::solve() {
 	for (auto rope : em->getEntitiesFromComponent<RopeComponent>()) {
 		auto rp = em->getComponentFromId<RopeComponent>(rope);
 		auto factor = rp->constant / 2;
-		for (auto it = 0; it < precision; it++) {
+		for (it = 0; it < precision; it++) {
 			for (i = 1; i < rp->points.size(); i++) {
 				i2 = isInFixed(rp->fixedPoints, i);
-				if (i2)
-					continue;
 				i1 = isInFixed(rp->fixedPoints, i - 1);
 
 				// solve rope simulation
@@ -238,10 +273,11 @@ void RopeSolver::solve() {
 }
 
 void PhysicWorld::onAttach() {
+	// add basic solvers
 	this->m_solvers.push_back(CreateShared<GravitySolver>(*this));
-	this->m_attached = true;
 	this->m_currentFrame = glfwGetTime();
 	this->m_lastFrame = this->m_currentFrame;
+	this->m_attached = true;
 }
 
 void PhysicWorld::onDetach() {
@@ -250,15 +286,13 @@ void PhysicWorld::onDetach() {
 }
 
 void PhysicWorld::onUpdate() {
-	// apply physics
+	// calculate delta time
 	this->m_currentFrame = glfwGetTime();
 	this->m_deltaTime = this->m_currentFrame - this->m_lastFrame;
 	this->m_lastFrame = this->m_currentFrame;
 
 	// execute each solver step
-	for (auto s : this->m_solvers) {
-		s->solve();
-	}
+	std::for_each(ALL(this->m_solvers), [](Shared<Solver> s) { s->solve(); });
 }
 
 void PhysicWorld::addEntity(const unsigned int &id) {
