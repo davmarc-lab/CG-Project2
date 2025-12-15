@@ -2,9 +2,6 @@
 
 #include "../../../Opengl-Core/include/Core.hpp"
 
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/ext/vector_float3.hpp>
-#include <glm/geometric.hpp>
 #include <glm/gtx/quaternion.hpp>
 
 #include "../Utils.hpp"
@@ -13,6 +10,8 @@
 #include <glm/trigonometric.hpp>
 #include <utility>
 #include <vector>
+
+using namespace light;
 
 /**
  * @brief Base class for every entity component.
@@ -1012,16 +1011,34 @@ public:
 	virtual ~PhysicComponent() override = default;
 };
 
+/**
+ * @brief This Component stores all information to manage a rope in the PhysicWorld.
+ */
 class RopeComponent : public Component {
 public:
+	/// number of subdivisions
 	unsigned int subdivisions = 3;
+	/// position in the world of the center
 	glm::vec3 center{};
+	/// rope length
 	float length{};
+	/// rope constant value
 	float constant = 1.f;
+	/// rope list of points, each value is an id of an entity in the ECS
 	std::vector<unsigned int> points{};
-    std::vector<unsigned int> fixedPoints{};
+	/// rope list of fixed points (points not affected by physics or held bye something)
+	std::vector<unsigned int> fixedPoints{};
+	/// distance from each point (length / subdivisions)
 	float distance;
 
+    /**
+     * @brief Instances a basic rope.
+     *
+     * @param center the rope center point
+     * @param length the rope total length
+     * @param sub the rope subdivisions value
+     * @param constant the rope constant value
+     */
 	RopeComponent(const glm::vec3 &center, const float &length, const unsigned int &sub, const float &constant) :
 		center(center), length(length), subdivisions(sub), constant(constant), distance(length / subdivisions), Component() {}
 

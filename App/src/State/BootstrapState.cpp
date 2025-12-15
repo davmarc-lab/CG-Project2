@@ -10,7 +10,7 @@ const auto ed = EventManager::instance();
 const auto sm = StateManager::instance();
 
 void BootstrapState::onAttach() {
-    ASSERT(!this->m_attached);
+	ASSERT(!this->m_attached);
 	State::onAttach();
 	WindowSettings s{};
 	s.bgColor = {1, 1, 1, 1};

@@ -20,7 +20,7 @@ struct Color {
 struct TextureParams {
 	/// texture target
 	unsigned int target = 0;
-	/// texture level
+	/// texture mipmap level
 	int level = 0;
 	/// texture internal data format
 	int internalFormat = 0;

@@ -97,8 +97,16 @@ protected:
 
 #ifdef _WIN32
 
+/**
+ * @brief Profiler implementation for Windows build.
+ */
 class WProfiler : public Profiler {
 public:
+    /**
+     * @brief Instances basic WProfiler.
+     *
+     * @param filter the profiler filter (wall, cpu or both)
+     */
 	WProfiler(const ProfileFilter &filter = PROFILE_ALL) :
 		Profiler(filter) {
 	}
@@ -108,30 +116,45 @@ public:
 	void start() override;
 	void end() override;
 
+    /**
+     * @brief Retrieves the last wall time registered.
+     *
+     * @return the last registered wall time
+     */
 	inline double getLastWall() const { return this->m_wall; }
+    /**
+     * @brief Retrieves the last cpu time registered.
+     *
+     * @return the last registered cpu time
+     */
 	inline double getLastCPU() const { return this->m_cpu; }
 
 private:
+    /// start time
 	std::time_t m_start{};
+    /// end time
 	std::time_t m_end{};
 };
 
 #else
 
 /**
- * @brief Implementation of Profiler for Linux build.
+ * @brief Profiler implementation for Linux build.
  */
 class LinuxProfiler : public Profiler {
 public:
-	/**
-	 * @brief Instances basic Linux profiler.
-	 */
 	LinuxProfiler(const ProfileFilter &filter) = delete;
 
 	LinuxProfiler(LinuxProfiler &other) = delete;
 
 	void operator=(const LinuxProfiler &other) = delete;
 
+	/**
+	 * @brief Retrieves the instance of the LinuxProfiler.
+	 * If it's not instanced, it will be instanced automatically.
+	 *
+	 * @return a Shared<LinuxProfiler> object
+	 */
 	inline static Shared<LinuxProfiler> instance() {
 		if (s_pointer == nullptr) {
 			Shared<LinuxProfiler> copy(new LinuxProfiler());
@@ -158,18 +181,45 @@ public:
 	 */
 	inline double getLastCPU() const { return this->m_cpu; }
 
+    /**
+    * @brief Dumps to the standard output the input times.
+    */
 	inline void dumpInput() { this->dump(this->inputWalltime, this->inputCputime); }
+    /**
+    * @brief Dumps to the standard output the update times.
+    */
 	inline void dumpUpdate() { this->dump(this->updateWalltime, this->updateCputime); }
+    /**
+    * @brief Dumps to the standard output the render times.
+    */
 	inline void dumpRender() { this->dump(this->renderWalltime, this->renderCputime); }
 
+    /**
+    * @brief Retrieves the input wall and cpu times in a Pair<double>.
+    *
+    * @return a pair containing wall and cpu times
+    */
 	inline Pair<double> getInputTime() { return {this->inputWalltime, this->inputCputime}; }
+    /**
+    * @brief Retrieves the update wall and cpu times in a Pair<double>.
+    *
+    * @return a pair containing wall and cpu times
+    */
 	inline Pair<double> getUpdateTime() { return {this->updateWalltime, this->updateCputime}; }
+    /**
+    * @brief Retrieves the render wall and cpu times in a Pair<double>.
+    *
+    * @return a pair containing wall and cpu times
+    */
 	inline Pair<double> getRenderTime() { return {this->renderWalltime, this->renderCputime}; }
 
 private:
 	LinuxProfiler() = default;
 
+	/// static shared pointer for Singleton
 	inline static Shared<LinuxProfiler> s_pointer = nullptr;
+
+    /// input wall time
 	double inputWalltime{};
 	/// input cpu time
 	double inputCputime{};

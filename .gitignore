@@ -1,4 +1,5 @@
 ## Ignore the generated documentation
+docs/html
 warnings.txt
 html
 
