@@ -32,23 +32,6 @@ WProfiler profiler{PROFILE_ALL};
 auto profiler = LinuxProfiler::instance();
 #endif
 
-// Some Utilities
-/*
-glm::vec3 evaluateNormal(const unsigned int &id) {
-	auto v = em->getComponentFromId<VertexComponent>(id);
-	glm::vec3 norm{};
-	glm::vec3 v1 = glm::vec4(v->getVertexCoords()[v->getIndexCoords()[0]], 0) * systems::transform::getModelMatrix(id);
-	glm::vec3 v2 = glm::vec4(v->getVertexCoords()[v->getIndexCoords()[1]], 0) * systems::transform::getModelMatrix(id);
-	glm::vec3 v3 = glm::vec4(v->getVertexCoords()[v->getIndexCoords()[2]], 0) * systems::transform::getModelMatrix(id);
-
-	v1 -= v2;
-	v3 -= v2;
-	norm = glm::normalize(glm::cross(v1, v3));
-
-	return norm;
-}
-*/
-
 int main(int argc, char *argv[]) {
 	auto st = CreateShared<SimulationState>();
 	sm->cacheState(st);
@@ -79,7 +62,7 @@ int main(int argc, char *argv[]) {
 #ifdef C_DBG
 		std::cout << "INP\n";
 #endif
-        profiler->start();
+		profiler->start();
 		ed->post(event::loop::LOOP_UPDATE);
 		profiler->end();
 		profiler->dumpUpdate();
