@@ -126,6 +126,10 @@ public:
 		Solver(world) {}
 
 	virtual ~GravitySolver() override = default;
+
+private:
+    /// delay time at startup
+    bool m_delay = false;
 };
 
 /**

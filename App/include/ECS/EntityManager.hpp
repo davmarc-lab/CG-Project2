@@ -20,7 +20,7 @@
  */
 class EntityManager {
 public:
-    /// entity id in ecs
+	/// entity id in ecs
 	using Index = unsigned int;
 
 	/**
@@ -70,7 +70,7 @@ public:
 	 * @brief Sets the name of the entity given.
 	 *
 	 * @param id entity id
-     * @param name entity name
+	 * @param name entity name
 	 */
 	inline void setEntityName(const Index &id, const std::string &name) { this->m_entities.at(id) = std::move(name); }
 
@@ -242,6 +242,8 @@ private:
 
 	/// map containing each entity and its name
 	std::map<Index, std::string> m_entities{};
+
+	// use map<string, Component> instead of vector
 	/// map containing each entity and its components
 	std::map<Index, std::vector<Shared<Component>>> m_ettComponent{};
 	/// map containing each component class and all the entities with that component
