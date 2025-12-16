@@ -77,6 +77,7 @@ GENERATED += $(OBJDIR)/Event.o
 GENERATED += $(OBJDIR)/FrameBuffer.o
 GENERATED += $(OBJDIR)/ImGuiManager.o
 GENERATED += $(OBJDIR)/InputManager.o
+GENERATED += $(OBJDIR)/JsonSerialize.o
 GENERATED += $(OBJDIR)/RenderBuffer.o
 GENERATED += $(OBJDIR)/Renderer.o
 GENERATED += $(OBJDIR)/Resource.o
@@ -101,6 +102,7 @@ OBJECTS += $(OBJDIR)/Event.o
 OBJECTS += $(OBJDIR)/FrameBuffer.o
 OBJECTS += $(OBJDIR)/ImGuiManager.o
 OBJECTS += $(OBJDIR)/InputManager.o
+OBJECTS += $(OBJDIR)/JsonSerialize.o
 OBJECTS += $(OBJDIR)/RenderBuffer.o
 OBJECTS += $(OBJDIR)/Renderer.o
 OBJECTS += $(OBJDIR)/Resource.o
@@ -210,6 +212,9 @@ $(OBJDIR)/ImGuiManager.o: src/Core/ImGuiManager.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/InputManager.o: src/Core/InputManager.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/JsonSerialize.o: src/Core/JsonSerialize.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Renderer.o: src/Core/Renderer.cpp

@@ -126,3 +126,18 @@ private:
 	/// simulation parameters
 	SimulationConfig m_config{};
 };
+
+class ImGuiMeshLoader : public ImGuiPanel {
+public:
+	virtual void onRender() override;
+
+	/**
+	 * @brief Instances basic simualtion panel.
+	 *
+	 * @param config the simulation configuration
+	 */
+	ImGuiMeshLoader() :
+		ImGuiPanel("Loader Panel") {}
+
+	virtual ~ImGuiMeshLoader() override = default;
+};

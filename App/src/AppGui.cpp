@@ -324,15 +324,15 @@ void ImGuiEntityTree::onRender() {
 				}
 			}
 
-            auto pm = em->getComponentFromId<PBMaterial>(id);
-            if (pm != nullptr) {
-                if (ImGui::CollapsingHeader("PBRMaterial##8")) {
-                    ImGui::SliderFloat3("Albedo: ", &pm->albedo.x, 0.f, 1.f);
-                    ImGui::SliderFloat("Metallic: ", &pm->metallic, 0.f, 1.f);
-                    ImGui::SliderFloat("Roughness: ", &pm->roughness, 0.f, 1.f);
-                    ImGui::SliderFloat("Ao: ", &pm->ao, 0.f, 1.f);
-                }
-            }
+			auto pm = em->getComponentFromId<PBMaterial>(id);
+			if (pm != nullptr) {
+				if (ImGui::CollapsingHeader("PBRMaterial##8")) {
+					ImGui::SliderFloat3("Albedo: ", &pm->albedo.x, 0.f, 1.f);
+					ImGui::SliderFloat("Metallic: ", &pm->metallic, 0.f, 1.f);
+					ImGui::SliderFloat("Roughness: ", &pm->roughness, 0.f, 1.f);
+					ImGui::SliderFloat("Ao: ", &pm->ao, 0.f, 1.f);
+				}
+			}
 
 			ImGui::PopID();
 			ImGui::TreePop();
@@ -528,10 +528,20 @@ void ImGuiSimulationPanel::onRender() {
 		ed->post(STOP_SIMULATION);
 	}
 
-    ImGui::Text("Collisions: %zu", systems::collision::getCollisions().size());
+	ImGui::Text("Collisions: %zu", systems::collision::getCollisions().size());
 
-    if (ImGui::Button("Add")) {
-        ed->post(ADD_SPHERE);
-    }
+	if (ImGui::Button("Add")) {
+		ed->post(ADD_SPHERE);
+	}
+	ImGui::End();
+}
+
+void ImGuiMeshLoader::onRender() {
+	ImGui::Begin("Loader");
+
+	ImGui::Button("Save");
+	ImGui::SameLine();
+	ImGui::Button("Load");
+
 	ImGui::End();
 }

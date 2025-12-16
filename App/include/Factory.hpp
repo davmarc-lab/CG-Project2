@@ -6,21 +6,6 @@
 
 #include "Utils.hpp"
 
-/**
- * @brief Simple data structure to store mesh information: position,
- * scale, rotation and if it needs to be rendered.
- */
-struct BasicInfo {
-	/// mesh position
-	glm::vec3 position{};
-	/// mesh scale
-	glm::vec3 scale{1, 1, 1};
-	/// mesh rotation
-	glm::vec3 rotation{};
-	/// render mesh flag
-	bool render = true;
-};
-
 namespace factory {
 	/**
 	 * @brief Factory method to create a cube mesh in the ECS.

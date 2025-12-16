@@ -18,7 +18,8 @@ project "App"
     links {
         "Opengl-Core",
         "glfw",
-        "assimp"
+        "assimp",
+        "jsoncpp"
     }
 
     buildoptions {

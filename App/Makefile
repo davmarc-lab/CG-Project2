@@ -48,7 +48,7 @@ OBJDIR = ../bin/int/linux-x86_64/Debug/App
 DEFINES += -DDEBUG
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g -g
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -g
-LIBS += ../bin/linux-x86_64/Debug/Opengl-Core/libOpengl-Core.a -lglfw -lassimp
+LIBS += ../bin/linux-x86_64/Debug/Opengl-Core/libOpengl-Core.a -lglfw -lassimp -ljsoncpp
 LDDEPS += ../bin/linux-x86_64/Debug/Opengl-Core/libOpengl-Core.a
 
 else ifeq ($(config),release)
@@ -58,7 +58,7 @@ OBJDIR = ../bin/int/linux-x86_64/Release/App
 DEFINES += -DNDEBUG
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -g -g
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -g -g
-LIBS += ../bin/linux-x86_64/Release/Opengl-Core/libOpengl-Core.a -lglfw -lassimp
+LIBS += ../bin/linux-x86_64/Release/Opengl-Core/libOpengl-Core.a -lglfw -lassimp -ljsoncpp
 LDDEPS += ../bin/linux-x86_64/Release/Opengl-Core/libOpengl-Core.a
 
 endif
@@ -78,6 +78,8 @@ GENERATED += $(OBJDIR)/BootstrapState.o
 GENERATED += $(OBJDIR)/EcsScene.o
 GENERATED += $(OBJDIR)/Factory.o
 GENERATED += $(OBJDIR)/LightScene.o
+GENERATED += $(OBJDIR)/LoaderState.o
+GENERATED += $(OBJDIR)/MeshLoader.o
 GENERATED += $(OBJDIR)/NormalViewState.o
 GENERATED += $(OBJDIR)/PBScene.o
 GENERATED += $(OBJDIR)/PhysicWorld.o
@@ -92,6 +94,8 @@ OBJECTS += $(OBJDIR)/BootstrapState.o
 OBJECTS += $(OBJDIR)/EcsScene.o
 OBJECTS += $(OBJDIR)/Factory.o
 OBJECTS += $(OBJDIR)/LightScene.o
+OBJECTS += $(OBJDIR)/LoaderState.o
+OBJECTS += $(OBJDIR)/MeshLoader.o
 OBJECTS += $(OBJDIR)/NormalViewState.o
 OBJECTS += $(OBJDIR)/PBScene.o
 OBJECTS += $(OBJDIR)/PhysicWorld.o
@@ -176,6 +180,9 @@ $(OBJDIR)/System.o: src/ECS/System.cpp
 $(OBJDIR)/Factory.o: src/Factory.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/MeshLoader.o: src/MeshLoader.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/PBScene.o: src/PBR/PBScene.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
@@ -189,6 +196,9 @@ $(OBJDIR)/BootstrapState.o: src/State/BootstrapState.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/LightScene.o: src/State/LightScene.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/LoaderState.o: src/State/LoaderState.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/NormalViewState.o: src/State/NormalViewState.cpp
