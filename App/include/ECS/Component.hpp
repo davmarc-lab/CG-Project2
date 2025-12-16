@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <glm/trigonometric.hpp>
+#include <json/value.h>
 #include <utility>
 #include <vector>
 
@@ -32,7 +33,7 @@ public:
 /**
  * @brief Component to store mesh position, rotation, scale data.
  */
-class Transform : public Component {
+class Transform : public Component, public JsonSerializable {
 public:
 	/**
 	 * @brief Retrieves if the model matrix is enable.
@@ -222,6 +223,28 @@ public:
 		this->dirty = false;
 	}
 
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["position"] = seGlm<glm::vec3>(position);
+		elem["scale"] = seGlm<glm::vec3>(scale);
+		elem["rotation"] = seGlm<glm::vec3>(rotation);
+		elem["quaternion"] = seQuat(quaternion);
+		elem["model"] = seGlm<glm::mat4>(model);
+		elem["dirty"] = dirty;
+		elem["enableModel"] = enableModel;
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		position = deGlm<glm::vec3>(elem["position"]);
+		scale = deGlm<glm::vec3>(elem["scale"]);
+		rotation = deGlm<glm::vec3>(elem["rotation"]);
+		quaternion = deGlm<glm::quat>(elem["quaternion"]);
+		model = deGlm<glm::mat4>(elem["model"]);
+		dirty = deVal<bool>(elem["dirty"].asBool());
+		enableModel = deVal<bool>(elem["enableModel"].asBool());
+	}
+
 	/// mesh position vector
 	glm::vec3 position{};
 	/// mesh scale
@@ -249,13 +272,26 @@ public:
  * This can be used to define an anchor and all the meshes linked will
  * transform using anchor transform data.
  */
-class MultiMesh : public Component {
+class MultiMesh : public Component, public JsonSerializable {
 public:
 	MultiMesh() :
 		Component() {
 	}
 
 	virtual ~MultiMesh() override = default;
+
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		// TODO
+		// elem["entities"] = seGlm<unsigned int>(entities);
+		elem["anchor"] = anchor;
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		// TODO
+		// position = deGlm<glm::vec3>(elem["position"]);
+	}
 
 	/// list of child entities
 	std::vector<unsigned int> entities{};
@@ -1031,14 +1067,14 @@ public:
 	/// distance from each point (length / subdivisions)
 	float distance;
 
-    /**
-     * @brief Instances a basic rope.
-     *
-     * @param center the rope center point
-     * @param length the rope total length
-     * @param sub the rope subdivisions value
-     * @param constant the rope constant value
-     */
+	/**
+	 * @brief Instances a basic rope.
+	 *
+	 * @param center the rope center point
+	 * @param length the rope total length
+	 * @param sub the rope subdivisions value
+	 * @param constant the rope constant value
+	 */
 	RopeComponent(const glm::vec3 &center, const float &length, const unsigned int &sub, const float &constant) :
 		center(center), length(length), subdivisions(sub), constant(constant), distance(length / subdivisions), Component() {}
 

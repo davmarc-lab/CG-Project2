@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdexcept>
 #include <string>
 
 template <class T>
@@ -7,7 +8,7 @@ class Serializable {
 public:
 	virtual ~Serializable() = default;
 
-	virtual T serialize(T &elem) {}
+	virtual T serialize(T &elem) { throw std::runtime_error("Non callable method."); }
 
 	virtual void deserialize(T &elem) {}
 };

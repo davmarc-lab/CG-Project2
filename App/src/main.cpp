@@ -120,5 +120,11 @@ int main(int argc, char *argv[]) {
 
 	s.serializeToFile(root, file);
 
+	std::vector<int> a{1, 2, 3};
+	auto b = JsonSerializable::seVec<std::vector<int>>(a);
+	// auto c = JsonSerializable::deVec<std::vector<int>>(b);
+
+	std::for_each(ALL(a), [](auto e) { std::cout << e << "\n"; });
+
 	return EXIT_SUCCESS;
 }
