@@ -13,9 +13,12 @@
 #include "../include/ECS/System.hpp"
 #include "../include/PBR/PBMaterial.hpp"
 #include "../include/PhysicWorld.hpp"
+#include "../include/State/LoaderState.hpp"
 #include "../include/State/SimulationState.hpp"
 
 #include "../../Opengl-Core/include/Core.hpp"
+
+#include "../../Opengl-Core/vendor/include/imgui/ImGuiFileDialog.h"
 
 const auto em = EntityManager::instance();
 const auto ed = EventManager::instance();
@@ -539,9 +542,63 @@ void ImGuiSimulationPanel::onRender() {
 void ImGuiMeshLoader::onRender() {
 	ImGui::Begin("Loader");
 
-	ImGui::Button("Save");
+	if (ImGui::Button("Save")) {
+		ed->post(SAVE_SCENE);
+	};
 	ImGui::SameLine();
-	ImGui::Button("Load");
+	if (ImGui::Button("Load")) {
+		ed->post(LOAD_SCENE);
+	};
 
 	ImGui::End();
+}
+
+void ImGuiFilePicker::onRender() {
+	if (this->m_open) {
+		IGFD::FileDialogConfig config;
+		config.path = this->m_path;
+		ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", this->m_title, this->m_extension.c_str(), config);
+		if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
+			if (ImGuiFileDialog::Instance()->IsOk()) {
+				std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+				std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+
+                ImGuiFileDialog::Instance()->GetSelection().clear();
+
+				// if is using windows parse the path before using
+#ifdef _WIN32
+				{
+					// make custom path for windows
+					std::vector<std::string> words;
+					std::string word;
+					std::istringstream stream(filePathName);
+					bool start_writing = false, add_sep = true;
+					std::string res = "./";
+
+					while (std::getline(stream, word, '\\')) {
+						std::istringstream subStream(word);
+						if (!start_writing && word == "resources") {
+							start_writing = true;
+						}
+
+						if (start_writing) {
+							res.append(word);
+							res.append("/");
+						}
+					}
+
+					if (!res.empty()) {
+						res.pop_back();
+					}
+					filePathName = std::string(res);
+				}
+#endif
+				this->m_action(filePathName);
+				this->close();
+            }
+
+			// close
+			ImGuiFileDialog::Instance()->Close();
+		}
+	}
 }

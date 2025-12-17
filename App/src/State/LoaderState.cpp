@@ -91,6 +91,8 @@ void LoaderState::onAttach() {
 	skyboxShader->createShaderProgram();
 	Shared<ShaderProgram> planeShader = CreateShared<ShaderProgram>("vertexShader.glsl", "basicFS.glsl");
 	planeShader->createShaderProgram();
+	Shared<ShaderProgram> lightShader = CreateShared<ShaderProgram>("lightVertShader.glsl", "lightFragShader.glsl");
+	lightShader->createShaderProgram();
 	Shared<ShaderProgram> modelShader = CreateShared<ShaderProgram>("modelVertShader.glsl", "modelFragShader.glsl");
 	modelShader->createShaderProgram();
 
@@ -100,11 +102,13 @@ void LoaderState::onAttach() {
 	systems::ecs::updateEntityName(plane, "Plane");
 	scene->addEntity(planeShader, plane);
 
+	auto pyr = factory::factoryPyramid(BasicInfo{{0, 0, -6}});
+	scene->addEntity(lightShader, pyr);
+
 	// lights
-	// auto dir = factory::light::factoryDirectional({1, 1, -1});
-	auto dir = factory::light::factoryPoint({0, 0, -1}, {});
-	auto aaa = factory::light::factoryPoint({-3, 0, -2}, {});
-	auto bbb = factory::light::factoryPoint({0, 2, -3}, {});
+	auto dir = factory::light::factoryPoint({0, 0, 1}, {});
+	auto aaa = factory::light::factoryPoint({-3, 0, 2}, {});
+	auto bbb = factory::light::factoryPoint({0, 2, 3}, {});
 
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { systems::collision::updateAllColliders(); });
 
@@ -134,6 +138,17 @@ void LoaderState::onAttach() {
 	ed->subscribe(event::loop::LOOP_RENDER, [this, skybox, skyboxShader]() {
 		systems::render::renderSkybox(skybox, skyboxShader);
 		systems::render::renderAllMeshes();
+	});
+
+	auto loadDialog = CreateShared<ImGuiFilePicker>("./resources/mesh", ".json", [](auto s) { std::cout << "LOAD " << s << "\n"; }, "Load Mesh");
+	this->m_igm->addPanel(loadDialog);
+
+	ed->subscribe(SAVE_SCENE, []() {
+        // serialize all
+	});
+
+	ed->subscribe(LOAD_SCENE, [loadDialog]() {
+		loadDialog->open();
 	});
 
 	ed->subscribe(STATE_CHANGED, []() {

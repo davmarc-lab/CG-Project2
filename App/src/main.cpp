@@ -101,36 +101,49 @@ void old() {
 #include <json/json.h>
 
 int main(int argc, char *argv[]) {
-	const std::string file = "./resources/mesh/file.json";
-	std::ifstream f(file);
-
-	Json::Value root;
-	Json::CharReaderBuilder builder;
-	std::string errs;
-	Json::parseFromStream(builder, f, &root, &errs);
-	f.close();
-	if (!errs.empty())
-		return 1;
-
-	JsonSerializer s{};
-
-	auto &etts = root["entities"];
-	std::for_each(ALL(etts), [](Json::Value e) {
-		e["name"] = "A";
-	});
-	std::cout << etts << "\n";
-
-	s.serializeToFile(root, file);
-
-    auto v1 = glm::vec3{1, 1, 1};
-    auto v2 = glm::vec3{2, 2, 2};
-    auto v3 = glm::vec3{3, 3, 3};
-
-	std::vector<glm::vec3> a{v1, v2, v3};
-	auto b = JsonSerializable::seGlmVec<glm::vec3>(a);
-    std::cout << b << "\n";
-	auto c = JsonSerializable::deGlmVec<glm::vec3>(b);
-	std::for_each(ALL(a), [](auto e) { std::cout << glm::to_string(e) << "\n"; });
+    old();
+	// const std::string file = "./resources/mesh/file.json";
+	// std::ifstream f(file);
+	//
+	// Json::Value root;
+	// Json::CharReaderBuilder builder;
+	// std::string errs;
+	// Json::parseFromStream(builder, f, &root, &errs);
+	// f.close();
+	// if (!errs.empty())
+	// 	return 1;
+	//
+	// JsonSerializer s{};
+	//
+	// auto &etts = root["entities"];
+	// std::for_each(ALL(etts), [](Json::Value e) {
+	// 	e["name"] = "A";
+	// });
+	// std::cout << etts << "\n";
+	//
+	// s.serializeToFile(root, file);
+	//
+	// auto v1 = glm::vec3{1, 1, 1};
+	// auto v2 = glm::vec3{2, 2, 2};
+	// auto v3 = glm::vec3{3, 3, 3};
+	//
+	// std::vector<unsigned int> a{1, 2, 1, 6, 7};
+	// auto b = JsonSerializable::seVec<unsigned int>(a);
+	// std::cout << b << "\n";
+	// auto c = std::vector<unsigned int>{2, 2, 2, 2, 2};
+	// c = {JsonSerializable::deVec<unsigned int>(b)};
+	// std::for_each(ALL(a), [](auto e) { std::cout << e << "\n"; });
+	//
+	//    auto vc = VertexComponent(cubeGeometry, getColorVector(glm::vec4{1}, cubeGeometry.size()), cubeIndices);
+	//    auto ss = vc.serialize();
+	//    std::cout << ss << "\n";
+	//
+	//    auto other = VertexComponent({}, {}, {});
+	//    other.deserialize(ss);
+	//
+	//    std::cout << other.getVertexCoords().size() << "\n";
+	//    auto cc = other.getVertexCoords();
+	// std::for_each(ALL(cc), [](auto e) { std::cout << glm::to_string(e) << "\n"; });
 
 	return EXIT_SUCCESS;
 }

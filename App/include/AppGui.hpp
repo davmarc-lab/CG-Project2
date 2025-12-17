@@ -141,3 +141,23 @@ public:
 
 	virtual ~ImGuiMeshLoader() override = default;
 };
+
+class ImGuiFilePicker : public ImGuiPanel {
+public:
+	virtual void onRender() override;
+
+	inline void open() { this->m_open = true; }
+	inline void close() { this->m_open = false; }
+
+	ImGuiFilePicker() = delete;
+
+	ImGuiFilePicker(const std::string &path, const std::string &extension, std::function<void(const std::string &)> action, const std::string &title = "Pick a file") :
+		m_path(path), m_extension(extension), m_action(action), m_title(title), ImGuiPanel("File Picker") {}
+
+private:
+	bool m_open = false;
+	std::string m_title{};
+	std::string m_path{};
+	std::string m_extension{};
+	std::function<void(const std::string &)> m_action;
+};

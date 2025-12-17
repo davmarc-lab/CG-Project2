@@ -289,6 +289,8 @@ public:
 
 	inline virtual void deserialize(Json::Value &elem) override {
 		anchor = elem["anchor"].asUInt();
+		entities.clear();
+		entities.insert(entities.end(), ALL(deVec<unsigned int>(elem["entities"])));
 	}
 
 	/// list of child entities
@@ -330,7 +332,7 @@ public:
 /**
  * @brief Component to store vertices coords data.
  */
-class VertexComponent : public Component {
+class VertexComponent : public Component, public JsonSerializable {
 public:
 	/**
 	 * @brief Retrieves all mesh vertices coords.
@@ -457,6 +459,24 @@ public:
 			this->m_index.push_back(e);
 	}
 
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["vertex"] = seGlmVec<glm::vec3>(m_vertex);
+		elem["colors"] = seGlmVec<glm::vec4>(m_colors);
+		elem["texCoords"] = seGlmVec<glm::vec2>(m_texCoords);
+		elem["index"] = seVec<unsigned int>(m_index);
+		elem["normals"] = seGlmVec<glm::vec3>(m_normals);
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		m_vertex = {deGlmVec<glm::vec3>(elem["vertex"])};
+		m_colors = {deGlmVec<glm::vec4>(elem["colors"])};
+		m_texCoords = {deGlmVec<glm::vec2>(elem["texCoords"])};
+		m_index = {deVec<unsigned int>(elem["index"])};
+		m_normals = {deGlmVec<glm::vec3>(elem["normals"])};
+	}
+
 	/**
 	 * @brief Instances the VertexComponent object with the given data.
 	 *
@@ -491,8 +511,22 @@ private:
  *
  * @see ogl::Texture
  */
-class TextureComponent : public Component {
+class TextureComponent : public Component, public JsonSerializable {
 public:
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["path"] = path;
+		elem["width"] = texture.getWidth();
+		elem["height"] = texture.getHeight();
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		texture.setHeight(elem["height"].asUInt());
+		texture.setHeight(elem["width"].asUInt());
+		path = elem["path"].asString();
+	}
+
 	/**
 	 * @brief Instance an empty Component.
 	 */
@@ -527,8 +561,18 @@ public:
  * if a children mesh is transformed the parent mesh isn't affected. But
  * if the parent node is transformed all his children are affected.
  */
-class ParentComponent : public Component {
+class ParentComponent : public Component, public JsonSerializable {
 public:
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["children"] = seVec<unsigned int>(children);
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		children = {deVec<unsigned int>(elem["children"])};
+	}
+
 	/**
 	 * @brief Instance basic Component.
 	 */
@@ -546,8 +590,26 @@ public:
  * @brief Component to store mesh shader data and some mesh information like
  * light computation and the capability to reflect the skybox texture.
  */
-class ShaderComponent : public Component {
+class ShaderComponent : public Component, public JsonSerializable {
 public:
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["computation"] = computation;
+		elem["reflective"] = reflective;
+		elem["vertex"] = vert;
+		elem["fragment"] = frag;
+		elem["geometry"] = geom;
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		computation = LightComputation{elem["computation"].asUInt()};
+		reflective = elem["reflective"].asBool();
+		vert = elem["vertex"].asString();
+		frag = elem["fragment"].asString();
+		geom = elem["geometry"].asString();
+	}
+
 	/// Can't use an empty constructor
 	ShaderComponent() = delete;
 
@@ -759,8 +821,26 @@ namespace material {
  * @see Material
  * @see material::getMaterialFromPool()
  */
-class MaterialComponent : public Component {
+class MaterialComponent : public Component, public JsonSerializable {
 public:
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["name"] = material.name;
+		elem["ambient"] = seGlm(material.ambient);
+		elem["diffuse"] = seGlm(material.diffuse);
+		elem["specular"] = seGlm(material.specular);
+		elem["shininess"] = material.shininess;
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		material.name = elem["name"].asString();
+		material.ambient = deGlm<glm::vec3>(elem["ambient"]);
+		material.diffuse = deGlm<glm::vec3>(elem["diffuse"]);
+		material.specular = deGlm<glm::vec3>(elem["specular"]);
+		material.shininess = elem["shininess"].asFloat();
+	}
+
 	/**
 	 * @brief Instances a Component with the given material.
 	 *
@@ -1102,8 +1182,20 @@ enum ColliderType : unsigned int {
  *
  * @see systems::collision::getCollisions()
  */
-class ColliderComponent : public Component {
+class ColliderComponent : public Component, public JsonSerializable {
 public:
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["type"] = type;
+		elem["static"] = isStatic;
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		type = ColliderType{elem["type"].asUInt()};
+		isStatic = elem["static"].asUInt();
+	}
+
 	/// collider type
 	ColliderType type = COLLIDER_CUBE;
 	/// collider center position
@@ -1283,4 +1375,14 @@ public:
 	 */
 	HideTreeComponent() = default;
 	virtual ~HideTreeComponent() override = default;
+};
+
+class LoaderComponent : public Component {
+public:
+	/**
+	 * @brief Instances basic Component to enstablish which entity should be serialized or not.
+	 * If an entity has this component it will be serialized.
+	 */
+	LoaderComponent() = default;
+	virtual ~LoaderComponent() override = default;
 };

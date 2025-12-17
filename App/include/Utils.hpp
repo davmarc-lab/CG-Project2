@@ -165,9 +165,9 @@ namespace light {
 	 * @enum LightComputation
 	 * @brief Defines light alghoritm to use in shaders.
 	 */
-	enum LightComputation {
+	enum LightComputation : unsigned int {
 		/// no light computation
-		NONE,
+		NONE = 0,
 		/// Phong alghoritm computation
 		PHONG,
 		/// Blinn-Phong alghoritm computation
