@@ -1,10 +1,12 @@
 {
    "entities" : [
       {
-         "name" : "A"
+         "name" : "A",
+         "ns" : null
       },
       {
-         "name" : "A"
+         "name" : "A",
+         "ns" : null
       }
    ]
 }

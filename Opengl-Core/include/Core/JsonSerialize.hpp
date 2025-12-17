@@ -6,6 +6,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 #include <iostream>
 #include <json/json.h>
 
@@ -20,18 +22,32 @@ public:
 	virtual Json::Value serialize() { return Json::nullValue; }
 
 	template <typename T>
-	inline static Json::Value seVec(T cont) {
-		// glm packed value type
-		using TypeT = typename T::value_type;
-		// number of packed elements
-		const size_t n = sizeof(T);
+	struct is_glm_type : std::false_type {};
 
-		TypeT data[n];
-		std::memcpy(data, &cont[0], n);
+	template <glm::length_t L, typename T, glm::qualifier Q>
+	struct is_glm_type<glm::vec<L, T, Q>> : std::true_type {};
 
+	template <glm::length_t C, glm::length_t R, typename T, glm::qualifier Q>
+	struct is_glm_type<glm::mat<C, R, T, Q>> : std::true_type {};
+
+	template <typename T, glm::qualifier Q>
+	struct is_glm_type<glm::qua<T, Q>> : std::true_type {};
+
+	template <typename T>
+	inline static Json::Value seGlmVec(std::vector<T> vec) {
 		Json::Value arr(Json::arrayValue);
-		for (size_t i = 0; i < n / sizeof(TypeT); i++)
-			arr.append(data[i]);
+		if (is_glm_type<T>::value)
+			for (auto e : vec) {
+				arr.append(seGlm(e));
+			}
+		return arr;
+	}
+
+	template <typename T>
+	inline static Json::Value seVec(std::vector<T> vec) {
+		Json::Value arr(Json::arrayValue);
+		for (auto e : vec)
+			arr.append(e);
 		return arr;
 	}
 
@@ -59,26 +75,28 @@ public:
 	virtual void deserialize(Json::Value &elem) {}
 
 	template <typename T>
-	inline static T deVal(const T &val) {
-		if (val)
-			return val;
-		return T();
+	static std::vector<T> deVec(Json::Value &arr) {
+		if (!arr.isArray()) {
+			return {};
+		}
+
+		std::vector<T> data{};
+		for (auto e : arr) {
+			data.push_back(e.as<T>());
+		}
+
+		return data;
 	}
 
-	// template <typename T>
-	// static std::vector<T> deVec(Json::Value &arr) {
-	// 	if (!arr.isArray() || arr.size() != n) {
-	// 		std::cerr << "JSON array size does not match GLM type\n";
-	// 	}
-	//
-	// 	std::vector<T> data{};
-	// 	for (std::size_t i = 0; i < n; ++i)
-	// 		data[i] = arr[static_cast<Json::ArrayIndex>(i)].asFloat();
-	//
-	// 	T obj;
-	// 	std::copy(std::begin(data), std::end(data), std::begin(obj));
-	// 	return obj;
-	// }
+	template <typename T>
+	inline static std::vector<T> deGlmVec(Json::Value &arr) {
+		std::vector<T> data{};
+		if (arr.isArray())
+			for (auto e : arr) {
+				data.push_back(deGlm<T>(e));
+			}
+		return data;
+	}
 
 	template <typename T>
 	static T deGlm(Json::Value &arr) {

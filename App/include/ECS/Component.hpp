@@ -241,8 +241,8 @@ public:
 		rotation = deGlm<glm::vec3>(elem["rotation"]);
 		quaternion = deGlm<glm::quat>(elem["quaternion"]);
 		model = deGlm<glm::mat4>(elem["model"]);
-		dirty = deVal<bool>(elem["dirty"].asBool());
-		enableModel = deVal<bool>(elem["enableModel"].asBool());
+		dirty = elem["dirty"].asBool();
+		enableModel = elem["enableModel"].asBool();
 	}
 
 	/// mesh position vector
@@ -282,15 +282,13 @@ public:
 
 	inline virtual Json::Value serialize() override {
 		Json::Value elem;
-		// TODO
-		// elem["entities"] = seGlm<unsigned int>(entities);
+		elem["entities"] = seVec<unsigned int>(entities);
 		elem["anchor"] = anchor;
 		return elem;
 	}
 
 	inline virtual void deserialize(Json::Value &elem) override {
-		// TODO
-		// position = deGlm<glm::vec3>(elem["position"]);
+		anchor = elem["anchor"].asUInt();
 	}
 
 	/// list of child entities

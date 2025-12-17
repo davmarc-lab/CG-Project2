@@ -115,16 +115,22 @@ int main(int argc, char *argv[]) {
 	JsonSerializer s{};
 
 	auto &etts = root["entities"];
-	std::for_each(ALL(etts), [](auto &e) { e["name"] = "A"; });
+	std::for_each(ALL(etts), [](Json::Value e) {
+		e["name"] = "A";
+	});
 	std::cout << etts << "\n";
 
 	s.serializeToFile(root, file);
 
-	std::vector<int> a{1, 2, 3};
-	auto b = JsonSerializable::seVec<std::vector<int>>(a);
-	// auto c = JsonSerializable::deVec<std::vector<int>>(b);
+    auto v1 = glm::vec3{1, 1, 1};
+    auto v2 = glm::vec3{2, 2, 2};
+    auto v3 = glm::vec3{3, 3, 3};
 
-	std::for_each(ALL(a), [](auto e) { std::cout << e << "\n"; });
+	std::vector<glm::vec3> a{v1, v2, v3};
+	auto b = JsonSerializable::seGlmVec<glm::vec3>(a);
+    std::cout << b << "\n";
+	auto c = JsonSerializable::deGlmVec<glm::vec3>(b);
+	std::for_each(ALL(a), [](auto e) { std::cout << glm::to_string(e) << "\n"; });
 
 	return EXIT_SUCCESS;
 }
