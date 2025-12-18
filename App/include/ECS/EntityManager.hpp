@@ -146,6 +146,29 @@ public:
 	}
 
 	/**
+	 * @brief Adds an existing component to the ECS.
+	 *
+	 * @tparam T the class of the component
+	 * @param id the entity id
+	 * @param comp the component to add
+	 */
+	template <typename T>
+	inline void addComponent(const Index &id, const Shared<T> &comp) {
+		if (!this->isEntityValid(id))
+			return;
+
+		this->m_ettComponent.at(id).emplace_back(comp);
+
+		auto name = CLASSNAME(T);
+		if (this->m_compEntity.count(name)) {
+			this->m_compEntity.at(name).push_back(id);
+		} else {
+			this->m_compEntity.emplace(name, std::vector<Index>{});
+			this->m_compEntity.at(name).push_back(id);
+		}
+	}
+
+	/**
 	 * @brief Removes a component from the given entity.
 	 *
 	 * @tparam T class of the component that will be removed
@@ -216,6 +239,19 @@ public:
 		return std::dynamic_pointer_cast<T>(*std::find_if(ALL(this->m_ettComponent.at(id)), [](auto e) {
 			return std::dynamic_pointer_cast<T>(e) != nullptr;
 		}));
+	}
+
+    /**
+     * @brief Retrieves all the components of the given entity.
+     *
+     * @param id the entity id.
+     *
+     * @return a vector containing Shared<Component> of the given entity
+     */
+	inline std::vector<Shared<Component>> getEntityComponents(unsigned int &id) {
+		if (this->m_ettComponent.find(id) == this->m_ettComponent.end())
+			return {};
+		return this->m_ettComponent.at(id);
 	}
 
 	EntityManager(EntityManager &other) = delete;

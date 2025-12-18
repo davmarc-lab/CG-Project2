@@ -75,8 +75,10 @@ GENERATED += $(OBJDIR)/Camera.o
 GENERATED += $(OBJDIR)/ElementBuffer.o
 GENERATED += $(OBJDIR)/Event.o
 GENERATED += $(OBJDIR)/FrameBuffer.o
+GENERATED += $(OBJDIR)/ImGuiFileDialog.o
 GENERATED += $(OBJDIR)/ImGuiManager.o
 GENERATED += $(OBJDIR)/InputManager.o
+GENERATED += $(OBJDIR)/JsonSerialize.o
 GENERATED += $(OBJDIR)/RenderBuffer.o
 GENERATED += $(OBJDIR)/Renderer.o
 GENERATED += $(OBJDIR)/Resource.o
@@ -99,8 +101,10 @@ OBJECTS += $(OBJDIR)/Camera.o
 OBJECTS += $(OBJDIR)/ElementBuffer.o
 OBJECTS += $(OBJDIR)/Event.o
 OBJECTS += $(OBJDIR)/FrameBuffer.o
+OBJECTS += $(OBJDIR)/ImGuiFileDialog.o
 OBJECTS += $(OBJDIR)/ImGuiManager.o
 OBJECTS += $(OBJDIR)/InputManager.o
+OBJECTS += $(OBJDIR)/JsonSerialize.o
 OBJECTS += $(OBJDIR)/RenderBuffer.o
 OBJECTS += $(OBJDIR)/Renderer.o
 OBJECTS += $(OBJDIR)/Resource.o
@@ -212,6 +216,9 @@ $(OBJDIR)/ImGuiManager.o: src/Core/ImGuiManager.cpp
 $(OBJDIR)/InputManager.o: src/Core/InputManager.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/JsonSerialize.o: src/Core/JsonSerialize.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Renderer.o: src/Core/Renderer.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
@@ -233,6 +240,9 @@ $(OBJDIR)/Texture.o: src/Texture/Texture.cpp
 $(OBJDIR)/glad.o: vendor/src/glad/src/glad.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/ImGuiFileDialog.o: vendor/src/imgui/ImGuiFileDialog.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/imgui.o: vendor/src/imgui/imgui.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"

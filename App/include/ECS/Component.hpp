@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <glm/trigonometric.hpp>
+#include <json/value.h>
 #include <utility>
 #include <vector>
 
@@ -32,7 +33,7 @@ public:
 /**
  * @brief Component to store mesh position, rotation, scale data.
  */
-class Transform : public Component {
+class Transform : public Component, public JsonSerializable {
 public:
 	/**
 	 * @brief Retrieves if the model matrix is enable.
@@ -198,7 +199,7 @@ public:
 	 * @brief Default constructor.
 	 */
 	Transform() :
-		Component() {
+		Component(), JsonSerializable("transform") {
 	}
 
 	virtual ~Transform() override = default;
@@ -220,6 +221,26 @@ public:
 
 		this->model = t * s * r;
 		this->dirty = false;
+	}
+
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["position"] = seGlm<glm::vec3>(position);
+		elem["scale"] = seGlm<glm::vec3>(scale);
+		elem["rotation"] = seGlm<glm::vec3>(rotation);
+		elem["quaternion"] = seQuat(quaternion);
+		elem["dirty"] = dirty;
+		elem["enableModel"] = enableModel;
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		position = deGlm<glm::vec3>(elem["position"]);
+		scale = deGlm<glm::vec3>(elem["scale"]);
+		rotation = deGlm<glm::vec3>(elem["rotation"]);
+		quaternion = deGlm<glm::quat>(elem["quaternion"]);
+		dirty = elem["dirty"].asBool();
+		enableModel = elem["enableModel"].asBool();
 	}
 
 	/// mesh position vector
@@ -249,13 +270,26 @@ public:
  * This can be used to define an anchor and all the meshes linked will
  * transform using anchor transform data.
  */
-class MultiMesh : public Component {
+class MultiMesh : public Component, public JsonSerializable {
 public:
 	MultiMesh() :
-		Component() {
+		Component(), JsonSerializable("multimesh") {
 	}
 
 	virtual ~MultiMesh() override = default;
+
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["entities"] = seVec<unsigned int>(entities);
+		elem["anchor"] = anchor;
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		anchor = elem["anchor"].asUInt();
+		entities.clear();
+		entities.insert(entities.end(), ALL(deVec<unsigned int>(elem["entities"])));
+	}
 
 	/// list of child entities
 	std::vector<unsigned int> entities{};
@@ -296,7 +330,7 @@ public:
 /**
  * @brief Component to store vertices coords data.
  */
-class VertexComponent : public Component {
+class VertexComponent : public Component, public JsonSerializable {
 public:
 	/**
 	 * @brief Retrieves all mesh vertices coords.
@@ -423,6 +457,26 @@ public:
 			this->m_index.push_back(e);
 	}
 
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["vertex"] = seGlmVec<glm::vec3>(m_vertex);
+		elem["colors"] = seGlmVec<glm::vec4>(m_colors);
+		elem["texCoords"] = seGlmVec<glm::vec2>(m_texCoords);
+		elem["index"] = seVec<unsigned int>(m_index);
+		elem["normals"] = seGlmVec<glm::vec3>(m_normals);
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		m_vertex = {deGlmVec<glm::vec3>(elem["vertex"])};
+		m_colors = {deGlmVec<glm::vec4>(elem["colors"])};
+		m_texCoords = {deGlmVec<glm::vec2>(elem["texCoords"])};
+		m_index = {deVec<unsigned int>(elem["index"])};
+		m_normals = {deGlmVec<glm::vec3>(elem["normals"])};
+	}
+
+	VertexComponent() : Component(), JsonSerializable("vertex") {}
+
 	/**
 	 * @brief Instances the VertexComponent object with the given data.
 	 *
@@ -431,7 +485,7 @@ public:
 	 * @param indices a `std::vector<unsigned int>` containing indices
 	 */
 	VertexComponent(const std::vector<glm::vec3> &vertex, const std::vector<glm::vec4> &colors, const std::vector<unsigned int> &indices) :
-		Component() {
+		Component(), JsonSerializable("vertex") {
 		this->m_vertex = vertex;
 		this->m_colors = colors;
 		this->m_index = indices;
@@ -457,13 +511,27 @@ private:
  *
  * @see ogl::Texture
  */
-class TextureComponent : public Component {
+class TextureComponent : public Component, public JsonSerializable {
 public:
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["path"] = path;
+		elem["width"] = texture.getWidth();
+		elem["height"] = texture.getHeight();
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		texture.setHeight(elem["height"].asUInt());
+		texture.setHeight(elem["width"].asUInt());
+		path = elem["path"].asString();
+	}
+
 	/**
 	 * @brief Instance an empty Component.
 	 */
 	TextureComponent() :
-		Component() {
+		Component(), JsonSerializable("texture") {
 	}
 
 	/**
@@ -472,7 +540,7 @@ public:
 	 * @param path texture's file path
 	 */
 	TextureComponent(std::string path) :
-		Component(), path(std::move(path)) {
+		Component(), path(std::move(path)), JsonSerializable("texture") {
 	}
 
 	virtual ~TextureComponent() override = default;
@@ -493,13 +561,23 @@ public:
  * if a children mesh is transformed the parent mesh isn't affected. But
  * if the parent node is transformed all his children are affected.
  */
-class ParentComponent : public Component {
+class ParentComponent : public Component, public JsonSerializable {
 public:
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["children"] = seVec<unsigned int>(children);
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		children = {deVec<unsigned int>(elem["children"])};
+	}
+
 	/**
 	 * @brief Instance basic Component.
 	 */
 	ParentComponent() :
-		Component() {
+		Component(), JsonSerializable("parent") {
 	}
 
 	virtual ~ParentComponent() = default;
@@ -512,10 +590,25 @@ public:
  * @brief Component to store mesh shader data and some mesh information like
  * light computation and the capability to reflect the skybox texture.
  */
-class ShaderComponent : public Component {
+class ShaderComponent : public Component, public JsonSerializable {
 public:
-	/// Can't use an empty constructor
-	ShaderComponent() = delete;
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["computation"] = computation;
+		elem["reflective"] = reflective;
+		elem["vertex"] = vert;
+		elem["fragment"] = frag;
+		elem["geometry"] = geom;
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		computation = LightComputation{elem["computation"].asUInt()};
+		reflective = elem["reflective"].asBool();
+		vert = elem["vertex"].asString();
+		frag = elem["fragment"].asString();
+		geom = elem["geometry"].asString();
+	}
 
 	/**
 	 * @brief Instances the Component by giving shaders path and light computation.
@@ -532,7 +625,9 @@ public:
 	 * will be used while shading that mesh.
 	 */
 	ShaderComponent(const LightComputation &comp, const std::string &vert, const std::string &frag, const bool &reflective = false, const std::string &geom = "") :
-		computation(comp), vert(std::move(vert)), frag(std::move(vert)), reflective(reflective), geom(std::move(geom)), Component() {}
+		computation(comp), vert(std::move(vert)), frag(std::move(vert)), reflective(reflective), geom(std::move(geom)), Component(), JsonSerializable("shader") {}
+
+	ShaderComponent() : Component(), JsonSerializable("shader") {}
 
 	virtual ~ShaderComponent() override = default;
 
@@ -559,8 +654,14 @@ namespace light {
  * @brief This Component is used to render a mesh in the ogl::Window.
  * It stores the render call that will be called by `systems`.
  */
-class RenderComponent : public Component {
+class RenderComponent : public Component, public JsonSerializable {
 public:
+	inline virtual Json::Value serialize() override {
+		Json::Value elem = true;
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {}
 	/**
 	 * @brief Sets the render call that will be used.
 	 *
@@ -580,7 +681,7 @@ public:
 	 * @brief Instance basic Component.
 	 */
 	RenderComponent() :
-		Component() {
+		Component(), JsonSerializable("render") {
 	}
 
 	virtual ~RenderComponent() override = default;
@@ -725,15 +826,33 @@ namespace material {
  * @see Material
  * @see material::getMaterialFromPool()
  */
-class MaterialComponent : public Component {
+class MaterialComponent : public Component, public JsonSerializable {
 public:
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["name"] = material.name;
+		elem["ambient"] = seGlm(material.ambient);
+		elem["diffuse"] = seGlm(material.diffuse);
+		elem["specular"] = seGlm(material.specular);
+		elem["shininess"] = material.shininess;
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		material.name = elem["name"].asString();
+		material.ambient = deGlm<glm::vec3>(elem["ambient"]);
+		material.diffuse = deGlm<glm::vec3>(elem["diffuse"]);
+		material.specular = deGlm<glm::vec3>(elem["specular"]);
+		material.shininess = elem["shininess"].asFloat();
+	}
+
 	/**
 	 * @brief Instances a Component with the given material.
 	 *
 	 * @param material a Material object
 	 */
 	MaterialComponent(const Material &material = material::defaultMaterials[0]) :
-		Component(), material(material) {
+		Component(), material(material), JsonSerializable("material") {
 	}
 
 	/**
@@ -746,7 +865,7 @@ public:
 	 * @see material::getMaterialFromPool()
 	 */
 	MaterialComponent(const material::MaterialType &type) :
-		Component(), material(material::getMaterialFromPool(type)) {
+		Component(), material(material::getMaterialFromPool(type)), JsonSerializable("material") {
 	}
 
 	virtual ~MaterialComponent() = default;
@@ -1031,14 +1150,14 @@ public:
 	/// distance from each point (length / subdivisions)
 	float distance;
 
-    /**
-     * @brief Instances a basic rope.
-     *
-     * @param center the rope center point
-     * @param length the rope total length
-     * @param sub the rope subdivisions value
-     * @param constant the rope constant value
-     */
+	/**
+	 * @brief Instances a basic rope.
+	 *
+	 * @param center the rope center point
+	 * @param length the rope total length
+	 * @param sub the rope subdivisions value
+	 * @param constant the rope constant value
+	 */
 	RopeComponent(const glm::vec3 &center, const float &length, const unsigned int &sub, const float &constant) :
 		center(center), length(length), subdivisions(sub), constant(constant), distance(length / subdivisions), Component() {}
 
@@ -1068,8 +1187,26 @@ enum ColliderType : unsigned int {
  *
  * @see systems::collision::getCollisions()
  */
-class ColliderComponent : public Component {
+class ColliderComponent : public Component, public JsonSerializable {
 public:
+	inline virtual Json::Value serialize() override {
+		Json::Value elem;
+		elem["type"] = type;
+		elem["static"] = isStatic;
+		elem["position"] = seGlm<glm::vec3>(position);
+		elem["normal"] = seGlm<glm::vec3>(normal);
+		elem["size"] = seGlm<glm::vec3>(size);
+		return elem;
+	}
+
+	inline virtual void deserialize(Json::Value &elem) override {
+		type = ColliderType{elem["type"].asUInt()};
+		isStatic = elem["static"].asUInt();
+		position = deGlm<glm::vec3>(elem["position"]);
+		normal = deGlm<glm::vec3>(elem["normal"]);
+		size = deGlm<glm::vec3>(elem["size"]);
+	}
+
 	/// collider type
 	ColliderType type = COLLIDER_CUBE;
 	/// collider center position
@@ -1164,7 +1301,7 @@ public:
 	/**
 	 * @brief Instances a basic Component.
 	 */
-	ColliderComponent() = default;
+	ColliderComponent() : Component(), JsonSerializable("collider") {}
 
 	/**
 	 * @brief Instances a non Optimized Bounding Box collider.
@@ -1172,7 +1309,8 @@ public:
 	 * @param position collider center position
 	 * @param size collider size (center-right)
 	 */
-	ColliderComponent(const glm::vec3 &position, const glm::vec3 &size) {
+	ColliderComponent(const glm::vec3 &position, const glm::vec3 &size) :
+		JsonSerializable("collider") {
 		this->botLeft = position - size;
 		this->topRight = position + size;
 		this->position = position;
@@ -1249,4 +1387,17 @@ public:
 	 */
 	HideTreeComponent() = default;
 	virtual ~HideTreeComponent() override = default;
+};
+
+/**
+ * @brief This Component defines which entities can be serialized/deserialized.
+ */
+class LoaderComponent : public Component {
+public:
+	/**
+	 * @brief Instances basic Component to enstablish which entity should be serialized or not.
+	 * If an entity has this component it will be serialized.
+	 */
+	LoaderComponent() = default;
+	virtual ~LoaderComponent() override = default;
 };

@@ -181,7 +181,7 @@ namespace ogl {
 		glfwSetErrorCallback(errorCallback);
 
 		this->m_context = glfwCreateWindow(this->m_settings.size.x, this->m_settings.size.y, this->m_settings.name.c_str(),
-										   this->m_settings.fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL);
+										   NULL, NULL);
 		ASSERT(this->m_context != nullptr);
 
 		glfwMakeContextCurrent(this->m_context);

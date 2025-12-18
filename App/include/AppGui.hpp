@@ -126,3 +126,60 @@ private:
 	/// simulation parameters
 	SimulationConfig m_config{};
 };
+
+/**
+ * @brief Implementation of ImGuiPanel, it creates a panel with two buttons Save and Load.
+ * When Save is clicked it creates a file called `scene.json` and serialize all entities data.
+ * When Load is clicked it loads a file and deserialize all entities data.
+ */
+class ImGuiMeshLoader : public ImGuiPanel {
+public:
+	virtual void onRender() override;
+
+	/**
+	 * @brief Instances basic panel.
+	 */
+	ImGuiMeshLoader() :
+		ImGuiPanel("Loader Panel") {}
+
+	virtual ~ImGuiMeshLoader() override = default;
+};
+
+/**
+ * @brief Implementation of ImGuiPanel, it creates a panel that let the user pick one or multiple files.
+ * When the Ok button is clicked it execute the action function and closes the panel.
+ */
+class ImGuiFilePicker : public ImGuiPanel {
+public:
+	virtual void onRender() override;
+
+	/// Open the panel.
+	inline void open() { this->m_open = true; }
+	/// Close the panel.
+	inline void close() { this->m_open = false; }
+
+	ImGuiFilePicker() = delete;
+
+	/**
+	 * @brief Instances basic panel with the given parameters.
+	 *
+	 * @param path the path to a folder to show
+	 * @param extension the file extension to show
+	 * @param action the function to execute when Ok button is clicked
+	 * @param title the panel title
+	 */
+	ImGuiFilePicker(const std::string &path, const std::string &extension, std::function<void(const std::string &)> action, const std::string &title = "Pick a file") :
+		m_path(path), m_extension(extension), m_action(action), m_title(title), ImGuiPanel("File Picker") {}
+
+private:
+	/// panel open/close flag
+	bool m_open = false;
+	/// panel title
+	std::string m_title{};
+	/// folder path start point
+	std::string m_path{};
+	/// file extension
+	std::string m_extension{};
+	/// action to execute when ok button is clicked
+	std::function<void(const std::string &)> m_action;
+};

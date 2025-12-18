@@ -245,7 +245,7 @@ namespace systems {
 
 		void updateAllColliders() {
 			auto ids = em->getEntitiesFromComponent<ColliderComponent>();
-			for (auto id : em->getEntitiesFromComponent<ColliderComponent>()) {
+			for (auto id : ids) {
 				updateCollider(id);
 			}
 		}
