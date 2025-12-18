@@ -1,17 +1,13 @@
 #include "Serialize.hpp"
 
+#include "Utils.hpp"
+
 #include <cstring>
-#include <functional>
-#include <glm/ext/matrix_float4x4.hpp>
 #include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/string_cast.hpp>
 #include <iostream>
 #include <json/json.h>
 
-#include <stdexcept>
 #include <type_traits>
 #include <vector>
 
@@ -19,7 +15,14 @@ class JsonSerializable : public Serializable<Json::Value> {
 public:
 	virtual ~JsonSerializable() = default;
 
+	JsonSerializable() = delete;
+	JsonSerializable(const std::string &name) : m_name(std::move(name)) {}
+
 	virtual Json::Value serialize() { return Json::nullValue; }
+
+	virtual void deserialize(Json::Value &elem) {}
+
+	inline std::string getName() const { return this->m_name; }
 
 	template <typename T>
 	struct is_glm_type : std::false_type {};
@@ -72,8 +75,6 @@ public:
 		return seGlm<glm::vec4>(vec);
 	}
 
-	virtual void deserialize(Json::Value &elem) {}
-
 	template <typename T>
 	static std::vector<T> deVec(Json::Value &arr) {
 		if (!arr.isArray()) {
@@ -120,11 +121,41 @@ public:
 		auto v = deGlm<glm::vec4>(elem);
 		return glm::quat(v.w, v.x, v.y, v.z);
 	}
+
+protected:
+	/// used to store the content
+	std::string m_name = "";
 };
 
 class JsonSerializer : public Serializer<Json::Value> {
 public:
 	virtual ~JsonSerializer() = default;
 
+	virtual Json::Value deserializeFromFile(const std::string &path) override;
+
 	virtual void serializeToFile(Json::Value &elem, const std::string &path) override;
+
+	JsonSerializer(JsonSerializer &other) = delete;
+
+	void operator=(const JsonSerializer &other) = delete;
+
+	/**
+	 * @brief Retrieves the instance of the JsonSerializer.
+	 * If it's not instanced, it will be instanced automatically.
+	 *
+	 * @return a Shared<JsonSerializer> object
+	 */
+	inline static Shared<JsonSerializer> instance() {
+		if (s_pointer == nullptr) {
+			Shared<JsonSerializer> copy(new JsonSerializer());
+			copy.swap(s_pointer);
+		}
+		return s_pointer;
+	}
+
+private:
+	JsonSerializer() = default;
+
+	/// static shared pointer for Singleton
+	inline static Shared<JsonSerializer> s_pointer = nullptr;
 };

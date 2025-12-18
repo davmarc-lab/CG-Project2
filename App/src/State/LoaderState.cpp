@@ -10,6 +10,7 @@
 #include "../../include/ECS/EntityManager.hpp"
 #include "../../include/ECS/System.hpp"
 #include "../../include/Factory.hpp"
+#include "../../include/MeshLoader.hpp"
 
 #include "../../include/Profiler.hpp"
 
@@ -140,11 +141,19 @@ void LoaderState::onAttach() {
 		systems::render::renderAllMeshes();
 	});
 
-	auto loadDialog = CreateShared<ImGuiFilePicker>("./resources/mesh", ".json", [](auto s) { std::cout << "LOAD " << s << "\n"; }, "Load Mesh");
+	auto loadDialog = CreateShared<ImGuiFilePicker>("./resources/mesh", ".json", [lightShader](auto s) { 
+        std::cout << "LOAD " << s << "\n";
+        auto newEtts = MeshLoader::instance()->loadMeshes(s);
+        for (auto e : newEtts) {
+            scene->addEntity(lightShader, e);
+        }
+    }, "Load Mesh");
 	this->m_igm->addPanel(loadDialog);
 
 	ed->subscribe(SAVE_SCENE, []() {
-        // serialize all
+		// serialize all
+		auto ser = em->getEntitiesFromComponent<LoaderComponent>();
+		MeshLoader::instance()->saveMeshes(ser);
 	});
 
 	ed->subscribe(LOAD_SCENE, [loadDialog]() {

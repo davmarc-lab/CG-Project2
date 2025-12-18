@@ -40,7 +40,7 @@ public:
 	 * @param shader a ogl::ShaderProgram shared pointer
 	 * @param ett an `unsigned int` entity id
 	 */
-	void addEntity(Shared<ogl::ShaderProgram> &shader, const unsigned int &ett);
+	void addEntity(const Shared<ogl::ShaderProgram> &shader, const unsigned int &ett);
 
 	/**
 	 * @brief Removes the given entity from the scene with the corresponding shader,

@@ -7,6 +7,8 @@
 #include "Utils.hpp"
 
 namespace factory {
+	void fillBufferData(const unsigned int &id);
+
 	/**
 	 * @brief Factory method to create a cube mesh in the ECS.
 	 *

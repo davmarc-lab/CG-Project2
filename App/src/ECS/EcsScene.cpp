@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-void BasicScene::addEntity(Shared<ogl::ShaderProgram> &shader, const unsigned int &ett) {
+void BasicScene::addEntity(const Shared<ogl::ShaderProgram> &shader, const unsigned int &ett) {
 	if (this->m_entities.find(shader) == this->m_entities.end()) {
 		this->m_entities.insert_or_assign(shader, std::vector<unsigned int>{});
 	}

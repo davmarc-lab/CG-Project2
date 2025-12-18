@@ -18,5 +18,7 @@ class Serializer {
 public:
 	virtual ~Serializer() = default;
 
-	virtual void serializeToFile(T &elem, const std::string& filePath) {}
+	virtual T deserializeFromFile(const std::string &filePath) { return T(); }
+
+	virtual void serializeToFile(T &elem, const std::string &filePath) {}
 };

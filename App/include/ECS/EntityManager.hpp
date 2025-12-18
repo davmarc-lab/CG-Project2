@@ -145,6 +145,22 @@ public:
 		return comp;
 	}
 
+	template <typename T>
+	inline void addComponent(const Index &id, const Shared<T> &comp) {
+		if (!this->isEntityValid(id))
+			return;
+
+		this->m_ettComponent.at(id).emplace_back(comp);
+
+		auto name = CLASSNAME(T);
+		if (this->m_compEntity.count(name)) {
+			this->m_compEntity.at(name).push_back(id);
+		} else {
+			this->m_compEntity.emplace(name, std::vector<Index>{});
+			this->m_compEntity.at(name).push_back(id);
+		}
+	}
+
 	/**
 	 * @brief Removes a component from the given entity.
 	 *
@@ -216,6 +232,12 @@ public:
 		return std::dynamic_pointer_cast<T>(*std::find_if(ALL(this->m_ettComponent.at(id)), [](auto e) {
 			return std::dynamic_pointer_cast<T>(e) != nullptr;
 		}));
+	}
+
+	inline std::vector<Shared<Component>> getEntityComponents(unsigned int &id) {
+		if (this->m_ettComponent.find(id) == this->m_ettComponent.end())
+			return {};
+		return this->m_ettComponent.at(id);
 	}
 
 	EntityManager(EntityManager &other) = delete;
