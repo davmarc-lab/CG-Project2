@@ -1389,6 +1389,9 @@ public:
 	virtual ~HideTreeComponent() override = default;
 };
 
+/**
+ * @brief This Component defines which entities can be serialized/deserialized.
+ */
 class LoaderComponent : public Component {
 public:
 	/**

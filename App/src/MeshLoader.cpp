@@ -74,6 +74,9 @@ bool MeshLoader::saveMeshes(std::vector<unsigned int> &entities) {
 	// with static pointer cast throw error at compile time
 	// with dynamic pointer cast throw error at runtime
 	for (auto ent : entities) {
+		// throw error if the entity should not be loaded
+		ASSERT(em->entityHasComponent<LoaderComponent>(ent));
+
 		elem = Json::nullValue;
 		for (auto c : em->getEntityComponents(ent)) {
 			auto casted = std::dynamic_pointer_cast<JsonSerializable>(c);

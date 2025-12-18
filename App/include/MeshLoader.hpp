@@ -5,10 +5,30 @@
 #include <string>
 #include <vector>
 
+/**
+ * @brief This class saves and loads entity from/to a file.
+ * It serializes/deserializes all the entities components (which extends JsonSerializable).
+ */
 class MeshLoader {
 public:
+	/**
+	 * @brief Loads a file where are contained all entitites serialized data.
+	 * It creates the necessary entities and initializes all components needed.
+	 *
+	 * @param path the file path
+	 *
+	 * @return a vector containing all created entities
+	 */
 	std::vector<unsigned int> loadMeshes(const std::string &path);
 
+	/**
+	 * @brief Saves in a file placed in `resources/mesh/` called `scene.json` all the entities.
+	 * In particular serializes the entities components data if they are allowed.
+	 *
+	 * @param entities the entities to serialize
+	 *
+	 * @return true if the file is written
+	 */
 	bool saveMeshes(std::vector<unsigned int> &entities);
 
 	MeshLoader(MeshLoader &other) = delete;

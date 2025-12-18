@@ -11,19 +11,33 @@
 #include <type_traits>
 #include <vector>
 
+/**
+ * @brief This class provides overridable methods to serialize and deserialize a class in Json data.
+ */
 class JsonSerializable : public Serializable<Json::Value> {
 public:
 	virtual ~JsonSerializable() = default;
 
 	JsonSerializable() = delete;
+	/**
+	 * @brief Instances basic serializable object, it will use the given name as root element.
+	 *
+	 * @param name the json root element key
+	 */
 	JsonSerializable(const std::string &name) : m_name(std::move(name)) {}
 
-	virtual Json::Value serialize() { return Json::nullValue; }
+	virtual Json::Value serialize() override { return Json::nullValue; }
 
-	virtual void deserialize(Json::Value &elem) {}
+	virtual void deserialize(Json::Value &elem) override {}
 
+	/**
+	 * @brief Retrieves the element name.
+	 *
+	 * @return a string containing the element name
+	 */
 	inline std::string getName() const { return this->m_name; }
 
+	// template specialization to distinguish glm objects
 	template <typename T>
 	struct is_glm_type : std::false_type {};
 
@@ -36,6 +50,14 @@ public:
 	template <typename T, glm::qualifier Q>
 	struct is_glm_type<glm::qua<T, Q>> : std::true_type {};
 
+	/**
+	 * @brief Serializes an `std::vector` containing glm values.
+	 *
+	 * @param vec the vector to serialize
+	 * @tparam T the glm element type inside the vector
+	 *
+	 * @return a Json::Value element containing the vec data
+	 */
 	template <typename T>
 	inline static Json::Value seGlmVec(std::vector<T> vec) {
 		Json::Value arr(Json::arrayValue);
@@ -46,6 +68,14 @@ public:
 		return arr;
 	}
 
+	/**
+	 * @brief Serializes an `std::vector` containing standard values.
+	 *
+	 * @param vec the vector to serialize
+	 * @tparam T the standard element type inside the vector
+	 *
+	 * @return a Json::Value element containing the vec data
+	 */
 	template <typename T>
 	inline static Json::Value seVec(std::vector<T> vec) {
 		Json::Value arr(Json::arrayValue);
@@ -54,6 +84,14 @@ public:
 		return arr;
 	}
 
+	/**
+	 * @brief Serializes a glm element.
+	 *
+	 * @param glm the element to serialize
+	 * @tparam T the glm element type
+	 *
+	 * @return a Json::Value element containing the glm data
+	 */
 	template <typename T>
 	inline static Json::Value seGlm(T &glm) {
 		// glm packed value type
@@ -70,11 +108,29 @@ public:
 		return arr;
 	}
 
+	/**
+	 * @brief Serializes a glm quaternion.
+	 *
+	 * @param q the glm quat to serialize
+	 * @tparam T the glm element inside the vector
+	 *
+	 * @warning It can be merged with seGlm
+	 *
+	 * @return a Json::Value element containing the vec data
+	 */
 	inline Json::Value seQuat(glm::quat &q) {
 		auto vec = glm::vec4(q.x, q.y, q.z, q.w);
 		return seGlm<glm::vec4>(vec);
 	}
 
+	/**
+	 * @brief Deserializes all standard type elements inside a std::vector.
+	 *
+	 * @param arr the Json::Value array
+	 * @tparam T the standard type to deserialize each element
+	 *
+	 * @return a vector containing all deserialized elements
+	 */
 	template <typename T>
 	static std::vector<T> deVec(Json::Value &arr) {
 		if (!arr.isArray()) {
@@ -89,6 +145,14 @@ public:
 		return data;
 	}
 
+	/**
+	 * @brief Deserializes all the glm type elements inside a std::vector.
+	 *
+	 * @param arr the Json::Value array
+	 * @tparam T the glm type to deserialize each element
+	 *
+	 * @return a vector containing all deserialized elements
+	 */
 	template <typename T>
 	inline static std::vector<T> deGlmVec(Json::Value &arr) {
 		std::vector<T> data{};
@@ -99,24 +163,41 @@ public:
 		return data;
 	}
 
+	/**
+	 * @brief Deserializes a glm element.
+	 *
+	 * @param glm the Json::Value containing a serialized glm element
+	 * @tparam T the glm type to deserialize the element
+	 *
+	 * @return a glm element containing deserialized data
+	 */
 	template <typename T>
-	static T deGlm(Json::Value &arr) {
+	static T deGlm(Json::Value &glm) {
 		using TypeT = typename T::value_type;
 		const std::size_t n = sizeof(T) / sizeof(TypeT);
 
-		if (!arr.isArray() || arr.size() != n) {
+		if (!glm.isArray() || glm.size() != n) {
 			std::cerr << "JSON array size does not match GLM type\n";
 		}
 
 		TypeT data[n];
 		for (std::size_t i = 0; i < n; ++i)
-			data[i] = arr[static_cast<Json::ArrayIndex>(i)].asFloat();
+			data[i] = glm[static_cast<Json::ArrayIndex>(i)].asFloat();
 
 		T obj;
 		std::memcpy(glm::value_ptr(obj), data, sizeof(TypeT) * n);
 		return obj;
 	}
 
+	/**
+	 * @brief Deserializes a glm quaternion element.
+	 *
+	 * @param elem the Json::Value containing a serialized glm quaternion element
+	 *
+	 * @warning It can be merged with deGlm
+	 *
+	 * @return a glm::quat containing the deserialized element
+	 */
 	inline glm::quat deQuat(Json::Value &elem) {
 		auto v = deGlm<glm::vec4>(elem);
 		return glm::quat(v.w, v.x, v.y, v.z);
@@ -127,12 +208,28 @@ protected:
 	std::string m_name = "";
 };
 
+/**
+ * @brief This class writes/read into/from a given file the json elements.
+ */
 class JsonSerializer : public Serializer<Json::Value> {
 public:
 	virtual ~JsonSerializer() = default;
 
+	/**
+	 * @brief Deserializes all the file content into a Json::Value.
+	 *
+	 * @param path the file path to be read
+	 *
+	 * @return a Json::Value containing all parsed elements
+	 */
 	virtual Json::Value deserializeFromFile(const std::string &path) override;
 
+	/**
+	 * @brief Serializes the Json::Value element given into a file.
+	 *
+	 * @param elem the Json::Value element to parse
+	 * @param path the file path to create/write
+	 */
 	virtual void serializeToFile(Json::Value &elem, const std::string &path) override;
 
 	JsonSerializer(JsonSerializer &other) = delete;

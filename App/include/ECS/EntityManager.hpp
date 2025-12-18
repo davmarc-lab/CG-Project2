@@ -145,6 +145,13 @@ public:
 		return comp;
 	}
 
+	/**
+	 * @brief Adds an existing component to the ECS.
+	 *
+	 * @tparam T the class of the component
+	 * @param id the entity id
+	 * @param comp the component to add
+	 */
 	template <typename T>
 	inline void addComponent(const Index &id, const Shared<T> &comp) {
 		if (!this->isEntityValid(id))
@@ -234,6 +241,13 @@ public:
 		}));
 	}
 
+    /**
+     * @brief Retrieves all the components of the given entity.
+     *
+     * @param id the entity id.
+     *
+     * @return a vector containing Shared<Component> of the given entity
+     */
 	inline std::vector<Shared<Component>> getEntityComponents(unsigned int &id) {
 		if (this->m_ettComponent.find(id) == this->m_ettComponent.end())
 			return {};
