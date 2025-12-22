@@ -20,7 +20,7 @@ const auto ed = EventManager::instance();
 const auto sm = StateManager::instance();
 
 #ifdef _WIN32
-WProfiler profiler{PROFILE_ALL};
+auto profiler = WProfiler::instance();
 #else
 auto profiler = LinuxProfiler::instance();
 #endif

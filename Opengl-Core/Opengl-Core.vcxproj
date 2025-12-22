@@ -114,10 +114,12 @@
     <ClInclude Include="include\Core\Event.hpp" />
     <ClInclude Include="include\Core\ImGui.hpp" />
     <ClInclude Include="include\Core\InputManager.hpp" />
+    <ClInclude Include="include\Core\JsonSerialize.hpp" />
     <ClInclude Include="include\Core\Layer.hpp" />
     <ClInclude Include="include\Core\MeshVertices.hpp" />
     <ClInclude Include="include\Core\Renderer.hpp" />
     <ClInclude Include="include\Core\Resource.hpp" />
+    <ClInclude Include="include\Core\Serialize.hpp" />
     <ClInclude Include="include\Core\Structs.hpp" />
     <ClInclude Include="include\Core\Utils.hpp" />
     <ClInclude Include="include\Core\Window.hpp" />
@@ -125,9 +127,12 @@
     <ClInclude Include="include\Shader\Shader.hpp" />
     <ClInclude Include="include\Texture\Texture.hpp" />
     <ClInclude Include="include\Text\TextManager.hpp" />
+    <ClInclude Include="vendor\include\dirent\dirent.h" />
     <ClInclude Include="vendor\include\glad\glad.h" />
     <ClInclude Include="vendor\include\imgui\imconfig.h" />
     <ClInclude Include="vendor\include\imgui\imgui.h" />
+    <ClInclude Include="vendor\include\imgui\ImGuiFileDialog.h" />
+    <ClInclude Include="vendor\include\imgui\ImGuiFileDialogConfig.h" />
     <ClInclude Include="vendor\include\imgui\imgui_impl_glfw.h" />
     <ClInclude Include="vendor\include\imgui\imgui_impl_opengl3.h" />
     <ClInclude Include="vendor\include\imgui\imgui_impl_opengl3_loader.h" />
@@ -148,6 +153,7 @@
     <ClCompile Include="src\Core\Event.cpp" />
     <ClCompile Include="src\Core\ImGuiManager.cpp" />
     <ClCompile Include="src\Core\InputManager.cpp" />
+    <ClCompile Include="src\Core\JsonSerialize.cpp" />
     <ClCompile Include="src\Core\Renderer.cpp" />
     <ClCompile Include="src\Core\Resource.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
@@ -156,6 +162,7 @@
     <ClCompile Include="src\Text\TextManager.cpp" />
     <ClCompile Include="vendor\src\glad\src\glad.c" />
     <ClCompile Include="vendor\src\imgui\imgui.cpp" />
+    <ClCompile Include="vendor\src\imgui\ImGuiFileDialog.cpp" />
     <ClCompile Include="vendor\src\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendor\src\imgui\imgui_draw.cpp" />
     <ClCompile Include="vendor\src\imgui\imgui_impl_glfw.cpp" />
@@ -169,11 +176,17 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\freetype2.2.6.0.1\build\native\freetype2.targets" Condition="Exists('..\packages\freetype2.2.6.0.1\build\native\freetype2.targets')" />
+    <Import Project="..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets" Condition="Exists('..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" />
+    <Import Project="..\packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets" Condition="Exists('..\packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets')" />
+    <Import Project="..\packages\Assimp.3.0.0\build\native\Assimp.targets" Condition="Exists('..\packages\Assimp.3.0.0\build\native\Assimp.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\freetype2.2.6.0.1\build\native\freetype2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freetype2.2.6.0.1\build\native\freetype2.targets'))" />
+    <Error Condition="!Exists('..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets'))" />
+    <Error Condition="!Exists('..\packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\Assimp.3.0.0\build\native\Assimp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Assimp.3.0.0\build\native\Assimp.targets'))" />
   </Target>
 </Project>

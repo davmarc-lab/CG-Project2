@@ -102,13 +102,24 @@ protected:
  */
 class WProfiler : public Profiler {
 public:
-    /**
-     * @brief Instances basic WProfiler.
-     *
-     * @param filter the profiler filter (wall, cpu or both)
-     */
-	WProfiler(const ProfileFilter &filter = PROFILE_ALL) :
-		Profiler(filter) {
+	WProfiler(const ProfileFilter &filter) = delete;
+
+	WProfiler(WProfiler &other) = delete;
+
+	void operator=(const WProfiler &other) = delete;
+
+	/**
+	 * @brief Retrieves the instance of the WProfiler.
+	 * If it's not instanced, it will be instanced automatically.
+	 *
+	 * @return a Shared<WProfiler> object
+	 */
+	inline static Shared<WProfiler> instance() {
+		if (s_pointer == nullptr) {
+			Shared<WProfiler> copy(new WProfiler());
+			copy.swap(s_pointer);
+		}
+		return s_pointer;
 	}
 
 	virtual ~WProfiler() override = default;
@@ -129,11 +140,60 @@ public:
      */
 	inline double getLastCPU() const { return this->m_cpu; }
 
+	    /**
+	 * @brief Dumps to the standard output the input times.
+	 */
+	inline void dumpInput() { this->dump(this->inputWalltime, this->inputCputime); }
+	/**
+	 * @brief Dumps to the standard output the update times.
+	 */
+	inline void dumpUpdate() { this->dump(this->updateWalltime, this->updateCputime); }
+	/**
+	 * @brief Dumps to the standard output the render times.
+	 */
+	inline void dumpRender() { this->dump(this->renderWalltime, this->renderCputime); }
+
+    /**
+	 * @brief Retrieves the input wall and cpu times in a Pair<double>.
+	 *
+	 * @return a pair containing wall and cpu times
+	 */
+	inline Pair<double> getInputTime() { return {this->inputWalltime, this->inputCputime}; }
+	/**
+	 * @brief Retrieves the update wall and cpu times in a Pair<double>.
+	 *
+	 * @return a pair containing wall and cpu times
+	 */
+	inline Pair<double> getUpdateTime() { return {this->updateWalltime, this->updateCputime}; }
+	/**
+	 * @brief Retrieves the render wall and cpu times in a Pair<double>.
+	 *
+	 * @return a pair containing wall and cpu times
+	 */
+	inline Pair<double> getRenderTime() { return {this->renderWalltime, this->renderCputime}; }
+
 private:
+	WProfiler() = default;
+
+	/// static shared pointer for Singleton
+	inline static Shared<WProfiler> s_pointer = nullptr;
     /// start time
 	std::time_t m_start{};
     /// end time
 	std::time_t m_end{};
+
+	/// input wall time
+	double inputWalltime{};
+	/// input cpu time
+	double inputCputime{};
+	/// update wall time
+	double updateWalltime{};
+	/// update cpu time
+	double updateCputime{};
+	/// render wall time
+	double renderWalltime{};
+	/// render cpu time
+	double renderCputime{};
 };
 
 #else

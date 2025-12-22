@@ -120,7 +120,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)bin\$(Configuration)-$(Platform)\lib\;$(SolutionDir)\Opengl-Core\vendor\include\GLFW\;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)bin\$(Configuration)-$(Platform)\Opengl-Core\;$(SolutionDir)\Opengl-Core\vendor\include\GLFW\;</AdditionalLibraryDirectories>
       <AdditionalDependencies>Opengl-Core.lib;glfw3.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -150,9 +150,14 @@
     <ClInclude Include="include\ECS\EntityManager.hpp" />
     <ClInclude Include="include\ECS\System.hpp" />
     <ClInclude Include="include\Factory.hpp" />
+    <ClInclude Include="include\MeshLoader.hpp" />
+    <ClInclude Include="include\PBR\PBMaterial.hpp" />
+    <ClInclude Include="include\PBR\PBScene.hpp" />
     <ClInclude Include="include\PhysicWorld.hpp" />
     <ClInclude Include="include\Profiler.hpp" />
     <ClInclude Include="include\State\BootstrapState.hpp" />
+    <ClInclude Include="include\State\LightScene.hpp" />
+    <ClInclude Include="include\State\LoaderState.hpp" />
     <ClInclude Include="include\State\NormalViewState.hpp" />
     <ClInclude Include="include\State\SimulationState.hpp" />
     <ClInclude Include="include\State\State.hpp" />
@@ -165,9 +170,13 @@
     <ClCompile Include="src\ECS\System.cpp" />
     <ClCompile Include="src\Factory.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MeshLoader.cpp" />
+    <ClCompile Include="src\PBR\PBScene.cpp" />
     <ClCompile Include="src\PhysicWorld.cpp" />
     <ClCompile Include="src\Profiler.cpp" />
     <ClCompile Include="src\State\BootstrapState.cpp" />
+    <ClCompile Include="src\State\LightScene.cpp" />
+    <ClCompile Include="src\State\LoaderState.cpp" />
     <ClCompile Include="src\State\NormalViewState.cpp" />
     <ClCompile Include="src\State\SimulationState.cpp" />
     <ClCompile Include="src\State\State.cpp" />
@@ -235,11 +244,17 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\freetype2.2.6.0.1\build\native\freetype2.targets" Condition="Exists('..\packages\freetype2.2.6.0.1\build\native\freetype2.targets')" />
+    <Import Project="..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets" Condition="Exists('..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" />
+    <Import Project="..\packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets" Condition="Exists('..\packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets')" />
+    <Import Project="..\packages\Assimp.3.0.0\build\native\Assimp.targets" Condition="Exists('..\packages\Assimp.3.0.0\build\native\Assimp.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\freetype2.2.6.0.1\build\native\freetype2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freetype2.2.6.0.1\build\native\freetype2.targets'))" />
+    <Error Condition="!Exists('..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets'))" />
+    <Error Condition="!Exists('..\packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Assimp.redist.3.0.0\build\native\Assimp.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\Assimp.3.0.0\build\native\Assimp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Assimp.3.0.0\build\native\Assimp.targets'))" />
   </Target>
 </Project>

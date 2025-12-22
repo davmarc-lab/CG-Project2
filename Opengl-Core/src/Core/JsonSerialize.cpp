@@ -22,9 +22,9 @@ void JsonSerializer::serializeToFile(Json::Value &elem, const std::string &fileP
 	if (elem == Json::nullValue)
 		return;
 
-	Json::StyledWriter writer{};
+	Json::StreamWriterBuilder builder{};
 
 	std::ofstream out(filePath);
-	out << writer.write(elem);
+	out << Json::writeString(builder, elem);
 	out.close();
 }
