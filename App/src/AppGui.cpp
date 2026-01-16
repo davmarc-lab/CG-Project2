@@ -180,7 +180,7 @@ void ImGuiEntityTree::onRender() {
 					switch (data.type) {
 						case LightType::LIGHT_DIRECTIONAL: {
 							ImGui::TextColored({1, 1, 0, 1}, "Directional Light");
-							if (ImGui::SliderFloat3("Direction##2", &data.direction.x, -1.f, 1.f)) {
+							if (ImGui::DragFloat3("Direction##2", &data.direction.x, .2f, -1.f, 1.f)) {
 								systems::light::updateDirection(id, data.direction);
 							}
 							break;
@@ -206,7 +206,7 @@ void ImGuiEntityTree::onRender() {
 							if (ImGui::DragFloat3("Position##2", &data.position.x, 0.2f)) {
 								systems::light::updatePosition(id, data.position);
 							}
-							if (ImGui::SliderFloat3("Direction##2", &data.direction.x, -1.f, 1.f)) {
+							if (ImGui::DragFloat3("Direction##2", &data.direction.x, .2f, -1.f, 1.f)) {
 								systems::light::updateDirection(id, data.direction);
 							}
 							if (ImGui::SliderFloat("Constant##2", &data.constant, 0.f, 1.f)) {
@@ -218,10 +218,10 @@ void ImGuiEntityTree::onRender() {
 							if (ImGui::SliderFloat("Quadratic##2", &data.quadratic, 0.f, 1.f)) {
 								systems::light::updateQuadratic(id, data.quadratic);
 							}
-							if (ImGui::DragFloat("Cut Off##2", &data.cutoff, 0.2f, 0.f)) {
+							if (ImGui::DragFloat("Cut Off##2", &data.cutoff, 0.2f, 0.f, data.outerCutoff - 0.001f)) {
 								systems::light::updateCutoff(id, data.cutoff);
 							}
-							if (ImGui::DragFloat("Outer Cut Off##2", &data.outerCutoff, 0.2f, 0.1f)) {
+							if (ImGui::DragFloat("Outer Cut Off##2", &data.outerCutoff, 0.2f, data.cutoff + 0.001f)) {
 								systems::light::updateOuterCutoff(id, data.outerCutoff);
 							}
 

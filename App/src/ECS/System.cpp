@@ -724,8 +724,8 @@ namespace systems {
 					shader->setFloat("lights[" + std::to_string(index) + "].constant", data.constant);
 					shader->setFloat("lights[" + std::to_string(index) + "].linear", data.linear);
 					shader->setFloat("lights[" + std::to_string(index) + "].quadratic", data.quadratic);
-					shader->setFloat("lights[" + std::to_string(index) + "].cutOff", data.cutoff);
-					shader->setFloat("lights[" + std::to_string(index) + "].outerCutOff", data.outerCutoff);
+					shader->setFloat("lights[" + std::to_string(index) + "].cutoff", data.cutoff);
+					shader->setFloat("lights[" + std::to_string(index) + "].outerCutoff", data.outerCutoff);
 					break;
 				}
 				default:

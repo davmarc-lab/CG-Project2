@@ -337,10 +337,10 @@ void NormalViewState::onAttach() {
 	ASSERT(!this->m_attached);
 	State::onAttach();
 	srand(time(NULL));
-	WindowSettings s{};
-	s.decorated = false;
-	s.size = {800, 600};
-	s.position = {400, 50};
+	WindowSettings settings{};
+	settings.decorated = false;
+	settings.size = {1200, 800};
+	settings.position = {400, 50};
 
 #ifdef BIG
 	s.position = {10, 606};
@@ -348,9 +348,9 @@ void NormalViewState::onAttach() {
 #ifdef _WIN32
 	s.position = {470, 50};
 #endif
-	s.focused = true;
+	settings.focused = true;
 
-	w = CreateUnique<Window>(s);
+	w = CreateUnique<Window>(settings);
 	ASSERT(w != nullptr);
 	w->onAttach();
 	defaultKeyCallback(w.get(), this->world, mouse);
@@ -409,7 +409,7 @@ void NormalViewState::onAttach() {
 
 	plane = factory::factoryPlane({0.3, 0.3, 0.3, 1});
 	systems::ecs::updateEntityName(plane, "Basic Plane");
-	scene->addEntity(basicShader, plane);
+	scene->addEntity(lightShader, plane);
 
 	auto shape = factory::factoryPyramid(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
@@ -445,7 +445,7 @@ void NormalViewState::onAttach() {
     auto tree = factory::factoryTree({{}, {1, 1, 1}, {}});
     scene->addEntity(lightShader, tree);
 
-	auto id = factory::light::factoryDirectional({1, 0, 0});
+	auto id = factory::light::factorySpot({2, 1, 1}, {1, 0, 0}, {});
 
 	ub = CreateUnique<UniformBuffer>();
 	ub->onAttach();

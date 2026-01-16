@@ -113,7 +113,7 @@ vec3 spotLight(Light light) {
     vec3 diffuse = light.intensity * light.color * light.diffuse * diff * material.diffuse;
     vec3 specular = light.intensity * light.color * light.specular * spec * material.specular;
 
-    ambient *= attenuation * intensity;
+    ambient *= attenuation;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
 
@@ -144,6 +144,14 @@ void main() {
                 reflectDir = lightComp == 2 ? normalize(lightDir + viewDir) : reflect(-lightDir, norm);
                 spec = pow(max(lightComp == 2 ? dot(norm, reflectDir) : dot(viewDir, reflectDir), 0.0), material.shininess);
 
+                // if (lights[i].type == 0) {
+                //     result += directionalLight(lights[i]);
+                // } else if (lights[i].type == 1) {
+                //     result += pointLight(lights[i]);
+                // } else if (lights[i].type == 2) {
+                //     result += spotLight(lights[i]);
+                // }
+
                 switch (lights[i].type) {
                     case 0:
                     {
@@ -157,6 +165,8 @@ void main() {
                     }
                     case 2:
                     {
+                        fragColor = vec4(spotLight(lights[i]), 1);
+                        return;
                         result += spotLight(lights[i]);
                         break;
                     }
