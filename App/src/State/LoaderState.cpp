@@ -21,9 +21,9 @@ const auto scene = BasicScene::instance();
 const auto sm = StateManager::instance();
 
 #ifdef WIN_32
-const auto pf = LinuxProfiler::instance();
-#else 
 const auto pf = WProfiler::instance();
+#else 
+const auto pf = LinuxProfiler::instance();
 #endif
 
 static Mouse mouse{};

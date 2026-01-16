@@ -250,7 +250,8 @@ namespace factory {
 
 	unsigned int factoryPlane(const glm::vec4 &color) {
 		auto pos = glm::vec3{0, -2, 0};
-		auto size = glm::vec3{100, 0, 100};
+        // y scale for normals to work
+		auto size = glm::vec3{100, 0.01, 100};
 		auto id = factoryCube(BasicInfo{pos, size}, color);
 		systems::transform::updateModelMatrix(id);
 		em->removeComponent<MaterialComponent>(id);

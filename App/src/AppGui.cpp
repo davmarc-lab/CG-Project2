@@ -333,7 +333,7 @@ void ImGuiEntityTree::onRender() {
 					ImGui::SliderFloat3("Albedo: ", &pm->albedo.x, 0.f, 1.f);
 					ImGui::SliderFloat("Metallic: ", &pm->metallic, 0.f, 1.f);
 					ImGui::SliderFloat("Roughness: ", &pm->roughness, 0.f, 1.f);
-					ImGui::SliderFloat("Ao: ", &pm->ao, 0.f, 1.f);
+					ImGui::DragFloat("Ao: ", &pm->ao, 1.f, 0.f);
 				}
 			}
 
@@ -563,7 +563,7 @@ void ImGuiFilePicker::onRender() {
 				std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
 				std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
 
-                ImGuiFileDialog::Instance()->GetSelection().clear();
+				ImGuiFileDialog::Instance()->GetSelection().clear();
 
 				// if is using windows parse the path before using
 #ifdef _WIN32
@@ -595,7 +595,7 @@ void ImGuiFilePicker::onRender() {
 #endif
 				this->m_action(filePathName);
 				this->close();
-            }
+			}
 
 			// close
 			ImGuiFileDialog::Instance()->Close();

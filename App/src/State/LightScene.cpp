@@ -23,9 +23,9 @@ const auto pbscene = PBScene::instance();
 const auto sm = StateManager::instance();
 
 #ifdef WIN_32
-const auto pf = LinuxProfiler::instance();
-#else
 const auto pf = WProfiler::instance();
+#else
+const auto pf = LinuxProfiler::instance();
 #endif
 
 Mouse mouse{};
@@ -36,7 +36,7 @@ void LightState::onAttach() {
 	srand(time(NULL));
 	ogl::WindowSettings settings{};
 	settings.decorated = false;
-	settings.size = {800, 600};
+	settings.size = {1200, 800};
 	settings.position = {400, 50};
 	settings.bgColor = {.3, .3, .3, 1};
 
@@ -106,36 +106,36 @@ void LightState::onAttach() {
 	auto skybox = factory::factorySkyBox("./resources/texture/skybox/lycksele/", "jpg");
 
 	auto plane = factory::factoryPlane({.3f, .3f, .3f, 1});
+	em->addComponent<PBMaterial>(plane);
 	systems::ecs::updateEntityName(plane, "Plane");
-	scene->addEntity(planeShader, plane);
+	// scene->addEntity(planeShader, plane);
+	systems::pbr::updateMaterialAlbedo(plane, {.3f, .3f, .3f});
+	pbscene->addEntity(plane);
 
 	// entities
-	auto foo = factory::factorySphere(BasicInfo{{-2, 0, -4}, {1, 1, 1}, {0, 0, 0}});
-	em->removeComponent<MaterialComponent>(foo);
-	em->addComponent<PBMaterial>(foo);
-	systems::pbr::updateMaterial(foo, pbr::metal);
-	systems::light::setLightComputation(foo, LightComputation::PHONG);
-	pbscene->addEntity(foo);
+	auto sphere = factory::factoryCube(BasicInfo{{-2, 0, -4}, {1, 1, 1}, {0, 0, 0}});
+	em->removeComponent<MaterialComponent>(sphere);
+	em->addComponent<PBMaterial>(sphere);
+	systems::pbr::updateMaterial(sphere, pbr::redMetal);
+	pbscene->addEntity(sphere);
 
-	{
-		// Too heavy
-		auto model = factory::factoryObjMesh(BasicInfo{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}}, "resources/models/machine/Machine.obj");
-		scene->addEntity(modelShader, model);
-	}
-
-	{
-		// Too heavy
-		flipImagesVertically(true);
-		auto model = factory::factoryObjMesh(BasicInfo{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}}, "resources/models/backpack/backpack.obj");
-		flipImagesVertically(false);
-		scene->addEntity(modelShader, model);
-	}
+	// {
+	// 	// Too heavy
+	// 	auto model = factory::factoryObjMesh(BasicInfo{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}}, "resources/models/machine/Machine.obj");
+	// 	scene->addEntity(modelShader, model);
+	// }
+	// {
+	// 	// Too heavy
+	// 	flipImagesVertically(true);
+	// 	auto model = factory::factoryObjMesh(BasicInfo{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}}, "resources/models/backpack/backpack.obj");
+	// 	flipImagesVertically(false);
+	// 	scene->addEntity(modelShader, model);
+	// }
 
 	// lights
-	// auto dir = factory::light::factoryDirectional({1, 1, -1});
-	auto dir = factory::light::factoryPoint({0, 0, -1}, {});
-	auto aaa = factory::light::factoryPoint({-3, 0, -2}, {});
-	auto bbb = factory::light::factoryPoint({0, 2, -3}, {});
+	auto dir = factory::light::factoryDirectional({0, -1, 0});
+	auto p1 = factory::light::factoryPoint({-3, 0, -2}, {});
+	// auto p2 = factory::light::factorySpot({0, 2, -3}, {0, 0, -1}, {});
 
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { systems::collision::updateAllColliders(); });
 

@@ -59,12 +59,20 @@ namespace systems {
 	namespace pbr {
 
 		/**
-		 * @brief Updates the matiral of the given entity.
+		 * @brief Updates the material of the given entity.
 		 *
 		 * @param id the entity id
 		 * @param material the entity new material
 		 */
 		void updateMaterial(const unsigned int &id, const PBMaterial &material);
+
+		/**
+		 * @brief Updates the material albedo vector of the given entity.
+		 *
+		 * @param id the entity id
+		 * @param albedo the material new albedo
+		 */
+		void updateMaterialAlbedo(const unsigned int &id, const glm::vec3 &albedo);
 
 		/**
 		 * @brief Retrives the PBRMaterial of the given entity.

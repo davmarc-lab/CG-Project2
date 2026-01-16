@@ -85,47 +85,91 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
     return ggx1 * ggx2;
 }
 
-void main() {
-    if (lightsCount > 0) {
-        vec3 N = normalize(fs_out.normal);
-        vec3 V = normalize(camPos - FragPos);
+float calcAttenuation(Light light, float dist)
+{
+    return 1.0 / (light.constant +
+            light.linear * dist +
+            light.quadratic * dist * dist);
+}
 
-        vec3 F0 = vec3(0.04f);
-        F0 = mix(F0, material.albedo, material.metallic);
+void main()
+{
+    vec3 N = normalize(fs_out.normal);
+    vec3 V = normalize(camPos - FragPos);
 
-        vec3 Lo = vec3(0.f);
-        for (int i = 0; i < lightsCount && i < MAX_LIGHTS; i++) {
-            vec3 L = normalize(lights[i].position - FragPos);
-            vec3 H = normalize(V + L);
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, material.albedo, material.metallic);
 
-            float distance = length(lights[i].position - FragPos);
-            float attenuation = 1.0 / (distance * distance);
-            vec3 radiance = lights[i].color * attenuation;
+    vec3 Lo = vec3(0.0);
 
-            float NDF = distributionGGX(N, H, material.roughness);
-            float G = GeometrySmith(N, V, L, material.roughness);
-            vec3 F = fresnelSchlick(max(dot(H, V), 0.f), F0);
+    for (int i = 0; i < lightsCount && i < MAX_LIGHTS; i++)
+    {
+        Light light = lights[i];
 
-            vec3 kd = vec3(1.f) - F;
-            kd *= 1.f - material.metallic;
+        vec3 L;
+        float attenuation = 1.0;
+        float intensity = light.intensity;
 
-            vec3 numerator = NDF * G * F;
-            float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
-            vec3 specular = numerator / denominator;
+        // directional light
+        if (light.type == 0)
+        {
+            L = normalize(-light.direction);
+            attenuation = 5.0;
+        }
+        else if (light.type == 1)
+        {
+            // point light
+            vec3 lightVec = light.position - FragPos;
+            float dist = length(lightVec);
+            L = normalize(lightVec);
+            attenuation = calcAttenuation(light, dist);
+        }
+        else if (light.type == 2)
+        {
+            // spot light
+            vec3 lightVec = light.position - FragPos;
+            float dist = length(lightVec);
+            L = normalize(lightVec);
 
-            float NdotL = max(dot(N, L), 0.0);
-            Lo += (kd * material.albedo / PI + specular) * radiance * NdotL;
+            // float theta = dot(L, normalize(-light.direction));
+            // float epsilon = light.cutoff - light.outerCutoff;
+            // float spotFactor = clamp((theta - light.outerCutoff) / epsilon, 0.0, 1.0);
+            float spotFactor = clamp(((dot(L, normalize(-light.direction))) - light.outerCutoff) / (light.cutoff - light.outerCutoff), 0.0, 1.0);
+
+            attenuation = calcAttenuation(light, dist) * spotFactor;
         }
 
-        vec3 ambient = vec3(0.03) * material.albedo * material.ao;
-        vec3 color = ambient + Lo;
+        vec3 H = normalize(V + L);
 
-        color = color / (color + vec3(1.0));
-        // gamma correct
-        color = pow(color, vec3(1.0/2.2));
+        vec3 radiance = light.color * intensity * attenuation;
 
-        fragColor = vec4(color, 1.f);
-    } else {
-        fragColor = fs_out.vertColor;
+        float NDF = distributionGGX(N, H, material.roughness);
+        float G = GeometrySmith(N, V, L, material.roughness);
+        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+        vec3 kD = vec3(1.0) - F;
+        kD *= 1.0 - material.metallic;
+
+        vec3 numerator = NDF * G * F;
+        float denominator = 4.0 *
+                max(dot(N, V), 0.0) *
+                max(dot(N, L), 0.0) + 0.0001;
+
+        vec3 specular = numerator / denominator;
+
+        float NdotL = max(dot(N, L), 0.0);
+
+        Lo += (kD * material.albedo / PI + specular) * radiance * NdotL;
     }
+
+    // ambient term
+    vec3 ambient = vec3(0.03) * material.albedo * material.ao;
+
+    vec3 color = ambient + Lo;
+
+    // tonemapping + gamma
+    color = color / (color + vec3(1.0));
+    color = pow(color, vec3(1.0 / 2.2));
+
+    fragColor = vec4(color, 1.0);
 }

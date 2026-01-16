@@ -1,4 +1,5 @@
 #include "../../include/PBR/PBScene.hpp"
+#include <glm/geometric.hpp>
 
 #include "../../include/ECS/EntityManager.hpp"
 #include "../../include/ECS/System.hpp"
@@ -17,6 +18,12 @@ namespace systems {
 			c->ao = material.ao;
 		}
 
+		void updateMaterialAlbedo(const unsigned int &id, const glm::vec3 &albedo) {
+			auto c = em->getComponentFromId<PBMaterial>(id);
+			ASSERT(c != nullptr);
+			c->albedo = glm::normalize(albedo);
+		}
+
 		Shared<PBMaterial> getMaterial(const unsigned int &id) {
 			auto c = em->getComponentFromId<PBMaterial>(id);
 			ASSERT(c != nullptr);
@@ -24,13 +31,12 @@ namespace systems {
 		}
 	} // namespace pbr
 
-    
 	namespace render {
-		void renderScene(const Shared<ogl::ShaderProgram> &shader, ogl::WorldCamera& world) {
+		void renderScene(const Shared<ogl::ShaderProgram> &shader, ogl::WorldCamera &world) {
 			auto lightsData = prepareLightData();
 			shader->use();
-            sendLightDataShader(shader, lightsData);
-            shader->setVec3("camPos", world.camera->getCameraPosition());
+			sendLightDataShader(shader, lightsData);
+			shader->setVec3("camPos", world.camera->getCameraPosition());
 			for (auto ett : ps->getEntities()) {
 				auto mc = em->getComponentFromId<PBMaterial>(ett);
 				if (mc != nullptr) {

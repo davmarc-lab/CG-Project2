@@ -44,7 +44,7 @@ void old() {
 	sm->cacheState(bs);
 
 	// change and sync the current state
-	sm->changeState(bs);
+	sm->changeState(ls);
 	sm->sync();
 
 	// #define C_DBG
