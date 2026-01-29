@@ -117,9 +117,6 @@
     <ClInclude Include="include\Text\TextManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\JsonSerialize.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Serialize.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -204,9 +201,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Text\TextManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\JsonSerialize.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="vendor\src\imgui\ImGuiFileDialog.cpp">

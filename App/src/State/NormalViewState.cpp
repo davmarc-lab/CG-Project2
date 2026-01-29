@@ -346,7 +346,7 @@ void NormalViewState::onAttach() {
 	s.position = {10, 606};
 #endif // BIG
 #ifdef _WIN32
-	s.position = {470, 50};
+	settings.position = {470, 50};
 #endif
 	settings.focused = true;
 

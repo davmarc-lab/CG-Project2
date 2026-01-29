@@ -50,6 +50,7 @@ struct Light {
 uniform Light lights[MAX_LIGHTS];
 uniform int lightsCount;
 uniform int reflective;
+uniform int useColor;
 
 vec3 norm = vec3(0);
 vec3 lightDir = vec3(0);
@@ -112,13 +113,12 @@ vec3 spotLight(Light light) {
     vec3 diffuse = light.intensity * light.color * light.diffuse * diff * material.diffuse;
     vec3 specular = light.intensity * light.color * light.specular * spec * material.specular;
 
-    ambient *= attenuation * intensity;
+    ambient *= attenuation;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
 
     return (ambient + diffuse + specular);
 }
-
 
 void main() {
     if (reflective != 0) {
@@ -128,13 +128,13 @@ void main() {
         return;
     }
 
+    // critical
     if (lightsCount > 0) {
         vec3 result = vec3(0);
 
         if (lightComp == 0) {
             fragColor = vec4(texture(texture1, fs_out.texCoord).rgb, 1);
         } else if (lightComp > 0 && lightComp < 3) {
-
             norm = normalize(fs_out.normal);
             viewDir = normalize(viewPos - FragPos);
 
@@ -144,22 +144,39 @@ void main() {
                 reflectDir = lightComp == 2 ? normalize(lightDir + viewDir) : reflect(-lightDir, norm);
                 spec = pow(max(lightComp == 2 ? dot(norm, reflectDir) : dot(viewDir, reflectDir), 0.0), material.shininess);
 
+                // if (lights[i].type == 0) {
+                //     result += directionalLight(lights[i]);
+                // } else if (lights[i].type == 1) {
+                //     result += pointLight(lights[i]);
+                // } else if (lights[i].type == 2) {
+                //     result += spotLight(lights[i]);
+                // }
+
                 switch (lights[i].type) {
-                    case 0: {
+                    case 0:
+                    {
                         result += directionalLight(lights[i]);
                         break;
                     }
-                    case 1: {
+                    case 1:
+                    {
                         result += pointLight(lights[i]);
                         break;
                     }
-                    case 2: {
+                    case 2:
+                    {
+                        fragColor = vec4(spotLight(lights[i]), 1);
+                        return;
                         result += spotLight(lights[i]);
                         break;
                     }
                 }
             }
-            fragColor = vec4(result * texture(texture1, fs_out.texCoord).rgb, 1);
+            if (useColor == 1) {
+                fragColor = vec4(result * fs_out.vertColor.xyz, 1);
+            } else {
+                fragColor = vec4(result * texture(texture1, fs_out.texCoord).rgb, 1);
+            }
         } else {
             // interpolative result
             fragColor = vec4(resIntShading * texture(texture1, fs_out.texCoord).rgb, 1);
@@ -168,4 +185,3 @@ void main() {
         fragColor = fs_out.vertColor;
     }
 }
-

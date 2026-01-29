@@ -20,7 +20,7 @@ const auto ed = ogl::EventManager::instance();
 const auto scene = BasicScene::instance();
 const auto sm = StateManager::instance();
 
-#ifdef WIN_32
+#ifdef _WIN32
 const auto pf = WProfiler::instance();
 #else 
 const auto pf = LinuxProfiler::instance();
