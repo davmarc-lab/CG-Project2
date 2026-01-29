@@ -78,7 +78,6 @@ GENERATED += $(OBJDIR)/FrameBuffer.o
 GENERATED += $(OBJDIR)/ImGuiFileDialog.o
 GENERATED += $(OBJDIR)/ImGuiManager.o
 GENERATED += $(OBJDIR)/InputManager.o
-GENERATED += $(OBJDIR)/JsonSerialize.o
 GENERATED += $(OBJDIR)/RenderBuffer.o
 GENERATED += $(OBJDIR)/Renderer.o
 GENERATED += $(OBJDIR)/Resource.o
@@ -104,7 +103,6 @@ OBJECTS += $(OBJDIR)/FrameBuffer.o
 OBJECTS += $(OBJDIR)/ImGuiFileDialog.o
 OBJECTS += $(OBJDIR)/ImGuiManager.o
 OBJECTS += $(OBJDIR)/InputManager.o
-OBJECTS += $(OBJDIR)/JsonSerialize.o
 OBJECTS += $(OBJDIR)/RenderBuffer.o
 OBJECTS += $(OBJDIR)/Renderer.o
 OBJECTS += $(OBJDIR)/Resource.o
@@ -160,7 +158,7 @@ ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -rf $(OBJDIR)
 else
 	$(SILENT) if exist $(subst /,\\,$(TARGET)) del $(subst /,\\,$(TARGET))
-	$(SILENT) if exist $(subst /,\\,$(GENERATED)) del /s /q $(subst /,\\,$(GENERATED))
+	$(SILENT) $(foreach f,$(subst /,\\,$(GENERATED)),if exist $(f) del /s /q $(f) >nul &)
 	$(SILENT) if exist $(subst /,\\,$(OBJDIR)) rmdir /s /q $(subst /,\\,$(OBJDIR))
 endif
 
@@ -214,9 +212,6 @@ $(OBJDIR)/ImGuiManager.o: src/Core/ImGuiManager.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/InputManager.o: src/Core/InputManager.cpp
-	@echo "$(notdir $<)"
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/JsonSerialize.o: src/Core/JsonSerialize.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Renderer.o: src/Core/Renderer.cpp
