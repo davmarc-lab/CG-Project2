@@ -72,6 +72,9 @@
     <ClInclude Include="include\MeshLoader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\State\RopeSimulationState.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AppGui.cpp">
@@ -104,7 +107,7 @@
     <ClCompile Include="src\State\NormalViewState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\State\SimulationState.cpp">
+    <ClCompile Include="src\State\RopeSimulationState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\State\State.cpp">
@@ -120,6 +123,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\MeshLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\State\SimulationState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -165,8 +165,6 @@ void main() {
                     }
                     case 2:
                     {
-                        fragColor = vec4(spotLight(lights[i]), 1);
-                        return;
                         result += spotLight(lights[i]);
                         break;
                     }

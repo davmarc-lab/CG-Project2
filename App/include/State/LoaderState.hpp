@@ -4,9 +4,6 @@
 #include "../../include/Utils.hpp"
 #include "State.hpp"
 
-const auto SAVE_SCENE = ogl::Event("Save Scene");
-const auto LOAD_SCENE = ogl::Event("Load Scene");
-
 /**
  * @brief Simple scene with mesh/scene importer.
  */

@@ -339,11 +339,11 @@ void NormalViewState::onAttach() {
 	srand(time(NULL));
 	WindowSettings settings{};
 	settings.decorated = false;
-	settings.size = {1200, 800};
+	settings.size = {1366, 768};
 	settings.position = {400, 50};
 
 #ifdef BIG
-	s.position = {10, 606};
+	settings.position = {10, 606};
 #endif // BIG
 #ifdef _WIN32
 	settings.position = {470, 50};
@@ -411,7 +411,7 @@ void NormalViewState::onAttach() {
 	systems::ecs::updateEntityName(plane, "Basic Plane");
 	scene->addEntity(lightShader, plane);
 
-	auto shape = factory::factoryPyramid(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
+	auto shape = factory::factoryThorus(BasicInfo{{1, 1, -4}, {1, 1, 1}, {}});
 	scene->addEntity(lightShader, shape);
 	systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_EMERALD));
 	em->addComponent<ColliderComponent>(shape);
@@ -437,7 +437,7 @@ void NormalViewState::onAttach() {
 	t.generateMipmap();
 
 	systems::texture::setTexture(shape, t);
-	systems::ecs::updateEntityName(shape, "Sphere");
+	systems::ecs::updateEntityName(shape, "Thorus");
 	auto sc = em->getComponentFromId<ShaderComponent>(shape);
 	sc->computation = LightComputation::PHONG;
 	sc->reflective = false;
@@ -445,7 +445,10 @@ void NormalViewState::onAttach() {
     auto tree = factory::factoryTree({{}, {1, 1, 1}, {}});
     scene->addEntity(lightShader, tree);
 
-	auto id = factory::light::factorySpot({2, 1, 1}, {1, 0, 0}, {});
+	auto spot = factory::light::factorySpot({2, 1, 1}, {1, 0, 0}, {});
+	systems::ecs::updateEntityName(spot, "Spot Light");
+	auto dir = factory::light::factoryDirectional({0, -0.5, 1});
+	systems::ecs::updateEntityName(dir, "Directional Light");
 
 	ub = CreateUnique<UniformBuffer>();
 	ub->onAttach();

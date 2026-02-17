@@ -3,18 +3,15 @@
 #include "State.hpp"
 
 #include "../PhysicWorld.hpp"
-
-const auto ADD_SPHERE = ogl::Event("Add Sphere");
-inline const ogl::Event RUN_SIMULATION = ogl::Event("Run Simulation");
-inline const ogl::Event STOP_SIMULATION = ogl::Event("Stop Simulation");
+#include "SimulationState.hpp"
 
 /**
  * @brief This State render an interactive scene with rendered meshes and lights.
  *
- * This states simulates physics and collisions between objects.
+ * This states simulates rope physics.
  * All meshes are rendered using instanced rendering.
  */
-class SimulationState : public State {
+class RopeSimulationState : public State {
 public:
 	virtual void onAttach() override;
 	virtual void onDetach() override;
@@ -29,10 +26,10 @@ public:
 	 *
 	 * @param name state name
 	 */
-	SimulationState(const std::string &name = "Simulation State") :
+	RopeSimulationState(const std::string &name = "Rope Simulation State") :
 		State(name) {}
 
-	virtual ~SimulationState() override = default;
+	virtual ~RopeSimulationState() override = default;
 
 private:
 	/// scene window

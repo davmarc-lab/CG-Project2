@@ -163,6 +163,7 @@
     <ClInclude Include="include\State\State.hpp" />
     <ClInclude Include="include\stb_image.hpp" />
     <ClInclude Include="include\Utils.hpp" />
+    <ClInclude Include="include\State\RopeSimulationState.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AppGui.cpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="src\State\LightScene.cpp" />
     <ClCompile Include="src\State\LoaderState.cpp" />
     <ClCompile Include="src\State\NormalViewState.cpp" />
+    <ClCompile Include="src\State\RopeSimulationState.cpp" />
     <ClCompile Include="src\State\SimulationState.cpp" />
     <ClCompile Include="src\State\State.cpp" />
     <ClCompile Include="src\Utils.cpp" />

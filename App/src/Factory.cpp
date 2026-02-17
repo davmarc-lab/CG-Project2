@@ -285,7 +285,7 @@ namespace factory {
 		t.onAttach();
 		t.bind();
 		int width, height, nrChannels;
-		for (size_t i = 0; i < faces.size(); i++) {
+		for (auto i = 0; i < faces.size(); i++) {
 			auto dataRead = readImageData(path + faces[i] + "." + format, width, height, nrChannels, 0);
 			if (dataRead)
 				t.fastCreateCustomTexture2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, dataRead);
@@ -515,6 +515,7 @@ namespace factory {
 	unsigned int factoryTree(const BasicInfo &info) {
 		auto id = factoryCylinder(BasicInfo{info.position + TREE_LOG_OFFSET, TREE_LOG_SCALE, {90, 0, 0}});
 		em->addComponent<ParentComponent>(id);
+		em->addComponent<ColliderComponent>(id);
 
 		TextureParams params{};
 		params.target = GL_TEXTURE_2D;
@@ -541,6 +542,7 @@ namespace factory {
 
 		auto first = factoryPyramid(BasicInfo{info.position + TREE_LEAF_OFFSET, info.scale * TREE_LEAF_SCALE, {}}, {0, 1, 0, 1});
 		em->addComponent<HideTreeComponent>(first);
+		em->addComponent<ColliderComponent>(first);
 		systems::parent::addChild(id, first);
 		flipImagesVertically(true);
 		auto ddata = readImageData("./resources/texture/leaves.png", width, height, nrChannels);
@@ -560,6 +562,7 @@ namespace factory {
 
 		auto second = factoryPyramid(BasicInfo{info.position + TREE_LEAF_OFFSET * glm::vec3{0.5}, info.scale * (TREE_LEAF_SCALE + glm::vec3{0.2}), {}}, {0, 1, 0, 1});
 		em->addComponent<HideTreeComponent>(second);
+		em->addComponent<ColliderComponent>(second);
 		systems::parent::addChild(id, second);
 		em->addComponent<TextureComponent>(second);
 		systems::texture::setTexture(second, leaves);

@@ -540,17 +540,7 @@ void ImGuiSimulationPanel::onRender() {
 }
 
 void ImGuiMeshLoader::onRender() {
-	ImGui::Begin("Loader");
-
-	if (ImGui::Button("Save")) {
-		ed->post(SAVE_SCENE);
-	};
-	ImGui::SameLine();
-	if (ImGui::Button("Load")) {
-		ed->post(LOAD_SCENE);
-	};
-
-	ImGui::End();
+	// not working in windows
 }
 
 void ImGuiFilePicker::onRender() {

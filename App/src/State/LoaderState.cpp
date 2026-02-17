@@ -34,7 +34,7 @@ void LoaderState::onAttach() {
 	srand(time(NULL));
 	ogl::WindowSettings settings{};
 	settings.decorated = false;
-	settings.size = {1000, 800};
+	settings.size = {1366, 768};
 	settings.position = {400, 50};
 	settings.bgColor = {.3, .3, .3, 1};
 
@@ -94,26 +94,15 @@ void LoaderState::onAttach() {
 
 	Shared<ShaderProgram> skyboxShader = CreateShared<ShaderProgram>("skyboxVertShader.glsl", "skyboxFragShader.glsl");
 	skyboxShader->createShaderProgram();
-	Shared<ShaderProgram> planeShader = CreateShared<ShaderProgram>("vertexShader.glsl", "basicFS.glsl");
-	planeShader->createShaderProgram();
-	Shared<ShaderProgram> lightShader = CreateShared<ShaderProgram>("lightVertShader.glsl", "lightFragShader.glsl");
-	lightShader->createShaderProgram();
 	Shared<ShaderProgram> modelShader = CreateShared<ShaderProgram>("modelVertShader.glsl", "modelFragShader.glsl");
 	modelShader->createShaderProgram();
 
-	auto skybox = factory::factorySkyBox("./resources/texture/skybox/lycksele/", "jpg");
+	auto skybox = factory::factorySkyBox("./resources/texture/skybox/sea/", "jpg");
 
-	auto plane = factory::factoryPlane({.3f, .3f, .3f, 1});
-	systems::ecs::updateEntityName(plane, "Plane");
-	scene->addEntity(planeShader, plane);
-
-	auto pyr = factory::factoryPyramid(BasicInfo{{0, 0, -6}});
-	scene->addEntity(lightShader, pyr);
-
-	// lights
-	auto dir = factory::light::factoryPoint({0, 0, 1}, {});
-	auto aaa = factory::light::factoryPoint({-3, 0, 2}, {});
-	auto bbb = factory::light::factoryPoint({0, 2, 3}, {});
+	// load backpack mesh
+	flipImagesVertically(true);
+	auto back = factory::factoryObjMesh({}, "./resources/models/backpack/backpack.obj");
+	scene->addEntity(modelShader, back);
 
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { systems::collision::updateAllColliders(); });
 
@@ -143,29 +132,6 @@ void LoaderState::onAttach() {
 	ed->subscribe(event::loop::LOOP_RENDER, [this, skybox, skyboxShader]() {
 		systems::render::renderSkybox(skybox, skyboxShader);
 		systems::render::renderAllMeshes();
-	});
-
-	auto loadDialog = CreateShared<ImGuiFilePicker>("./resources/mesh", ".json", [lightShader](auto s) { 
-        std::cout << "LOAD " << s << "\n";
-        auto newEtts = MeshLoader::instance()->loadMeshes(s);
-        for (auto e : newEtts) {
-            scene->addEntity(lightShader, e);
-        }
-    }, "Load Mesh");
-	this->m_igm->addPanel(loadDialog);
-
-	ed->subscribe(SAVE_SCENE, []() {
-		// serialize all
-		auto ser = em->getEntitiesFromComponent<LoaderComponent>();
-		MeshLoader::instance()->saveMeshes(ser);
-	});
-
-	ed->subscribe(LOAD_SCENE, [loadDialog]() {
-		loadDialog->open();
-	});
-
-	ed->subscribe(STATE_CHANGED, []() {
-		// sm->changeState(BOOTSTRAP_STATE_NAME);
 	});
 }
 void LoaderState::onDetach() {

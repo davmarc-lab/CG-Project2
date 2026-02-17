@@ -1,4 +1,4 @@
-#include "../../include/State/SimulationState.hpp"
+#include "../../include/State/RopeSimulationState.hpp"
 #include <cstdlib>
 #include <glm/gtc/type_ptr.hpp>
 #include "../../include/State/BootstrapState.hpp"
@@ -21,10 +21,10 @@ const auto sm = StateManager::instance();
 const auto SPHERE_POS = glm::vec3(1, 1, -4);
 const auto SPHERE_SIZE = glm::vec3(0.3f);
 
-std::vector<glm::mat4> sphereModels{};
-std::vector<glm::vec4> sphereColors{};
+static std::vector<glm::mat4> sphereModels{};
+static std::vector<glm::vec4> sphereColors{};
 
-void SimulationState::defaultKeyCallback() {
+void RopeSimulationState::defaultKeyCallback() {
 	this->m_window->setKeysCallback([this](GLFWwindow *, int key, int, int action, int) {
 		switch (action) {
 			case GLFW_PRESS: {
@@ -42,7 +42,7 @@ void SimulationState::defaultKeyCallback() {
 	});
 }
 
-void SimulationState::enableDefaultCameraMovement() {
+void RopeSimulationState::enableDefaultCameraMovement() {
 	ed->subscribe(event::loop::LOOP_INPUT, [this]() {
 		auto collider = em->getComponentFromId<ColliderComponent>(this->m_world.cameraId);
 		ASSERT(collider != nullptr);
@@ -111,19 +111,7 @@ void SimulationState::enableDefaultCameraMovement() {
 	});
 }
 
-float randf() {
-	return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-}
-
-glm::vec3 getRandVec3() {
-	return glm::vec3(randf(), randf(), randf());
-}
-
-glm::vec3 getPosNear(const glm::vec3 &pos) {
-	return (getRandVec3() / glm::vec3{2});
-}
-
-void SimulationState::onAttach() {
+void RopeSimulationState::onAttach() {
 	ASSERT(!this->m_attached);
 	State::onAttach();
 	srand(time(NULL));
@@ -183,7 +171,6 @@ void SimulationState::onAttach() {
 	this->m_ub = CreateUnique<UniformBuffer>();
 	this->m_ub->onAttach();
 	this->m_ub->setup(sizeof(glm::mat4), 0, 0, 0);
-	this->m_world.camera->setCameraPosition({0, .4, 11});
 	auto viewProj = this->m_world.camera->getViewProjMatrix();
 	m_ub->update(0, sizeof(glm::mat4), glm::value_ptr(viewProj));
 
@@ -210,6 +197,20 @@ void SimulationState::onAttach() {
 	// simulation panel
 	auto sp = this->m_img->addPanel<ImGuiSimulationPanel>(config);
 	this->m_img->addPanel<ImGuiEntityTree>();
+
+	auto rope = factory::factoryRope({0, 1, 0}, 1, 1, 8);
+	for (auto r : rope) {
+		sphereColors.push_back(r.first);
+		sphereModels.push_back(r.second);
+	}
+
+	for (auto e : em->getEntitiesFromComponent<RopeComponent>()) {
+		auto c = em->getComponentFromId<RopeComponent>(e);
+		for (int i = 0; i < c->points.size(); i++) {
+			if (std::find(ALL(c->fixedPoints), i) == c->fixedPoints.end())
+				this->m_pw.addEntity(c->points[i]);
+		}
+	}
 
 	ed->subscribe(RUN_SIMULATION, [this, sp]() {
 		sp->setRunning(true);
@@ -249,25 +250,9 @@ void SimulationState::onAttach() {
 	ed->subscribe(STATE_CHANGED, []() {
 		sm->changeState(BOOTSTRAP_STATE_NAME);
 	});
-
-	ed->subscribe(ADD_SPHERE, [this]() {
-		auto color = glm::vec4{getRandVec3(), 1};
-		sphereColors.push_back(color);
-		auto shape = factory::factorySphereInstanced(BasicInfo{getPosNear(SPHERE_POS), SPHERE_SIZE, {}}, color);
-		systems::collision::updateColliderType(shape, ColliderType::COLLIDER_SPHERE);
-		systems::material::updateMaterial(shape, material::getMaterialFromPool(material::MATERIAL_NONE));
-
-		auto sc = em->getComponentFromId<ShaderComponent>(shape);
-		sc->computation = LightComputation::NONE;
-		sc->reflective = false;
-		em->addComponent<PhysicComponent>(shape);
-		sphereModels.push_back(systems::transform::getModelMatrix(shape));
-
-		this->m_pw.addEntity(shape);
-	});
 }
 
-void SimulationState::onDetach() {
+void RopeSimulationState::onDetach() {
 	ASSERT(this->m_attached);
 	State::onDetach();
 	systems::ecs::cleanAll();
@@ -279,10 +264,10 @@ void SimulationState::onDetach() {
 	this->m_window->onDetach();
 }
 
-void SimulationState::onUpdate() {}
+void RopeSimulationState::onUpdate() {}
 
-void SimulationState::onRender() {}
+void RopeSimulationState::onRender() {}
 
-bool SimulationState::isCurrentStateEnd() {
+bool RopeSimulationState::isCurrentStateEnd() {
 	return glfwWindowShouldClose(this->m_window->getContext());
 }

@@ -109,7 +109,7 @@ void LightState::onAttach() {
 	em->addComponent<PBMaterial>(plane);
 	systems::ecs::updateEntityName(plane, "Plane");
 	// scene->addEntity(planeShader, plane);
-	systems::pbr::updateMaterialAlbedo(plane, {.3f, .3f, .3f});
+	systems::pbr::updateMaterial(plane, pbr::blackMetal);
 	pbscene->addEntity(plane);
 
 	// entities
@@ -119,23 +119,11 @@ void LightState::onAttach() {
 	systems::pbr::updateMaterial(sphere, pbr::redMetal);
 	pbscene->addEntity(sphere);
 
-	// {
-	// 	// Too heavy
-	// 	auto model = factory::factoryObjMesh(BasicInfo{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}}, "resources/models/machine/Machine.obj");
-	// 	scene->addEntity(modelShader, model);
-	// }
-	// {
-	// 	// Too heavy
-	// 	flipImagesVertically(true);
-	// 	auto model = factory::factoryObjMesh(BasicInfo{{0, 0, 0}, {1, 1, 1}, {0, 0, 0}}, "resources/models/backpack/backpack.obj");
-	// 	flipImagesVertically(false);
-	// 	scene->addEntity(modelShader, model);
-	// }
-
 	// lights
 	auto dir = factory::light::factoryDirectional({0, -1, 0});
+	systems::ecs::updateEntityName(dir, "Directional");
 	auto p1 = factory::light::factoryPoint({-3, 0, -2}, {});
-	// auto p2 = factory::light::factorySpot({0, 2, -3}, {0, 0, -1}, {});
+	systems::ecs::updateEntityName(p1, "Point");
 
 	ed->subscribe(event::loop::LOOP_UPDATE, []() { systems::collision::updateAllColliders(); });
 
